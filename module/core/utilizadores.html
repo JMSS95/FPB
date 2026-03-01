@@ -1,0 +1,138 @@
+<style type="text/css">
+
+	table {
+		position: relative; /* Necessário para o posicionamento relativo */
+		overflow: visible; /* Permite que o dropdown seja exibido */
+	}
+	
+	.btn-outline-secondary-transparent {
+	  color: #6c757d; /* Cor do texto */
+	  border-color: transparent; /* Borda transparente */
+	}
+	
+	.btn-outline-secondary-transparent:hover {
+	  color: #fff; /* Texto branco ao passar o mouse */
+	  background-color: #6c757d; /* Fundo cinza ao passar o mouse */
+	  border-color: transparent; /* Borda permanece transparente */
+	}
+	
+	.btn-outline-secondary-transparent:focus, 
+	.btn-outline-secondary-transparent.focus {
+	  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); /* Foco com sombra */
+	}
+	
+	.btn-outline-secondary-transparent.disabled, 
+	.btn-outline-secondary-transparent:disabled {
+	  color: #6c757d; /* Texto permanece cinza */
+	  background-color: transparent; /* Fundo transparente */
+	  border-color: transparent; /* Borda transparente */
+	}
+	
+	.btn-outline-secondary-transparent:not(:disabled):not(.disabled):active, 
+	.btn-outline-secondary-transparent:not(:disabled):not(.disabled).active,
+	.show > .btn-outline-secondary-transparent.dropdown-toggle {
+	  color: #fff; /* Texto branco ao ativar */
+	  background-color: #6c757d; /* Fundo cinza ao ativar */
+	  border-color: transparent; /* Borda permanece transparente */
+	}
+	
+	.btn-outline-secondary-transparent:not(:disabled):not(.disabled):active:focus, 
+	.btn-outline-secondary-transparent:not(:disabled):not(.disabled).active:focus,
+	.show > .btn-outline-secondary-transparent.dropdown-toggle:focus {
+	  box-shadow: 0 0 0 0.2rem rgba(108, 117, 125, 0.5); /* Sombra no foco ativo */
+	}
+	
+	
+	.hidden-dropdown {
+		display: none; /* Oculto por padrão */
+		position: absolute; /* Necessário para posicionamento dinâmico */
+		background-color: white;
+		border: 1px solid #ccc;
+		border-radius: 4px;
+		padding: 10px;
+		box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+		z-index: 1000; /* Garante que o dropdown aparece acima */
+	}
+</style>
+
+<!-- begin #content -->
+<div id="content" class="content">
+	<!-- begin breadcrumb -->
+	<!-- <ol class="breadcrumb pull-right">
+		<li class="breadcrumb-item"><a href="javascript:;">Home</a></li>
+		<li class="breadcrumb-item"><a href="javascript:;">Library</a></li>
+		<li class="breadcrumb-item active"><a href="javascript:;">Data</a></li>
+	</ol> -->
+	<!-- end breadcrumb -->
+	<!-- begin page-header -->
+	<h1 class="page-header">Utilizadores</h1>
+	<!-- end page-header -->
+	
+	<!-- begin panel -->
+	<div class="panel panel-inverse">
+   		<div class="panel-heading">
+      		<div class="panel-heading-btn" id="currentbtn">
+            </div>
+			<h4 class="panel-title">Gestão de Utilizadores</h4>
+		</div>
+		<div class="panel-body">
+			<div class="panel-heading">
+					<ul class="nav nav-tabs">
+					<li class="nav-items">
+							<a href="#tab1" id="btntab1" onclick="loadusers(1);" data-toggle="tab" class="nav-link active">
+							<span class="d-sm-none">Utilizadores</span>
+							<span class="d-sm-block d-none">Utilizadores</span>
+							</a>
+						</li>
+					<li class="nav-items">
+							<a href="#tab2" id="btntab2" onclick="loadusers(2);" data-toggle="tab" class="nav-link">
+							<span class="d-sm-none">Histórico</span>
+							<span class="d-sm-block d-none">Histórico</span>
+						</a>
+					</li>
+					</ul>
+			</div>
+			<div class="panel-body">
+				<div class="tab-content pn br-n">
+					<div id="tab1" class="tab-pane fade active show">
+							<div class="row">
+							<div class='col-md-12' id="info11">
+
+							</div>
+							<div class='col-md-12' id="info12">
+
+							</div>    
+							<div class='col-md-12 row' id="info13">
+								<div class='col-md-12 row' id='listcomp'></div>
+							</div> 
+							</div>
+					</div>
+					<div id="tab2" class="tab-pane fade">
+							<div class="row">
+							<div class='col-md-12' id="info21">
+
+							</div>
+							<div class='col-md-12' id="info22">
+
+							</div>     
+							</div>
+					</div>
+				</div>
+			</div>
+		</div>
+  	</div>
+	<!-- end panel -->
+</div>
+<!-- end #content -->
+
+<!-- begin scroll to top btn -->
+<a href="javascript:;" class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade" data-click="scroll-top"><i class="fa fa-angle-up"></i></a>
+	
+<div class="modal" id="modaluser" data-keyboard="false" data-backdrop="static"></div>
+<!-- end page container -->
+
+<script type="text/javascript">
+	$.getScript("module/core/js/utilizadores.js", function(){
+		loadusers(1);
+	});
+</script>

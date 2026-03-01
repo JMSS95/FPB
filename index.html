@@ -1,0 +1,396 @@
+<!doctype html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+  <!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8" />
+    <title id="plattitle"></title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="OK4 Modular Concept" />
+    <meta content="" name="AA" />
+    <link rel="icon" id="platicon" href="img/ok4-02.png" />
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link href="assets/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    />
+    <link
+      href="assets/plugins/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="assets/plugins/font-awesome/css/all.min.css" rel="stylesheet" />
+    <!-- 	<link href="assets/css/default/app.min.css" rel="stylesheet" />
+ -->
+    <link href="assets/plugins/animate/animate4.min.css" rel="stylesheet" />
+    <link href="assets/css/default/style.min.css" rel="stylesheet" />
+    <link href="assets/css/default/style-responsive.min.css" rel="stylesheet" />
+    <link href="assets/css/default/theme/default.css" rel="stylesheet" />
+    <link
+      href="assets/plugins/bootstrap-social/bootstrap-social.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <link rel="stylesheet" href="assets/css/default/theme/kanban.css" />
+    <!-- ================== BEGIN FLAG CSS STYLE ================== -->
+    <link href="assets/plugins/flag-icon/css/flag-icon.css" rel="stylesheet" />
+    <!-- ================== END FLAG CSS STYLE ================== -->
+
+    <!-- ================== BEGIN DATATABLES STYLE ================== -->
+    <!-- REMOVIDO: CSS DataTables 1.x substituído pelo bundle DataTables 2.x -->
+    <!-- <link href="assets/plugins/DataTables/media/css/dataTables.bootstrap.min.css" rel="stylesheet" /> -->
+    <!-- <link href="assets/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css" rel="stylesheet" /> -->
+    <!-- ================== END DATATABLES STYLE ================== -->
+    <!-- ================== BEGIN DATATABLES2 STYLE (bundle completo com Responsive) ================== -->
+    <link
+      rel="stylesheet"
+      href="assets/plugins/DataTables2/datatables.min.css"
+    />
+    <!-- ================== END DATATABLES2 STYLE ================== -->
+
+    <!-- ================== BEGIN SELECT2 STYLE ================== -->
+    <link
+      href="assets/plugins/select2/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END SELECT2 STYLE ================== -->
+
+    <!-- ================== BEGIN d3 CSS ================== -->
+    <link href="assets/plugins/nvd3/build/nv.d3.css" rel="stylesheet" />
+    <!-- ================== END d3 CSS ================== -->
+
+    <!-- ================== BEGIN BASE JS ================== -->
+
+    <script src="assets/plugins/pace/pace.min.js"></script>
+    <script src="assets/plugins/jquery/jquery-3.3.1.min.js"></script>
+    <!-- SortableJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <!-- jQuery SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
+
+    <!-- ================== BEGIN CRYPTO LEVEL JS ================== -->
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/core.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/enc-base64.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/hmac.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/sha256.js"
+    ></script>
+    <!-- ================== TAG-IT ================== -->
+    <link href="assets/plugins/tag-it/css/jquery.tagit.css" rel="stylesheet" />
+    <!-- ================== END CRYPTO LEVEL JS ================== -->
+    <script type="text/javascript" src="assets/plugins/md5.js/md5.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <script type="text/javascript">
+      var newtemporal = new Date().valueOf();
+      $.getScript("js/new_work.js?v=" + newtemporal, function () {
+        $.getScript("js/check.js?v=" + newtemporal, function () {
+          runheaders();
+        });
+      });
+    </script>
+    <!-- ================== BEGIN gritter CSS STYLE ================== -->
+    <link
+      href="assets/plugins/gritter/css/jquery.gritter.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END gritter CSS STYLE ================== -->
+
+    <!-- ================== BEGIN SELECT2 CSS STYLE ================== -->
+    <link
+      href="assets/plugins/select2/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END SELECT2 CSS STYLE ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL CSS ================== -->
+    <link
+      href="assets/plugins/jstree/dist/themes/default/style.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL CSS ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL CSS ================== -->
+    <link
+      href="assets/plugins/signature/css/signature-pad.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL CSS ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
+    <link
+      href="assets/plugins/jquery-smart-wizard/src/css/smart_wizard.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL STYLE ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
+    <link
+      href="assets/plugins/sweetalert2/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL STYLE ================== -->
+
+    <!-- ================== BEGIN PAGE FROALA STYLE ================== -->
+    <link rel="stylesheet" href="assets/plugins/froala/css/froala_editor.css" />
+    <link rel="stylesheet" href="assets/plugins/froala/css/froala_style.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/code_view.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/draggable.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/colors.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/emoticons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/image_manager.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/image.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/line_breaker.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/table.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/char_counter.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/video.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/fullscreen.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/file.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/quick_insert.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/help.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/special_characters.css"
+    />
+    <!-- ================== END PAGE FROALA STYLE ================== -->
+    <!-- ================== BEGIN FULLCALENDAR STYLE ================== -->
+    <
+    <link
+      href="https://unpkg.com/@fullcalendar/core@6.1.7/main.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END FULLCALENDAR STYLE ================== -->
+    <!-- BEGIN TOASTR.JS LIB -->
+    <link rel="stylesheet" href="assets/plugins/toastr/toastr.min.css" />
+    <script src="assets/plugins/toastr/toastr.min.js"></script>
+    <!-- END TOASTR.JS LIB -->
+    <!-- BEGIN LEAFLET MAPS -->
+    <link rel="stylesheet" href="assets/plugins/local-leaflet/leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/local-leaflet/leaflet-routing-machine.css"
+    />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-sidebar-v2/3.0.1/leaflet-sidebar.min.css" /> -->
+    <!-- <link rel="stylesheet" href="https://raw.githubusercontent.com/noerw/leaflet-sidebar-v2/refs/heads/master/css/leaflet-sidebar.min.css" /> -->
+    <!-- END LEAFLET MAPS -->
+    <!-- BEGIN GOOGLE TRANSLATOR -->
+    <script src="assets/plugins/google-translate/google-translate.js"></script>
+    <!-- END GOOGLE TRANSLATOR -->
+    <link
+      rel="stylesheet"
+      href="assets/plugins/jquery.contextMenu/css/jquery.contextMenu.css"
+    />
+    <!-- ================================================
+	check.js - Verificar Sessão Aberta
+	================================================ -->
+    <!-- <script id='checkjsscript' type="text/javascript" src="js/check.js"></script> -->
+    <!-- ================== END BASE JS ================== -->
+    <link rel="stylesheet" href="./styles.css?v=20260228h" />
+  </head>
+
+  <body id="bodysupremus">
+    <!-- begin #page-container -->
+    <div id="page-container" class="fade page-sidebar-fixed page-header-fixed">
+      <!-- begin #header -->
+      <div id="header" class="header navbar-default">
+        <!-- begin navbar-header -->
+        <div class="navbar-header">
+          <a
+            id="dashtop"
+            onclick="loadpage('module/core/php/dashboard.html', 0, 3)"
+            class="navbar-brand"
+          >
+            <img
+              src="assets/img/logo/1200x628.png"
+              style="height: 60px; vertical-align: middle"
+              alt="FPB"
+            />
+          </a>
+          <button
+            type="button"
+            class="navbar-toggle"
+            data-click="sidebar-toggled"
+          >
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
+        <!-- end navbar-header -->
+
+        <!-- begin header-nav -->
+        <ul class="navbar-nav navbar-right">
+          <li id="countingtimer_li" style="display: none; margin-right: 50px">
+            <div
+              class="alert alert-warning alert-dismissible fade show h-100 mb-0"
+              style="margin-top: 1.5px"
+            >
+              <span id="countingtimer"></span>
+            </div>
+          </li>
+          <li class="dropdown navbar-language" id="divlang"></li>
+          <li class="dropdown navbar-user">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+              <div
+                class="image image-icon bg-black text-grey-darker"
+                id="userimg2"
+              ></div>
+              <!-- Nome utilizador -->
+              <span id="useremail" class="d-none d-md-inline"></span>
+              <b class="caret"></b>
+            </a>
+            <div class="dropdown-menu dropdown-menu-right">
+              <!-- <a href="javascript:;" onclick="perfil()" class="dropdown-item" id="btneditarperfil"
+							style='display: none;'>Editar Perfil</a> -->
+              <!-- <a href="javascript:;" onclick="genqr(utilizador)" class="dropdown-item" id="btngerarqr" style='display: none;'>Gerar QR</a> -->
+              <!-- <a href="javascript:;" onclick="genMessage()" class="dropdown-item" id="btnmessage" style='display: none;'>Notificação</a> -->
+              <!-- <a href="javascript:;" onclick="prepqr()" class="dropdown-item" id="btnprepqr" style='display: none;'>QR Sample</a> -->
+              <!-- <div class="dropdown-divider" id="divdivider" style='display: none;'></div> -->
+              <a href="javascript:;" onclick="perfil()" class="dropdown-item"
+                >Perfil</a
+              >
+              <a
+                href="javascript:;"
+                onclick="logoutaction()"
+                class="dropdown-item"
+                >Log Out</a
+              >
+              <!-- <a href="javascript:;" onclick="partlogout()" class="dropdown-item">Não Mexer</a> -->
+            </div>
+          </li>
+        </ul>
+        <!-- end header navigation right -->
+      </div>
+      <!-- end #header -->
+
+      <!-- begin #sidebar -->
+      <div id="sidebar" class="sidebar">
+        <div data-scrollbar="true" data-height="100%">
+          <ul class="nav">
+            <li class="nav-profile">
+              <a href="javascript:;" data-toggle="nav-profile">
+                <div
+                  class="cover with-shadow"
+                  style="
+                    background: url(&quot;img/back.png&quot;) no-repeat;
+                    background-size: cover;
+                  "
+                ></div>
+                <div
+                  class="image image-icon bg-black text-grey-darker"
+                  id="userimg"
+                ></div>
+                <div class="info">
+                  <!-- <b class="caret pull-right"></b> -->
+
+                  <small id="username"></small>
+                </div>
+              </a>
+            </li>
+          </ul>
+          <!-- end sidebar user -->
+          <!-- begin sidebar nav -->
+          <ul id="nav-menu" class="nav"></ul>
+          <li>
+            <a
+              href="javascript:;"
+              class="sidebar-minify-btn"
+              data-click="sidebar-minify"
+              ><i class="fa fa-angle-double-left"></i
+            ></a>
+          </li>
+          <!-- end sidebar nav -->
+        </div>
+        <!-- end sidebar scrollbar -->
+      </div>
+
+      <div class="sidebar-bg"></div>
+
+      <script>
+        $(function () {
+          var url = window.location.href;
+          var temporal = new Date().valueOf();
+          var partir = url.split("index.html");
+          window.history.pushState("", "", partir[0]);
+          if (localStorage.getItem("sessionPages")) {
+            var retrievedObject = localStorage
+              .getItem("sessionPages")
+              .split(".");
+            retrievedObject = JSON.parse(getBase64Decode(retrievedObject[1]));
+            $("#footerhook").load("footer.html");
+            if (retrievedObject.link == "") {
+              $("#page").load("login.html?v=" + temporal);
+            } else {
+              $("#page").load(
+                retrievedObject.link + "?v=" + temporal,
+                function (responseTxt, statusTxt, xhr) {
+                  if (statusTxt == "success") {
+                  } else {
+                    loadpage("module/core/dashboard.html?v=" + temporal, 0, 0);
+                  }
+                },
+              );
+            }
+            if (retrievedObject.sub != 0) {
+              $("#sub" + retrievedObject.sub)
+                .addClass("expand")
+                .children(".sub-menu")
+                .show();
+            }
+            $("#menu" + retrievedObject.page).addClass("active");
+            perm = retrievedObject.perm;
+            retrievedObject = "";
+          } else {
+            window.location.assign("login.html");
+          }
+        });
+      </script>
+      <div id="page"></div>
+      <div id="footerhook"></div>
+    </div>
+  </body>
+</html>

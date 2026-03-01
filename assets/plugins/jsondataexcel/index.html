@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>jQuery JHXLSX: JavaScript/JSON Data To Excel (XLSX) Converter Demo</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="css/styles.css">
+<link href="https://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha384-tsQFqpEReu7ZLhBV2VZlAu7zcOV+rXbYlF2cqB8txI/8aZajjp4Bqd+V6D5IgvKT" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.13.4/xlsx.core.min.js"></script>
+        <script src="js/FileSaver.js"></script>
+        <script src="js/jhxlsx.js"></script>
+    </head>
+    <body>
+<div id="jquery-script-menu">
+<div class="jquery-script-center">
+<ul>
+<li><a href="https://www.jqueryscript.net/other/JavaScript-JSON-Data-Excel-XLSX.html">Download This Plugin</a></li>
+<li><a href="https://www.jqueryscript.net/">Back To jQueryScript.Net</a></li>
+</ul>
+<div class="jquery-script-ads"><script type="text/javascript"><!--
+google_ad_client = "ca-pub-2783044520727903";
+/* jQuery_demo */
+google_ad_slot = "2780937993";
+google_ad_width = 728;
+google_ad_height = 90;
+//-->
+</script>
+<script type="text/javascript"
+src="https://pagead2.googlesyndication.com/pagead/show_ads.js">
+</script></div>
+<div class="jquery-script-clear"></div>
+</div>
+</div>
+        <div class="container bg-white" style="margin-top:150px">
+            <h2 class="text-center mb-3 mt-5 bg-danger text-white p-3">jQuery JHXLSX: JavaScript/JSON Data To Excel (XLSX) Converter Demo</h2>
+            <p class="text-danger p-2 border">
+                JHXLSX is a library to download or create xlsx file using javascript. This library is fully dynamic we can merge and set styling on each cell.
+            </p>
+            <button onclick="save()" class="btn btn-info btn-block">Export xlsx Sipmle Sheet</button>
+            <button class="export-me btn btn-info btn-block" data-jsonfile="single-sheet.json">Export xlsx Single Sheet</button>
+            <button class="export-me btn btn-info btn-block" data-jsonfile="multiple-sheet.json">Export xlsx Multiple Sheet</button>
+            <button class="export-me btn btn-info btn-block" data-jsonfile="with-style.json">Export xlsx With Styles</button>
+            <button class="export-me btn btn-info btn-block" data-jsonfile="with-merge.json">Export xlsx With Merging Cell</button>
+            <button class="export-me btn btn-info btn-block" data-jsonfile="all-in-one.json">Export All In One</button>
+
+
+        </div>
+
+        <script>
+            $(function () {
+                $('.export-me').on('click', function () {
+
+                    var url = 'json/' + $(this).data('jsonfile');
+                    $.get(url, {}, function (data) {
+                        Jhxlsx.export(data.tableData, data.options);
+                    }).fail(function (jqXHR) {
+                        alert("error: " + jqXHR.status + " / " + jqXHR.statusText);
+                    });
+                });
+            });
+
+            var tableData = [
+                {
+                    "sheetName": "Sheet1",
+                    "data": [[{"text":"Name"},{"text":"Position"},{"text":"Office"},{"text":"Age"},{"text":"Start date"},{"text":"Salary"}],[{"text":"Tiger Nixon"},{"text":"System Architect"},{"text":"Edinburgh"},{"text":61},{"text":"2011/04/25"},{"text":"$320,800"}],[{"text":"Garrett Winters"},{"text":"Accountant"},{"text":"Tokyo"},{"text":63},{"text":"2011/07/25"},{"text":"$170,750"}],[{"text":"Ashton Cox"},{"text":"Junior Technical Author"},{"text":"San Francisco"},{"text":66},{"text":"2009/01/12"},{"text":"$86,000"}],[{"text":"Cedric Kelly"},{"text":"Senior Javascript Developer"},{"text":"Edinburgh"},{"text":22},{"text":"2012/03/29"},{"text":"$433,060"}],[{"text":"Airi Satou"},{"text":"Accountant"},{"text":"Tokyo"},{"text":33},{"text":"2008/11/28"},{"text":"$162,700"}],[{"text":"Brielle Williamson"},{"text":"Integration Specialist"},{"text":"New York"},{"text":61},{"text":"2012/12/02"},{"text":"$372,000"}],[{"text":"Herrod Chandler"},{"text":"Sales Assistant"},{"text":"San Francisco"},{"text":59},{"text":"2012/08/06"},{"text":"$137,500"}],[{"text":"Rhona Davidson"},{"text":"Integration Specialist"},{"text":"Tokyo"},{"text":55},{"text":"2010/10/14"},{"text":"$327,900"}]]
+                }
+            ];
+            function save() {
+                var options = {
+                    fileName: "Export xlsx Sipmle Sheet"
+                };
+                Jhxlsx.export(tableData, options);
+            }
+
+
+        </script>
+<script type="text/javascript">
+
+  var _gaq = _gaq || [];
+  _gaq.push(['_setAccount', 'UA-36251023-1']);
+  _gaq.push(['_setDomainName', 'jqueryscript.net']);
+  _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
+    </body>
+</html>

@@ -1,0 +1,63 @@
+<style>
+  .popover {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  #map {
+    width: 300px;
+    height: 300px;
+    background: gray;
+  }
+  .destinations-wrapper {
+    max-height: 200px; /* Altura suficiente para aproximadamente 10 linhas */
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+  }
+
+  .destinations-wrapper.expanded {
+    max-height: none; /* Mostra todas as linhas quando expandido */
+  }
+
+  .toggle-destinations {
+    margin-top: 10px;
+    background: none;
+    border: 1px solid #007bff;
+    color: #007bff;
+    cursor: pointer;
+    border-radius: 4px;
+    padding: 5px 10px;
+  }
+</style>
+<!-- begin #content -->
+<div id="content" class="content">
+  <!-- begin page-header -->
+  <h1 class="page-header">Tabelas Auxiliares</h1>
+  <!-- end page-header -->
+
+  <!-- begin panel -->
+  <div class="panel panel-inverse">
+    <div class="panel-heading">
+      <div class="panel-heading-btn" id="tabAuxAddBtn"></div>
+      <h4 class="panel-title" id="currenttitle">Tabelas Auxiliares</h4>
+    </div>
+    <div class="panel-body">
+      <div id="tabAuxRoot"></div>
+      <div id="tabAuxBackofficeTables"></div>
+      <div id="tabAuxMarcacaoTables" style="display: none"></div>
+    </div>
+  </div>
+  <!-- end panel -->
+</div>
+<!-- end #content -->
+
+<!-- begin scroll to top btn -->
+<a
+  href="javascript:;"
+  class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade"
+  data-click="scroll-top"
+  ><i class="fa fa-angle-up"></i
+></a>
+<!-- end page container -->
+
+<script src="module/core/js/tabelasAuxiliares.js"></script>

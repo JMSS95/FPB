@@ -1,0 +1,1286 @@
+body {
+  padding-right: 0 !important;
+}
+
+.popover {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+.fullbtn {
+  width: 100%;
+  text-align: center;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SWEETALERT v1 (bootstrap-sweetalert / oldSwal) — Premium Dashboard Theme
+   Estilo: card-accordion • sidebar dark (#111) • accent orange (#FF8800)
+   Tipografia: Open Sans • border-radius: 14px • glassmorphism overlay
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Overlay ── */
+.swal-overlay {
+  background-color: rgba(0, 0, 0, 0.6) !important;
+  backdrop-filter: blur(8px) saturate(1.2) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.2) !important;
+}
+
+/* ── Entrada / Animação do modal ── */
+@keyframes ok4SwalSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes ok4SwalSlideOut {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-18px) scale(0.97);
+  }
+}
+
+.swal-modal {
+  background: #ffffff !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.25),
+    0 6px 24px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 136, 0, 0.06) !important;
+  padding: 0 !important;
+  border: none !important;
+  font-size: 14px !important;
+  color: #111111 !important;
+  max-width: 460px !important;
+  width: 92% !important;
+  overflow: hidden !important;
+  animation: ok4SwalSlideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+/* ── Barra de destaque no topo — simula card-header do accordion ── */
+.swal-modal::before {
+  content: "" !important;
+  display: block !important;
+  height: 5px !important;
+  background: linear-gradient(
+    90deg,
+    #ff8800 0%,
+    #ffaa44 50%,
+    #ff8800 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: ok4BarShimmer 2.5s ease infinite !important;
+  border-radius: 14px 14px 0 0 !important;
+  margin-bottom: 0 !important;
+}
+@keyframes ok4BarShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+/* ── Ícone — centralizado com espaçamento generoso ── */
+.swal-modal .swal-icon {
+  margin: 30px auto 10px !important;
+  transform: scale(1.08) !important;
+}
+
+/* ── Título — estilo card-header dark text ── */
+.swal-modal .swal-title {
+  color: #111111 !important;
+  font-size: 22px !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  padding: 14px 32px 6px !important;
+  letter-spacing: -0.4px !important;
+  line-height: 1.3 !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+}
+
+/* ── Texto corpo ── */
+.swal-modal .swal-text {
+  color: #555555 !important;
+  font-size: 15px !important;
+  line-height: 1.7 !important;
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 4px 32px 0 !important;
+  margin: 0 0 10px !important;
+  box-sizing: border-box !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+}
+.swal-modal .swal-text:last-child {
+  margin-bottom: 10px !important;
+}
+
+.swal-modal .swal-content {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* ── Área de botões — card-footer style ── */
+.swal-modal .swal-footer {
+  padding: 18px 28px 22px !important;
+  margin: 18px 0 0 !important;
+  background: #f7f8fa !important;
+  text-align: center !important;
+  border-top: 1px solid #ebedf0 !important;
+  border-radius: 0 0 14px 14px !important;
+}
+
+.swal-modal .swal-button-container {
+  margin: 0 6px !important;
+  display: inline-block !important;
+}
+
+/* ── Botões base ── */
+.swal-modal .swal-button {
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 10px 30px !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+  min-width: 120px !important;
+  letter-spacing: 0.3px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+.swal-modal .swal-button::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.12) 0%,
+    transparent 60%
+  ) !important;
+  pointer-events: none !important;
+}
+.swal-modal .swal-button:active {
+  transform: scale(0.96) !important;
+}
+
+/* Confirmar — laranja dashboard */
+.swal-modal .swal-button--confirm,
+.swal-modal .swal-button--confirm.btn,
+.swal-modal .swal-button--confirm.btn.btn-success {
+  background: linear-gradient(135deg, #ff8800, #ff9a22) !important;
+  color: #ffffff !important;
+}
+.swal-modal .swal-button--confirm:hover {
+  background: linear-gradient(135deg, #e07a00, #ff8800) !important;
+  outline: none !important;
+  box-shadow: 0 6px 20px rgba(255, 136, 0, 0.4) !important;
+  transform: translateY(-1px) !important;
+}
+.swal-modal .swal-button--confirm:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(255, 136, 0, 0.2) !important;
+}
+
+/* Cancelar — cinza neutro */
+.swal-modal .swal-button--cancel,
+.swal-modal .swal-button--cancel.btn,
+.swal-modal .swal-button--cancel.btn.btn-danger,
+.swal-modal .swal-button--cancel.btn.btn-secondary,
+.swal-modal .swal-button.btn-secondary {
+  background: linear-gradient(135deg, #e0e2e6, #ced0d4) !important;
+  color: #333333 !important;
+}
+.swal-modal .swal-button--cancel:hover,
+.swal-modal .swal-button.btn-secondary:hover {
+  background: linear-gradient(135deg, #d0d2d6, #c0c2c6) !important;
+  color: #111111 !important;
+  outline: none !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  transform: translateY(-1px) !important;
+}
+.swal-modal .swal-button--cancel:focus,
+.swal-modal .swal-button.btn-secondary:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Danger */
+.swal-modal .swal-button--danger {
+  background: linear-gradient(135deg, #e74c3c, #f06050) !important;
+  color: #ffffff !important;
+}
+.swal-modal .swal-button--danger:hover {
+  background: linear-gradient(135deg, #c0392b, #e74c3c) !important;
+  outline: none !important;
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+.swal-modal .swal-button--danger:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.18) !important;
+}
+
+.swal-modal .swal-button:focus {
+  outline: none !important;
+}
+.swal-modal .swal-button:disabled {
+  opacity: 0.45 !important;
+  transform: none !important;
+  cursor: not-allowed !important;
+}
+
+/* Botões tipo btn-info, btn-warning, btn-success btn-lg — modLogout / modLogin */
+.swal-modal .swal-button.btn-info {
+  background: linear-gradient(135deg, #2196f3, #42a5f5) !important;
+  color: #ffffff !important;
+}
+.swal-modal .swal-button.btn-info:hover {
+  background: linear-gradient(135deg, #1976d2, #2196f3) !important;
+  box-shadow: 0 6px 20px rgba(33, 150, 243, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+.swal-modal .swal-button.btn-warning {
+  background: linear-gradient(135deg, #ff9800, #ffb74d) !important;
+  color: #ffffff !important;
+}
+.swal-modal .swal-button.btn-warning:hover {
+  background: linear-gradient(135deg, #f57c00, #ff9800) !important;
+  box-shadow: 0 6px 20px rgba(255, 152, 0, 0.35) !important;
+  transform: translateY(-1px) !important;
+}
+/* .btn-success e .btn-danger já cobertos por --confirm e --danger acima */
+.swal-modal .swal-button.btn-lg {
+  padding: 12px 24px !important;
+  font-size: 14px !important;
+  min-width: 140px !important;
+  border-radius: 10px !important;
+}
+.swal-modal .swal-button.fullbtn {
+  width: 100% !important;
+  margin-bottom: 8px !important;
+}
+
+/* ── Ícones SweetAlert v1 — com glow e cores contextuais ── */
+
+/* Success — verde-esmeralda com glow */
+.swal-modal .swal-icon--success {
+  border-color: #27ae60 !important;
+  animation: ok4IconPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+.swal-modal .swal-icon--success__ring {
+  border-color: rgba(39, 174, 96, 0.2) !important;
+}
+.swal-modal .swal-icon--success__hide-corners {
+  background: #ffffff !important;
+}
+.swal-modal .swal-icon--success__line--long,
+.swal-modal .swal-icon--success__line--tip {
+  background-color: #27ae60 !important;
+}
+/* glow pulse atrás do ícone success */
+.swal-modal .swal-icon--success::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -8px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(
+    circle,
+    rgba(39, 174, 96, 0.12) 0%,
+    transparent 70%
+  ) !important;
+  animation: ok4GlowPulse 2s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Error — vermelho com glow */
+.swal-modal .swal-icon--error {
+  border-color: #e74c3c !important;
+  animation: ok4IconPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+.swal-modal .swal-icon--error .swal-icon--error__line {
+  background-color: #e74c3c !important;
+}
+.swal-modal .swal-icon--error::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -8px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(
+    circle,
+    rgba(231, 76, 60, 0.12) 0%,
+    transparent 70%
+  ) !important;
+  animation: ok4GlowPulse 2s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Warning — laranja puro */
+.swal-modal .swal-icon--warning {
+  border-color: #ff8800 !important;
+  animation: ok4IconPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+.swal-modal .swal-icon--warning .swal-icon--warning__body,
+.swal-modal .swal-icon--warning .swal-icon--warning__dot {
+  background-color: #ff8800 !important;
+}
+.swal-modal .swal-icon--warning::after {
+  content: "" !important;
+  position: absolute !important;
+  inset: -8px !important;
+  border-radius: 50% !important;
+  background: radial-gradient(
+    circle,
+    rgba(255, 136, 0, 0.12) 0%,
+    transparent 70%
+  ) !important;
+  animation: ok4GlowPulse 2s ease-in-out infinite !important;
+  pointer-events: none !important;
+  z-index: -1 !important;
+}
+
+/* Info — azul */
+.swal-modal .swal-icon--info {
+  border-color: #2196f3 !important;
+  color: #2196f3 !important;
+  animation: ok4IconPop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+.swal-modal .swal-icon--info::before,
+.swal-modal .swal-icon--info::after {
+  background-color: #2196f3 !important;
+}
+
+@keyframes ok4IconPop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+@keyframes ok4GlowPulse {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SWEETALERT v1 — Loading Modal (redesign completo)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.swal-modal--loading {
+  max-width: 380px !important;
+  background: #ffffff !important;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.22),
+    0 6px 24px rgba(0, 0, 0, 0.12),
+    0 0 0 1px rgba(255, 136, 0, 0.06) !important;
+}
+
+/* Barra topo animada — shimmer contínuo */
+.swal-modal--loading::before {
+  height: 5px !important;
+  background: linear-gradient(
+    90deg,
+    #ff8800 0%,
+    #ffcc66 25%,
+    #ff8800 50%,
+    #ffcc66 75%,
+    #ff8800 100%
+  ) !important;
+  background-size: 200% 100% !important;
+  animation: ok4LoadingBar 1.5s linear infinite !important;
+}
+@keyframes ok4LoadingBar {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+.swal-modal--loading .swal-title {
+  font-size: 21px !important;
+  color: #111111 !important;
+  font-weight: 700 !important;
+  padding: 28px 32px 8px !important;
+  letter-spacing: -0.3px !important;
+  line-height: 1.3 !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+}
+
+.swal-modal--loading .swal-text {
+  color: #555555 !important;
+  font-size: 15px !important;
+  line-height: 1.65 !important;
+  padding: 4px 32px 0 !important;
+  letter-spacing: 0 !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+}
+
+.swal-modal--loading .swal-content {
+  padding: 0 !important;
+}
+
+.swal-modal--loading .swal-footer {
+  display: none !important;
+}
+
+/* ── Spinner container ── */
+.swal-loading-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 28px 0 32px;
+  gap: 0;
+}
+
+/* ── Orbit spinner principal ── */
+.swal-loading-spinner {
+  position: relative;
+  width: 64px;
+  height: 64px;
+}
+
+/* Anel exterior — rotação horária */
+.swal-loading-spinner::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-top-color: #ff8800;
+  border-right-color: rgba(255, 136, 0, 0.3);
+  animation: ok4SpinOuter 1s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+
+/* Anel interior — rotação anti-horária */
+.swal-loading-spinner::after {
+  content: "";
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 3px solid transparent;
+  border-bottom-color: #ffaa44;
+  border-left-color: rgba(255, 170, 68, 0.3);
+  animation: ok4SpinInner 0.8s cubic-bezier(0.6, 0, 0.4, 1) infinite;
+}
+
+/* Ponto central pulsante */
+.swal-loading-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px 0 0 -4px;
+  background: #ff8800;
+  border-radius: 50%;
+  animation: ok4DotPulse 1.2s ease-in-out infinite;
+  box-shadow: 0 0 12px rgba(255, 136, 0, 0.5);
+}
+
+@keyframes ok4SpinOuter {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+@keyframes ok4SpinInner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(-360deg);
+  }
+}
+@keyframes ok4DotPulse {
+  0%,
+  100% {
+    transform: scale(0.8);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
+
+/* ── Barra de progresso indeterminada abaixo do spinner ── */
+.swal-loading-progress {
+  width: 120px;
+  height: 3px;
+  background: rgba(255, 136, 0, 0.15);
+  border-radius: 4px;
+  margin-top: 20px;
+  overflow: hidden;
+  position: relative;
+}
+.swal-loading-progress::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -40%;
+  width: 40%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #ff8800, transparent);
+  border-radius: 4px;
+  animation: ok4ProgressSlide 1.4s ease-in-out infinite;
+}
+@keyframes ok4ProgressSlide {
+  0% {
+    left: -40%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* ── Texto animado com dots ── */
+.swal-loading-dots {
+  margin-top: 14px;
+  color: #666666;
+  font-size: 11.5px;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0.5px;
+}
+.swal-loading-dots::after {
+  content: "";
+  animation: ok4LoadDots 1.5s steps(4, end) infinite;
+}
+@keyframes ok4LoadDots {
+  0% {
+    content: "";
+  }
+  25% {
+    content: ".";
+  }
+  50% {
+    content: "..";
+  }
+  75% {
+    content: "...";
+  }
+  100% {
+    content: "";
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   SWEETALERT v2 — Premium Dashboard Theme
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Popup base */
+.swal2-popup {
+  background: #ffffff !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 24px 80px rgba(0, 0, 0, 0.22),
+    0 6px 24px rgba(0, 0, 0, 0.12) !important;
+  border: none !important;
+  margin: -8px;
+  font-size: 0.9em;
+  animation: ok4SwalSlideUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards !important;
+}
+
+/* Título e texto */
+.swal2-title {
+  color: #111111 !important;
+  font-weight: 700 !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+  font-size: 20px !important;
+  letter-spacing: -0.3px !important;
+}
+
+.swal2-html-container {
+  color: #444444 !important;
+  text-align: start;
+  overflow-x: hidden;
+  min-height: 75vh;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+}
+
+.swal2-footer {
+  justify-content: end !important;
+  border-top: 1px solid #ebedf0 !important;
+  background: #f7f8fa !important;
+  border-radius: 0 0 14px 14px !important;
+}
+
+/* ── Ícones Swal2 — cores contextuais com glow ── */
+.swal2-icon.swal2-success {
+  border-color: #27ae60 !important;
+  color: #27ae60 !important;
+}
+.swal2-icon.swal2-success [class^="swal2-success-line"] {
+  background-color: #27ae60 !important;
+}
+.swal2-icon.swal2-success .swal2-success-ring {
+  border-color: rgba(39, 174, 96, 0.25) !important;
+}
+.swal2-icon.swal2-success .swal2-success-fix {
+  background-color: #ffffff !important;
+}
+
+.swal2-icon.swal2-error {
+  border-color: #e74c3c !important;
+  color: #e74c3c !important;
+}
+.swal2-icon.swal2-error [class^="swal2-x-mark-line"] {
+  background-color: #e74c3c !important;
+}
+
+.swal2-icon.swal2-warning {
+  border-color: #ff8800 !important;
+  color: #ff8800 !important;
+}
+
+.swal2-icon.swal2-info {
+  border-color: #2196f3 !important;
+  color: #2196f3 !important;
+}
+
+.swal2-icon.swal2-question {
+  border-color: #ff8800 !important;
+  color: #ff8800 !important;
+}
+
+/* Botão Confirmar */
+.swal2-confirm {
+  background: linear-gradient(135deg, #ff8800, #ff9a22) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding: 10px 28px !important;
+}
+.swal2-confirm:hover {
+  background: linear-gradient(135deg, #e07a00, #ff8800) !important;
+  box-shadow: 0 6px 20px rgba(255, 136, 0, 0.4) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+.swal2-confirm:focus {
+  box-shadow: 0 0 0 3px rgba(255, 136, 0, 0.2) !important;
+  outline: none !important;
+}
+
+/* Botão Cancelar */
+.swal2-cancel {
+  background: linear-gradient(135deg, #6c757d, #7c8590) !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 8px !important;
+  font-weight: 600 !important;
+  box-shadow: none !important;
+  font-family:
+    "Open Sans",
+    -apple-system,
+    sans-serif !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  padding: 10px 28px !important;
+}
+.swal2-cancel:hover {
+  background: linear-gradient(135deg, #545b62, #6c757d) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transform: translateY(-1px) !important;
+  outline: none !important;
+}
+.swal2-cancel:focus {
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.08) !important;
+  outline: none !important;
+}
+
+/* Loader SweetAlert v2 */
+.swal2-loader {
+  border-color: #ff8800 transparent #ff8800 transparent !important;
+}
+
+.swal2-container {
+  z-index: 10000 !important;
+}
+
+.pace-progress,
+.pace:before {
+  top: 0;
+}
+
+.pace .pace-activity {
+  top: 10px;
+}
+
+.sidebar .nav_ok4 {
+  display: block;
+}
+
+.nav_ok4 {
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  padding-left: 0;
+  margin-bottom: 0;
+  list-style: none;
+}
+
+dl,
+ol,
+ul {
+  margin-top: 0;
+}
+
+.sidebar .nav_ok4 > li {
+  position: relative;
+}
+
+.sidebar .nav_ok4 > li > a {
+  padding: 7px 20px;
+  line-height: 20px;
+  color: #a8acb1;
+  display: block;
+  text-decoration: none;
+}
+
+.sidebar .nav_ok4 > li > a i {
+  float: left;
+  margin-right: 10px;
+  width: 14px;
+  text-align: center;
+  line-height: 20px;
+  font-size: 14px;
+}
+
+.nav_ok4 .active a {
+  color: white !important;
+}
+
+/* ── FPB Sidebar Theme ─────────────────────────────────── */
+.sidebar,
+.sidebar-bg {
+  background: #111111 !important;
+}
+
+.sidebar .nav > li > a,
+.sidebar .nav_ok4 > li > a {
+  color: #cccccc !important;
+}
+
+.sidebar .nav > li > a i,
+.sidebar .nav_ok4 > li > a i {
+  color: #ff8800 !important;
+}
+
+.sidebar .nav > li > a:hover,
+.sidebar .nav > li > a:focus,
+.sidebar .nav_ok4 > li > a:hover,
+.sidebar .nav_ok4 > li > a:focus {
+  color: #ffffff !important;
+  background: rgba(255, 136, 0, 0.12) !important;
+}
+
+.sidebar .nav > li > a:hover i,
+.sidebar .nav > li > a:focus i,
+.sidebar .nav_ok4 > li > a:hover i,
+.sidebar .nav_ok4 > li > a:focus i {
+  color: #ff8800 !important;
+}
+
+.sidebar .nav > li.active > a,
+.sidebar .nav > li.active > a:hover,
+.sidebar .nav > li.active > a:focus {
+  color: #ffffff !important;
+  background: rgba(255, 136, 0, 0.2) !important;
+}
+
+.sidebar .nav > li.active > a i {
+  color: #ff8800 !important;
+}
+
+.sidebar .nav > li.nav-header {
+  color: #666666 !important;
+}
+
+.sidebar .sub-menu {
+  background: #0a0a0a !important;
+}
+
+/* =====================================================
+   GLOBAL DATATABLE LIGHT-GRAY THEME (desktop + table mode)
+   ===================================================== */
+table.dataTable:not(.dt-card-table) tbody tr {
+  background: #f2f3f5;
+}
+
+table.dataTable:not(.dt-card-table) tbody tr:nth-child(even) {
+  background: #eceef2;
+}
+
+table.dataTable:not(.dt-card-table) tbody td {
+  background: transparent;
+  color: #222222;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+table.dataTable:not(.dt-card-table) tbody tr:hover {
+  background: #e4e8ee;
+}
+
+@media (min-width: 1139px) {
+  table.dataTable tbody td .dt-card-label,
+  table.dataTable tbody td .dt-card-label-icon,
+  table.dataTable tbody td .dt-card-label-text {
+    display: none !important;
+  }
+
+  table.dataTable tbody td .dt-card-value {
+    margin-left: 0 !important;
+    text-align: inherit !important;
+  }
+}
+
+/* =====================================================
+   GLOBAL DATATABLE CARD MODE (mobile/tablet)
+   Applied to tables initialized by createDataTable() via .dt-card-table
+   ===================================================== */
+@media (max-width: 1138px) {
+  .table-responsive {
+    overflow: visible;
+  }
+
+  table.dataTable.dt-card-table > thead {
+    display: none;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr {
+    display: block;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255, 136, 0, 0.35);
+    border-radius: 8px;
+    background: #ffffff;
+    padding: 10px 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  table.dataTable.dt-card-table > tbody > tr:hover {
+    background: #fff8f0;
+    border-color: rgba(255, 136, 0, 0.55);
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-top: none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.16);
+    white-space: normal !important;
+    word-break: break-word;
+    background: transparent !important;
+    color: #222222;
+    font-size: 0.85rem;
+    text-align: right !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td:last-child {
+    border-bottom: none;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #ff8800;
+    text-transform: uppercase;
+    font-size: 0.76rem;
+    letter-spacing: 0.25px;
+    margin-right: 10px;
+    min-width: 80px;
+    flex-shrink: 0;
+    text-align: left !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-labeled-cell::before {
+    content: none !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin-right: 10px;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ff8800;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    line-height: 1;
+    overflow: hidden;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon i,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .fa,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .fas,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .far,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .fab {
+    font-size: 10px !important;
+    line-height: 1 !important;
+    display: block;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon svg {
+    width: 10px;
+    height: 10px;
+    display: block;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-text {
+    color: #111111;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.76rem;
+    letter-spacing: 0.25px;
+    white-space: nowrap;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-value {
+    margin-left: auto;
+    min-width: 0;
+    text-align: right;
+    color: #222222;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td:not([data-label])::before {
+    content: none;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Ações"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Acoes"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Download"] {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    padding-top: 10px;
+    padding-bottom: 4px;
+    text-align: center !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell::before,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Ações"]::before,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Acoes"]::before,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td[data-label="Download"]::before {
+    content: none;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell .btn,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Ações"] .btn,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Acoes"] .btn,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Download"] .btn,
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell .btn-xs,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Ações"] .btn-xs,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Acoes"] .btn-xs,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td[data-label="Download"]
+    .btn-xs {
+    min-width: 58px !important;
+    min-height: 30px !important;
+    padding: 0 14px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-numeric-cell,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Qtd"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Quantidade"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Preço"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Receita"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Total"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Tamanho"] {
+    white-space: nowrap !important;
+  }
+
+  table.dataTable.dt-card-table,
+  table.dataTable.dt-card-table > tbody {
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .dataTables_wrapper .dataTables_length,
+  .dataTables_wrapper .dataTables_filter,
+  .dataTables_wrapper .dataTables_info {
+    color: #d0d0d0;
+    font-size: 0.82rem;
+  }
+
+  .dataTables_wrapper .dataTables_filter input,
+  .dataTables_wrapper .dataTables_length select {
+    background: #0d0d0d;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #e8eaed;
+    border-radius: 5px;
+    padding: 4px 8px;
+  }
+
+  .dataTables_wrapper .dataTables_paginate .paginate_button {
+    color: #cccccc !important;
+    border-color: rgba(255, 255, 255, 0.15) !important;
+    background: transparent !important;
+  }
+
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+  .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+    color: #ffffff !important;
+    border-color: #ff8800 !important;
+    background: #ff8800 !important;
+  }
+}
+
+.sidebar .sub-menu > li > a {
+  color: #bbbbbb !important;
+}
+
+.sidebar .sub-menu > li > a:hover,
+.sidebar .sub-menu > li > a:focus {
+  color: #ffffff !important;
+}
+
+.sidebar .sub-menu > li > a i {
+  color: #ff8800 !important;
+}
+
+/* sub-menu active dot: was #00acac (teal) */
+.sidebar .sub-menu > li.active:after {
+  border-color: #ff8800 !important;
+}
+
+/* sub-menu connector lines & dots background */
+.sidebar .sub-menu > li:after {
+  background: #111111 !important;
+}
+.sidebar .sub-menu > li:before,
+.sidebar .sub-menu > li > a:after,
+.sidebar .sub-menu > li.has-sub > a:before {
+  background: #333333 !important;
+}
+
+/* sub-menu active link text */
+.sidebar .sub-menu > li.active > a,
+.sidebar .sub-menu > li.active > a:hover,
+.sidebar .sub-menu > li.active > a:focus {
+  color: #ff8800 !important;
+}
+
+/* nav-profile area (user block at top of sidebar) — fully black, no hover */
+.sidebar .nav > li.nav-profile {
+  background: #111111 !important;
+}
+.sidebar .nav > li.nav-profile .cover {
+  background: none !important;
+  display: none !important;
+}
+.sidebar .nav > li.nav-profile .cover.with-shadow:before {
+  background: transparent !important;
+  display: none !important;
+}
+.sidebar .nav > li.nav-profile > a,
+.sidebar .nav > li.nav-profile a {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+.sidebar .nav > li.nav-profile > a:hover,
+.sidebar .nav > li.nav-profile > a:focus {
+  background: transparent !important;
+}
+
+/* active link background: was #242a31 */
+.sidebar .nav > li.active > a,
+.sidebar .nav > li.active > a:hover,
+.sidebar .nav > li.active > a:focus {
+  background: #1a1a1a !important;
+  border-left: 3px solid #ff8800 !important;
+}
+
+/* sidebar grid border lines */
+.sidebar.sidebar-grid .nav > li > a {
+  border-color: #222222 !important;
+}
+
+/* float sub-menu (collapsed sidebar popout) */
+.float-sub-menu,
+.float-sub-menu-container {
+  background: #111111 !important;
+}
+.float-sub-menu li > a {
+  color: #cccccc !important;
+}
+.float-sub-menu li > a:hover,
+.float-sub-menu li > a:focus,
+.float-sub-menu li.active > a {
+  color: #ffffff !important;
+  background: rgba(255, 136, 0, 0.12) !important;
+}
+.float-sub-menu li > a i {
+  color: #ff8800 !important;
+}
+
+/* ── FPB Header: taller bar so logo has room ──────────── */
+.header.navbar-default {
+  height: 66px !important;
+  min-height: 66px !important;
+}
+.page-header-fixed .content-wrap,
+.page-header-fixed #content {
+  padding-top: 66px !important;
+}
+.sidebar {
+  padding-top: 66px !important;
+}
+.page-header-fixed #header {
+  height: 66px !important;
+}
+
+/* navbar-brand: bigger logo */
+.header .navbar-brand {
+  padding: 3px 20px !important;
+  height: 66px !important;
+  line-height: 60px !important;
+  overflow: visible !important;
+}
+.header .navbar-brand img {
+  max-height: 60px !important;
+  height: 60px !important;
+  width: auto !important;
+}
+
+@media (max-width: 767.98px) {
+  .swal2-html-container {
+    min-height: auto;
+    max-height: 60vh;
+    overflow-y: auto;
+  }
+
+  .header.navbar-default,
+  .page-header-fixed #header {
+    height: 56px !important;
+    min-height: 56px !important;
+  }
+
+  .page-header-fixed .content-wrap,
+  .page-header-fixed #content,
+  .sidebar {
+    padding-top: 56px !important;
+  }
+
+  .header .navbar-brand {
+    height: 56px !important;
+    line-height: 50px !important;
+    padding: 3px 12px !important;
+  }
+
+  .header .navbar-brand img {
+    max-height: 46px !important;
+    height: 46px !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .header.navbar-default,
+  .page-header-fixed #header {
+    height: 62px !important;
+    min-height: 62px !important;
+  }
+
+  .page-header-fixed .content-wrap,
+  .page-header-fixed #content,
+  .sidebar {
+    padding-top: 62px !important;
+  }
+
+  .swal2-html-container {
+    min-height: auto;
+    max-height: 65vh;
+    overflow-y: auto;
+  }
+}

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+<!--<![endif]-->
+<head>
+	<meta charset="utf-8" />
+	<title id='plattitle'></title>
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<meta content="" name="OK4 Modular Concept" />
+	<meta content="" name="AA" />
+	<link rel="icon" id='platicon' href="">
+	<!-- ================== BEGIN BASE CSS STYLE ================== -->
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
+	<link href="assets/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+	<link href="assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+	<link href="assets/plugins/font-awesome/css/all.min.css" rel="stylesheet" />
+	<link href="assets/plugins/animate/animate.min.css" rel="stylesheet" />
+	<link href="assets/css/default/style.min.css" rel="stylesheet" />
+	<link href="assets/css/default/style-responsive.min.css" rel="stylesheet" />
+	<link href="assets/css/default/theme/default.css" rel="stylesheet" id="theme" />
+	<!-- ================== END BASE CSS STYLE ================== -->
+
+	<!-- ================== BEGIN BASE JS ================== -->
+	<script src="assets/plugins/jquery/jquery-3.3.1.min.js"></script>
+	<!-- ================== BEGIN CRYPTO LEVEL JS ================== -->
+	<script type="text/javascript" src="assets/plugins/cryptojs/core.js"></script>
+	<script type="text/javascript" src="assets/plugins/cryptojs/enc-base64.js"></script>
+	<script type="text/javascript" src="assets/plugins/cryptojs/hmac.js"></script>
+	<script type="text/javascript" src="assets/plugins/cryptojs/sha256.js"></script>
+	<!-- ================== END CRYPTO LEVEL JS ================== -->
+	<script type="text/javascript" src="js/main.js?v=1"></script>
+	<!-- ================================================
+	md5.js - md5 pass
+	================================================ -->
+	<script type="text/javascript" src="assets/plugins/md5.js/md5.min.js"></script>
+	<!-- ================== END BASE JS ================== -->
+	<link href="styles.css?v=20260228h" rel="stylesheet" />
+</head>
+<body class="pace-top bg-white">
+	<!-- begin #page-loader -->
+	<!-- <div id="page-loader" class="fade show"><span class="spinner"></span></div> -->
+	<!-- end #page-loader -->
+
+	<!-- begin #page-container -->
+	<div id="page-container" class="fade">
+		<!-- begin login -->
+		<div class="login login-with-news-feed">
+			<!-- begin news-feed -->
+			<div class="news-feed">
+				<button type='button' id='btnhidden' style='visibility:hidden'>&nbsp;</button>
+				<div class="news-image" style="background-image: url(assets/img/login-bg/fpb.jpg)"></div>
+				<div class="news-caption">
+					<!-- <h4 class="caption-title"><b>{OK4</b> - <span id="sideemp"></span> <b>} <sup>&reg;</sup></b></h4> -->
+				</div>
+			</div>
+			<!-- end news-feed -->
+			<!-- begin right-content -->
+			<div class="right-content">
+				<!-- begin login-header -->
+				<div class="login-header" style="width: 100%;">
+					<div class="brand">
+						<center><img src="assets/img/logo/1200x628.png" alt="Logo" style="max-width: 100%; height: auto;" /></center>
+					</div>
+				</div>
+				<!-- end login-header -->
+				<!-- begin login-content -->
+
+					<div class="login-content" id="mainform2" style='display:none;'>
+						<center>
+                            <!-- <p style='text-align:justify;'>O Navegador Web que está a utilizar não é o adequado para a navegação na plataforma. Por favor, instale ou utilize o <b>Google Chrome</b>. Obrigado.</p> -->
+                            <p style='text-align:justify;'>Plataforma em manutenção, por favor, tente mais tarde.</p>
+                    	</center>
+
+					</div>
+					<div class="login-content" id="mainform">
+						<div class="form-group m-b-15">
+							<input id="user" type="text" class="form-control form-control-lg" placeholder="Endereço Email" required />
+						</div>
+						<div class="form-group m-b-15">
+							<input id="pass" type="password" class="form-control form-control-lg" placeholder="Password" required />
+						</div>
+						<!-- <div class="checkbox checkbox-css m-b-30">
+							<input type="checkbox" id="remember_me_checkbox" value="" />
+							<label for="remember_me_checkbox">
+							Remember Me
+							</label>
+						</div> -->
+						<div class="login-buttons">
+							<button onclick="login()" class="btn btn-block btn-lg" style="background-color: #FF6600; color: #ffffff;">Entrar</button>
+						</div>
+						<!-- <div class="m-t-20 m-b-40 p-b-40 text-inverse">
+						Not a member yet? Click <a href="register_v3.html" class="text-success">here</a> to register.
+						</div> -->
+					</div>
+
+				</div>
+				<!-- end login-content -->
+			</div>
+			<!-- end right-container -->
+		</div>
+		<!-- end login -->
+	</div>
+	<!-- end page container -->
+
+	<!-- ================== BEGIN BASE JS ================== -->
+	<!-- <script src="assets/plugins/jquery/jquery-3.3.1.min.js"></script> -->
+	<script src="assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+	<script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+	<!--[if lt IE 9]>
+		<script src="../assets/crossbrowserjs/html5shiv.js"></script>
+		<script src="../assets/crossbrowserjs/respond.min.js"></script>
+		<script src="../assets/crossbrowserjs/excanvas.min.js"></script>
+	<![endif]-->
+	<script src="assets/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+	<script src="assets/plugins/js-cookie/js.cookie.js"></script>
+	<script src="assets/js/theme/default.min.js"></script>
+	<script src="assets/js/apps.min.js"></script>
+	<!-- ================== END BASE JS ================== -->
+
+	<!-- ================== BEGIN sweetalert JS ================== -->
+	<script src="assets/plugins/bootstrap-sweetalert/sweetalert.min.js"></script>
+	<!-- ================== END sweetalert JS ================== -->
+	<script>
+		// Renomear o swal da versão antiga para evitar conflito
+		const oldSwal = swal;
+	</script>
+
+	<script type="text/javascript" src="assets/plugins/jquery-browser-plugin/jquery.browser.min.js"></script>
+
+	<script>
+		var currentyear = new Date().getFullYear();
+		$("#currentyear").html(currentyear);
+		$(document).ready(function() {
+			localStorage.clear();
+            $.browser.device = (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase()));
+			if($.browser.chrome || $.browser.device === true) {
+   				$("#mainform").show("slow");
+   				$("#mainform2").hide("slow");
+   				// var checkStatus;
+
+				// var element = new Image();
+				// // var element = document.createElement('any');
+				// Object.defineProperty(element, 'id', {
+				//   get:function() {
+				//     checkStatus='on';
+				//     throw	new Error("This is a hack to check If chrome Devtools is open. Pay no attention.............................................................................................................");
+				//   }
+				// });
+
+				// setInterval(function() {
+				//     checkStatus = 'off';
+				//     console.dir(element);
+				//     if(checkStatus == 'off'){
+				//     	//$("#modalalert").modal("hide");
+				//     }else{
+				//     	window.open("https://www.alentapp.pt","_self");
+				//     }
+				//    // document.querySelector('#devtool-status').innerHTML = checkStatus;
+				// }, 1000);
+			} else if ($.browser.mozilla) {
+				$("#mainform").show("slow");
+   				$("#mainform2").hide("slow");
+   				setInterval(function() {
+					var minimalUserResponseInMiliseconds = 100; var before = new Date().getTime(); debugger; var after = new Date().getTime(); if (after - before > minimalUserResponseInMiliseconds) { window.open("https://www.alentapp.pt","_self"); }
+			    }, 1000);
+   				/*$("#mainform").hide("slow");
+   				$("#mainform2").show("slow");*/
+			} else if ($.browser.msie) {
+   				$("#mainform").hide("slow");
+   				$("#mainform2").show("slow");
+			}else{
+				$("#mainform").show("slow");
+   				$("#mainform2").hide("slow");
+			}
+			App.init();
+		});
+	</script>
+	<script type="text/javascript">
+		var newtemporal = new Date().valueOf();
+		$.getScript("js/new_work.js?v="+newtemporal, function(){
+		});
+		$.getScript("js/check.js?v="+newtemporal, function(){
+			runheaders();
+		});
+	</script>
+</body>
+</html>

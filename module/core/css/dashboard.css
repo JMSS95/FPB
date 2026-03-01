@@ -1,0 +1,2820 @@
+/* =====================================================
+   DASHBOARD.CSS — FPB Dark Dashboard Theme (Optimized)
+   =====================================================
+   Selector shorthands used via :is():
+   ALL_TABLES      – every dashboard DataTable
+   ALL_WRAPPERS    – their DataTables wrapper divs
+   EDITABLE_TABLES – tables with bulk-select / CRUD
+   EDITABLE_WRAPS  – wrappers for the above
+   ALL_MODALS      – every dashboard edit modal
+   ===================================================== */
+
+/* === Panel base ======================================= */
+.dashboard-stats-panel .panel-heading,
+.dashboard-stats-chart-panel .panel-heading,
+.dashboard-stats-table-panel .panel-heading {
+  padding: 10px 15px;
+}
+
+.dashboard-stats-panel .panel-heading {
+  background-color: #111111 !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.dashboard-stats-panel,
+.dashboard-stats-chart-panel,
+.dashboard-stats-table-panel {
+  border: 1px solid rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.dashboard-stats-panel .panel-title,
+.dashboard-stats-chart-panel .panel-title,
+.dashboard-stats-table-panel .panel-title {
+  font-weight: 600;
+  letter-spacing: 0.2px;
+}
+
+/* === KPI styles ======================================= */
+.dashboard-stats-panel .panel-body {
+  min-height: 98px;
+  display: flex;
+  align-items: center;
+  padding: 16px;
+  background: linear-gradient(145deg, #111111 0%, #1a1a1a 100%);
+}
+
+.dashboard-stats-panel .panel-body h3 {
+  font-size: 1.55rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dashboard-kpi-title-icon {
+  display: inline-flex;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  font-size: 0.75rem;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background-color: rgba(255, 255, 255, 0.08);
+}
+
+.dashboard-kpi-title-icon.dashboard-kpi-tone-success,
+.dashboard-kpi-title-icon.dashboard-kpi-tone-primary,
+.dashboard-kpi-title-icon.dashboard-kpi-tone-danger,
+.dashboard-kpi-title-icon.dashboard-kpi-tone-warning {
+  color: #ff8800;
+}
+
+.dashboard-kpi-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.dashboard-kpi-value-wrap {
+  order: 2;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin-left: clamp(24px, 3.6vw, 52px);
+}
+
+.dashboard-kpi-value {
+  line-height: 1.2;
+  word-break: normal;
+  white-space: nowrap;
+  text-align: left;
+  color: #ffffff;
+}
+
+.dashboard-kpi-icon {
+  order: 1;
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  margin-left: 0;
+  border: 1px solid #ff8800;
+  background-color: #ff8800;
+  color: #ffffff;
+}
+
+/* KPI alignment override (high specificity) */
+.dashboard-stats-panel .dashboard-kpi-content {
+  justify-content: flex-start !important;
+}
+
+.dashboard-stats-panel .dashboard-kpi-icon {
+  order: 1 !important;
+  margin-left: 0 !important;
+  flex: 0 0 44px !important;
+}
+
+.dashboard-stats-panel .dashboard-kpi-value-wrap {
+  order: 2 !important;
+  flex: 1 1 auto !important;
+  margin-left: auto !important;
+  margin-right: clamp(8px, 1.5vw, 20px) !important;
+}
+
+.dashboard-stats-panel .dashboard-kpi-value {
+  white-space: nowrap !important;
+  text-align: right !important;
+}
+
+/* === Chart / table panel body ========================= */
+.dashboard-stats-chart-panel .panel-body {
+  min-height: 340px;
+  background-color: #ffffff;
+}
+
+#dashboardMonthlyChart,
+#dashboardCategoryChart,
+#dashboardChannelChart {
+  width: 100%;
+  min-height: 280px;
+}
+
+.dashboard-stats-table-panel .panel-body {
+  min-height: 340px;
+  background-color: #ffffff;
+}
+
+.dashboard-stats-table-panel .table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+/* === Table wrapper / width ============================= */
+:is(
+  #dashboardTopProductsTable_wrapper,
+  #dashboardCitiesTable_wrapper,
+  #dashboardCsvTable_wrapper,
+  #dashboardVendasTable_wrapper,
+  #dashboardProdutosTable_wrapper,
+  #dashboardCategoriasTable_wrapper,
+  #dashboardCidadesTable_wrapper
+) {
+  width: 100%;
+}
+
+:is(
+    #dashboardTopProductsTable_wrapper,
+    #dashboardCitiesTable_wrapper,
+    #dashboardCsvTable_wrapper,
+    #dashboardVendasTable_wrapper,
+    #dashboardProdutosTable_wrapper,
+    #dashboardCategoriasTable_wrapper,
+    #dashboardCidadesTable_wrapper
+  )
+  table.dataTable {
+  width: 100% !important;
+}
+
+#dashboardTopProductsTable_wrapper,
+#dashboardCitiesTable_wrapper {
+  margin-top: 0.25rem;
+}
+
+/* === Thead dark theme ================================== */
+:is(
+    #dashboardTopProductsTable,
+    #dashboardCitiesTable,
+    #dashboardCsvTable,
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable
+  )
+  thead
+  th {
+  background: #111111 !important;
+  color: #ffffff !important;
+  border-bottom: 2px solid #ff8800 !important;
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  font-weight: 600;
+  white-space: nowrap;
+  word-break: normal;
+  letter-spacing: 0.1px;
+}
+
+/* === Tbody td base ===================================== */
+:is(
+    #dashboardTopProductsTable,
+    #dashboardCitiesTable,
+    #dashboardCsvTable,
+    #dashboardCsvPreviewTable,
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable
+  )
+  tbody
+  td {
+  white-space: nowrap;
+  word-break: normal;
+  vertical-align: middle;
+  font-family: inherit;
+  font-weight: 500;
+  color: #000000 !important;
+  font-size: 0.96rem;
+  line-height: 1.35;
+}
+
+/* === Thead last-child border + icon colour ============== */
+:is(
+    #dashboardTopProductsTable,
+    #dashboardCitiesTable,
+    #dashboardCsvTable,
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable
+  )
+  thead
+  th:last-child {
+  border-right: 0;
+}
+
+:is(
+    #dashboardTopProductsTable,
+    #dashboardCitiesTable,
+    #dashboardCsvTable,
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable
+  )
+  thead
+  th
+  i {
+  color: #ffa860;
+}
+
+/* =====================================================
+   DESKTOP — row striping, card-label hiding, edit btn
+   ===================================================== */
+@media (min-width: 1139px) {
+  :is(
+      #dashboardTopProductsTable,
+      #dashboardCitiesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable,
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable
+    )
+    tbody
+    tr {
+    background: #f2f3f5;
+  }
+
+  :is(
+      #dashboardTopProductsTable,
+      #dashboardCitiesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable,
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable
+    )
+    tbody
+    tr:nth-child(even) {
+    background: #eceef2;
+  }
+
+  :is(
+      #dashboardTopProductsTable,
+      #dashboardCitiesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable,
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable
+    )
+    tbody
+    tr:hover {
+    background: #e4e8ee;
+  }
+
+  /* Hide card labels on desktop */
+  .dashboard-stats-table-panel table.dataTable > tbody > tr > td .dt-card-label,
+  .dashboard-stats-table-panel
+    table.dataTable
+    > tbody
+    > tr
+    > td
+    .dt-card-label-icon,
+  .dashboard-stats-table-panel
+    table.dataTable
+    > tbody
+    > tr
+    > td
+    .dt-card-label-text,
+  #dashboardCsvPreviewTable > tbody > tr > td .dt-card-label,
+  #dashboardCsvPreviewTable > tbody > tr > td .dt-card-label-icon,
+  #dashboardCsvPreviewTable > tbody > tr > td .dt-card-label-text {
+    display: none !important;
+  }
+
+  .dashboard-stats-table-panel table.dataTable > tbody > tr > td .dt-card-value,
+  #dashboardCsvPreviewTable > tbody > tr > td .dt-card-value {
+    margin-left: 0 !important;
+    text-align: inherit !important;
+  }
+
+  /* Desktop edit button sizing */
+  .dashboard-row-edit-btn {
+    width: auto;
+    min-width: 120px;
+    height: 38px;
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    box-sizing: border-box;
+    border-radius: 6px;
+    margin: 0 auto;
+  }
+}
+
+/* =====================================================
+   CARD-TABLE CLASS-BASED RULES (outside @media).
+   These guarantee card layout whenever JS adds the
+   dt-card-table class, even if window.innerWidth and
+   CSS viewport disagree by a few pixels (scrollbar).
+   ===================================================== */
+table.dataTable.dt-card-table {
+  display: block !important;
+  width: 100% !important;
+  table-layout: fixed !important;
+}
+
+table.dataTable.dt-card-table > tbody {
+  display: block !important;
+  width: 100% !important;
+}
+
+table.dataTable.dt-card-table > thead {
+  display: none !important;
+}
+
+table.dataTable.dt-card-table > tbody > tr {
+  display: block !important;
+}
+
+table.dataTable.dt-card-table > tbody > tr > td {
+  display: flex !important;
+}
+
+/* Editable-table thead override: show as absolute for bulk-select. */
+:is(
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable,
+    #dashboardCsvTable,
+    #dashboardCsvPreviewTable
+  ).dt-card-table
+  > thead {
+  display: block !important;
+  position: absolute !important;
+}
+
+/* DT2 layout fix — always when card class is present */
+.dt-card-table ~ .dt-layout-row.dt-layout-table,
+.table-responsive:has(.dt-card-table) .dt-layout-row.dt-layout-table {
+  display: block !important;
+}
+
+.dt-card-table ~ .dt-layout-row.dt-layout-table > .dt-layout-cell,
+.table-responsive:has(.dt-card-table)
+  .dt-layout-row.dt-layout-table
+  > .dt-layout-cell {
+  display: block !important;
+  width: 100% !important;
+}
+
+/* Overflow fix when card mode active */
+.table-responsive:has(.dt-card-table) {
+  overflow: visible !important;
+}
+
+/* =====================================================
+   CARD LAYOUT — Dashboard tables on mobile / tablet
+   Below 1138px each table row becomes a card with
+   labelled fields. Pure CSS handles the transformation.
+   ===================================================== */
+@media (max-width: 1138px) {
+  /* ── Editable-table wrappers: position context for thead ── */
+  :is(
+    #dashboardTopProductsTable_wrapper,
+    #dashboardCitiesTable_wrapper,
+    #dashboardVendasTable_wrapper,
+    #dashboardProdutosTable_wrapper,
+    #dashboardCategoriasTable_wrapper,
+    #dashboardCidadesTable_wrapper,
+    #dashboardCsvTable_wrapper,
+    #dashboardCsvPreviewTable_wrapper
+  ) {
+    position: relative !important;
+  }
+
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    .dataTables_filter,
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    .dt-search {
+    margin-left: auto !important;
+    text-align: right !important;
+    float: right !important;
+  }
+
+  /* ── Editable-table thead: absolute bulk select-all ── */
+  :is(
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable,
+    #dashboardCsvTable,
+    #dashboardCsvPreviewTable
+  ) {
+    position: relative !important;
+  }
+
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead {
+    display: block !important;
+    position: absolute !important;
+    top: -42px !important;
+    left: 0 !important;
+    width: auto !important;
+    z-index: 4 !important;
+  }
+
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead
+    > tr {
+    display: flex !important;
+    align-items: center !important;
+    padding: 4px 0 !important;
+    margin-bottom: 6px !important;
+  }
+
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead
+    > tr
+    > th {
+    display: none !important;
+  }
+
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead
+    > tr
+    > th.dashboard-bulk-select-col {
+    display: inline-flex !important;
+    align-items: center !important;
+    width: auto !important;
+    min-width: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    padding: 4px 4px 4px 0 !important;
+  }
+
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead
+    > tr
+    > th.dashboard-bulk-select-col
+    .dashboard-bulk-select-label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    margin: 0 !important;
+    font-size: 0.68rem !important;
+  }
+
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead
+    > tr
+    > th.dashboard-bulk-select-col
+    .dashboard-bulk-select-text {
+    display: inline-flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    text-align: center !important;
+    line-height: 1.05 !important;
+    color: #555555 !important;
+    font-size: 0.74rem !important;
+  }
+
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead
+    > tr
+    > th.dashboard-bulk-select-col
+    .dashboard-bulk-select-count {
+    display: block !important;
+  }
+
+  /* ── Card rows (single universal rule set for all dt-card-table tables) ── */
+  table.dataTable.dt-card-table > tbody > tr {
+    display: block !important;
+    position: relative;
+    margin-bottom: 10px;
+    border: 1px solid rgba(0, 0, 0, 0.2) !important;
+    border-radius: 8px;
+    border-color: rgba(0, 0, 0, 0.2) !important;
+    background: #f2f3f5 !important;
+    padding: 10px 14px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+    transition:
+      background 0.15s ease,
+      border-color 0.15s ease,
+      box-shadow 0.15s ease;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr:hover {
+    background: #e9ebef !important;
+    border-color: rgba(0, 0, 0, 0.18) !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr.dashboard-card-selected {
+    background: #fff2e6 !important;
+    border-color: #ff8800 !important;
+    box-shadow: 0 2px 10px rgba(255, 136, 0, 0.32) !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr.dashboard-card-selected > td {
+    border-bottom-color: rgba(255, 136, 0, 0.25) !important;
+  }
+
+  /* ── Each cell = flex row  label : value ── */
+  table.dataTable.dt-card-table > tbody > tr > td {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-top: none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.24);
+    white-space: normal !important;
+    word-break: break-word;
+    background: transparent !important;
+    color: #222222 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    font-size: 0.85rem;
+    text-align: right !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td:last-child {
+    border-bottom: none;
+  }
+
+  /* ── Checkbox cell — inline flow above card fields ── */
+  table.dataTable.dt-card-table > tbody > tr > td.dashboard-bulk-select-col,
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-select-cell {
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    padding: 0 0 8px 0 !important;
+    margin-bottom: 2px !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.24) !important;
+    display: flex !important;
+    justify-content: flex-start !important;
+    align-items: center !important;
+    gap: 0 !important;
+    background: transparent !important;
+    z-index: auto !important;
+  }
+
+  /* Hide pseudo-element / card-label in checkbox cell */
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dashboard-bulk-select-col::before,
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-select-cell::before {
+    display: none !important;
+    content: none !important;
+  }
+
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dashboard-bulk-select-col
+    .dt-card-label,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-select-cell
+    .dt-card-label {
+    display: none !important;
+  }
+
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-select-cell
+    .dt-card-select-box {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+  }
+
+  /* Larger touch-friendly checkbox */
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dashboard-bulk-select-col
+    .dashboard-bulk-row-select,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-select-cell
+    .dashboard-bulk-row-select,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dashboard-bulk-select-col
+    .dashboard-csv-preview-row-select,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-select-cell
+    .dashboard-csv-preview-row-select {
+    -webkit-appearance: none !important;
+    appearance: none !important;
+    width: 22px;
+    height: 22px;
+    border-radius: 50% !important;
+    border: 2px solid #8d95a3 !important;
+    background: #ffffff !important;
+    cursor: pointer;
+  }
+
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dashboard-bulk-select-col
+    .dashboard-bulk-row-select:checked,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-select-cell
+    .dashboard-bulk-row-select:checked,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dashboard-bulk-select-col
+    .dashboard-csv-preview-row-select:checked,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-select-cell
+    .dashboard-csv-preview-row-select:checked {
+    background: #ff8800 !important;
+    border-color: #ff8800 !important;
+    box-shadow: inset 0 0 0 4px #ffffff;
+  }
+
+  /* ── data-label pseudo-element (fallback before JS processes) ── */
+  table.dataTable.dt-card-table > tbody > tr > td[data-label]::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #ff8800;
+    font-size: 0.78rem;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+    margin-right: 12px;
+    min-width: 80px;
+    text-align: left !important;
+  }
+
+  /* Suppress pseudo when JS-injected labels are present */
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-labeled-cell::before {
+    content: none !important;
+  }
+
+  /* ── Card label (icon + text) ── */
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    margin-right: 10px;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #ff8800;
+    color: #ffffff;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.68rem;
+    line-height: 1;
+    overflow: hidden;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon i,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .fa,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .fas,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .far,
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon .fab {
+    font-size: 10px !important;
+    line-height: 1 !important;
+    display: block;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-icon svg {
+    width: 10px;
+    height: 10px;
+    display: block;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-label-text {
+    color: #111111;
+    text-transform: uppercase;
+    font-weight: 700;
+    font-size: 0.76rem;
+    letter-spacing: 0.25px;
+    white-space: nowrap;
+    display: inline !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* ── Card value ── */
+  table.dataTable.dt-card-table > tbody > tr > td .dt-card-value {
+    margin-left: auto;
+    min-width: 0;
+    text-align: right;
+    color: #222222;
+    display: inline-flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+
+  /* Cells without labels */
+  table.dataTable.dt-card-table > tbody > tr > td:not([data-label])::before {
+    content: none;
+  }
+
+  /* ── Action / Download cells — centred buttons, no label ── */
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Ações"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Acoes"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Download"] {
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 6px;
+    padding-top: 12px !important;
+    padding-bottom: 6px !important;
+    margin-top: 4px;
+    border-bottom: none !important;
+    text-align: center !important;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell::before,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Ações"]::before,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Acoes"]::before,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td[data-label="Download"]::before {
+    content: none;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell .btn,
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-actions-cell .btn-xs {
+    min-width: 58px !important;
+    min-height: 30px !important;
+    padding: 0 14px !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+  }
+
+  /* Edit / Download button larger sizing */
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-actions-cell
+    .dashboard-row-edit-btn,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-actions-cell
+    .dashboard-row-download-btn,
+  table.dataTable.dt-card-table
+    > tbody
+    > tr
+    > td.dt-card-actions-cell
+    .btn.btn-primary {
+    min-width: 120px !important;
+    min-height: 38px !important;
+    height: 38px !important;
+    padding: 0 12px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    line-height: 1 !important;
+    font-size: 0.84rem !important;
+    border-radius: 6px !important;
+    margin: 0 auto !important;
+  }
+
+  /* ── Numeric cells — keep nowrap ── */
+  table.dataTable.dt-card-table > tbody > tr > td.dt-card-numeric-cell,
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Qtd"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Quantidade"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Preço"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Receita"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Total"],
+  table.dataTable.dt-card-table > tbody > tr > td[data-label="Tamanho"] {
+    white-space: nowrap !important;
+  }
+
+  /* DT "no records" row */
+  table.dataTable.dt-card-table > tbody > tr > td.dt-empty,
+  table.dataTable.dt-card-table > tbody > tr > td.dataTables_empty {
+    display: block;
+    text-align: center;
+    padding: 20px 10px;
+    color: #999;
+  }
+
+  table.dataTable.dt-card-table > tbody > tr > td.dt-empty::before,
+  table.dataTable.dt-card-table > tbody > tr > td.dataTables_empty::before {
+    content: none;
+  }
+
+  /* Full width + white container bg */
+  .dashboard-stats-table-panel table.dataTable,
+  #dashboardCsvPreviewTable {
+    width: 100% !important;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .dashboard-stats-table-panel .panel-body,
+  #dashboardCsvPreviewPage {
+    background: #ffffff;
+  }
+
+  /* DT controls light theme in card mode */
+  .dashboard-stats-table-panel .dt-length,
+  .dashboard-stats-table-panel .dt-search,
+  .dashboard-stats-table-panel .dt-info,
+  #dashboardCsvPreviewPage .dt-length,
+  #dashboardCsvPreviewPage .dt-search,
+  #dashboardCsvPreviewPage .dt-info {
+    color: #333;
+    font-size: 0.82rem;
+  }
+
+  .dashboard-stats-table-panel .dt-search input,
+  .dashboard-stats-table-panel .dt-length select,
+  #dashboardCsvPreviewPage .dt-search input,
+  #dashboardCsvPreviewPage .dt-length select {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.18);
+    color: #111111;
+    border-radius: 5px;
+    padding: 4px 8px;
+  }
+
+  .dashboard-stats-table-panel .dt-paging .dt-paging-button,
+  #dashboardCsvPreviewPage .dt-paging .dt-paging-button {
+    color: #333 !important;
+    background: transparent !important;
+    border-color: rgba(0, 0, 0, 0.18) !important;
+  }
+
+  .dashboard-stats-table-panel .dt-paging .dt-paging-button.current,
+  #dashboardCsvPreviewPage .dt-paging .dt-paging-button.current {
+    color: #111 !important;
+    background: #e6e8ec !important;
+    border-color: rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .dashboard-stats-table-panel .dt-paging .dt-paging-button:hover,
+  #dashboardCsvPreviewPage .dt-paging .dt-paging-button:hover {
+    color: #111 !important;
+    background: #eef0f3 !important;
+    border-color: rgba(0, 0, 0, 0.25) !important;
+  }
+
+  /* ── Filter row full-width on mobile ── */
+  .dashboard-filters-panel .dashboard-filters-row > [class*="col-"] {
+    flex: 0 0 100% !important;
+    max-width: 100% !important;
+  }
+}
+
+/* =====================================================
+   BUTTON BASE STYLES
+   ===================================================== */
+.dashboard-stats-table-panel .btn-xs,
+:is(
+    #dashboardCsvTable,
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable
+  )
+  .btn-xs {
+  min-width: 28px;
+  min-height: 28px;
+  padding: 0 7px;
+  font-size: 0.78rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 5px;
+}
+
+.dashboard-table-add-btn,
+.dashboard-table-delete-btn,
+.dashboard-modal-action-btn {
+  width: 170px;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  border-radius: 6px;
+}
+
+/* === Bulk select base ================================== */
+.dashboard-bulk-select-col {
+  width: 88px;
+  min-width: 88px;
+}
+
+.dashboard-bulk-select-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  gap: 6px;
+  color: #e8eaed;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.dashboard-bulk-select-text {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  line-height: 1.05;
+  color: #ffa860;
+}
+
+.dashboard-bulk-select-main {
+  display: block;
+}
+
+.dashboard-bulk-select-count {
+  display: block;
+  font-size: 0.66rem;
+  margin-top: 1px;
+  width: 100%;
+  text-align: center;
+}
+
+.dashboard-bulk-select-all,
+.dashboard-bulk-row-select {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #8d95a3;
+  background: #ffffff;
+  cursor: pointer;
+  transition: none;
+}
+
+.dashboard-bulk-select-all:checked:not(:indeterminate),
+.dashboard-bulk-row-select:checked {
+  background: #ff8800;
+  border-color: #ff8800;
+  box-shadow: inset 0 0 0 3px #ffffff;
+}
+
+.dashboard-bulk-select-all:indeterminate {
+  background: #ffffff;
+  border-color: #ff8800;
+  background-image: linear-gradient(#ff8800, #ff8800);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 10px 2px;
+  box-shadow: none;
+}
+
+.dashboard-bulk-select-all:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+.dashboard-bulk-row-select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(255, 136, 0, 0.25);
+}
+
+/* === Bulk delete button ================================ */
+.dashboard-bulk-delete-btn,
+#dashboardCsvPreviewDeleteSelectedBtn,
+#dashboardCsvPreviewDeleteSelectedBtnBottom,
+.dashboard-csv-preview-bottom-delete {
+  background: linear-gradient(135deg, #b3261e 0%, #8f1d18 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25) !important;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+
+.dashboard-bulk-delete-btn:hover:not(:disabled),
+#dashboardCsvPreviewDeleteSelectedBtn:hover:not(:disabled),
+#dashboardCsvPreviewDeleteSelectedBtnBottom:hover:not(:disabled),
+.dashboard-csv-preview-bottom-delete:hover:not(:disabled),
+.dashboard-bulk-delete-btn:focus:not(:disabled),
+#dashboardCsvPreviewDeleteSelectedBtn:focus:not(:disabled),
+#dashboardCsvPreviewDeleteSelectedBtnBottom:focus:not(:disabled),
+.dashboard-csv-preview-bottom-delete:focus:not(:disabled) {
+  background: linear-gradient(135deg, #d0382c 0%, #a92b22 100%) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 12px rgba(179, 38, 30, 0.35) !important;
+}
+
+.dashboard-bulk-delete-btn:disabled,
+#dashboardCsvPreviewDeleteSelectedBtn:disabled,
+#dashboardCsvPreviewDeleteSelectedBtnBottom:disabled,
+.dashboard-csv-preview-bottom-delete:disabled {
+  background: linear-gradient(135deg, #9d4f49 0%, #7f3f3a 100%) !important;
+  color: rgba(255, 255, 255, 0.82) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+/* === Secondary action button =========================== */
+.dashboard-modal-action-btn-secondary,
+#dashrows
+  .btn-secondary:not(.dashboard-bulk-delete-btn):not(
+    .dashboard-csv-preview-bottom-delete
+  ) {
+  background: linear-gradient(135deg, #6b7280 0%, #5a606c 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+.dashboard-modal-action-btn-secondary:hover:not(:disabled),
+.dashboard-modal-action-btn-secondary:focus:not(:disabled),
+#dashrows
+  .btn-secondary:not(.dashboard-bulk-delete-btn):not(
+    .dashboard-csv-preview-bottom-delete
+  ):hover:not(:disabled),
+#dashrows
+  .btn-secondary:not(.dashboard-bulk-delete-btn):not(
+    .dashboard-csv-preview-bottom-delete
+  ):focus:not(:disabled) {
+  background: linear-gradient(135deg, #7b8390 0%, #676f7c 100%) !important;
+  border-color: rgba(255, 255, 255, 0.55) !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.25) !important;
+}
+
+.dashboard-modal-action-btn-secondary:disabled,
+#dashrows
+  .btn-secondary:not(.dashboard-bulk-delete-btn):not(
+    .dashboard-csv-preview-bottom-delete
+  ):disabled {
+  background: linear-gradient(135deg, #8c929d 0%, #7a818e 100%) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: rgba(255, 255, 255, 0.88) !important;
+  box-shadow: none !important;
+  cursor: not-allowed;
+}
+
+/* === Success action button ============================= */
+.dashboard-modal-action-btn-success {
+  background: linear-gradient(135deg, #ff8800 0%, #cc6e00 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  font-weight: 700;
+  border-radius: 6px;
+  box-shadow: 0 3px 10px rgba(255, 136, 0, 0.3);
+}
+
+.dashboard-modal-action-btn-success:hover:not(:disabled),
+.dashboard-modal-action-btn-success:focus:not(:disabled) {
+  background: linear-gradient(135deg, #ff9a28 0%, #d97800 100%) !important;
+  box-shadow: 0 4px 14px rgba(255, 136, 0, 0.45);
+  color: #ffffff !important;
+}
+
+/* === CSV Preview delete positioning ==================== */
+#dashboardCsvPreviewTopDeleteWrap {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+
+#dashboardCsvPreviewTopDeleteWrap .dashboard-modal-action-btn {
+  margin-right: 0 !important;
+}
+
+.dashboard-csv-preview-bottom-delete {
+  display: none !important;
+}
+
+/* =====================================================
+   FILTER PANEL
+   ===================================================== */
+.dashboard-filters-panel {
+  background: linear-gradient(135deg, #0e0e0e 0%, #1a1a1a 100%);
+  border: 1px solid rgba(255, 136, 0, 0.25);
+  border-radius: 8px;
+  margin-bottom: 18px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.18);
+}
+
+.dashboard-filters-header {
+  background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%);
+  border-bottom: 1px solid rgba(255, 136, 0, 0.25);
+  padding: 9px 16px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.25px;
+  text-transform: uppercase;
+}
+
+.dashboard-filters-header i {
+  color: #ff8800;
+}
+
+.dashboard-filters-body {
+  padding: 16px 16px 8px;
+}
+
+.dashboard-filter-label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.dashboard-filter-label i {
+  color: #ff8800;
+  font-size: 0.75rem;
+  width: 14px;
+  text-align: center;
+}
+
+.dashboard-filter-control {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 136, 0, 0.35) !important;
+  border-radius: 5px;
+  color: #e8eaed !important;
+  font-size: 0.875rem;
+  padding: 7px 10px;
+  transition:
+    border-color 0.18s,
+    background 0.18s;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 38px;
+}
+
+.dashboard-filter-control:focus {
+  outline: none;
+  border-color: rgba(255, 136, 0, 0.7) !important;
+  background: rgba(255, 136, 0, 0.08) !important;
+  box-shadow: 0 0 0 3px rgba(255, 136, 0, 0.12);
+}
+
+.dashboard-filter-control option {
+  background: #1a1a1a;
+  color: #e8eaed;
+}
+
+/* Date input calendar icon (webkit) */
+.dashboard-filter-control::-webkit-calendar-picker-indicator {
+  filter: invert(0.7) sepia(1) saturate(3) hue-rotate(0deg);
+  cursor: pointer;
+}
+
+/* === Filter panel — Select2 ============================ */
+.dashboard-filters-panel .select2-container {
+  width: 100% !important;
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-selection--multiple {
+  min-height: 38px;
+  background: rgba(255, 255, 255, 0.06) !important;
+  border: 1px solid rgba(255, 136, 0, 0.35) !important;
+  border-radius: 5px;
+  color: #e8eaed !important;
+  padding: 3px 8px 2px;
+}
+
+.dashboard-filters-panel
+  .select2-container--default.select2-container--focus
+  .select2-selection--multiple {
+  border-color: rgba(255, 136, 0, 0.7) !important;
+  background: rgba(255, 136, 0, 0.08) !important;
+  box-shadow: 0 0 0 3px rgba(255, 136, 0, 0.12);
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-selection--multiple
+  .select2-selection__rendered {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-selection--multiple
+  .select2-selection__choice {
+  margin: 0;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 136, 0, 0.28);
+  color: #e8eaed;
+  border-radius: 4px;
+  padding: 1px 6px;
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-selection--multiple
+  .select2-selection__choice__remove {
+  color: #ffb35c;
+  margin-right: 4px;
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-selection--multiple
+  .select2-search__field {
+  color: #ffffff !important;
+  margin-top: 0;
+  width: 100% !important;
+  min-width: 100% !important;
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-selection--multiple
+  .select2-search--inline {
+  width: 100%;
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-selection--multiple
+  .select2-search__field::placeholder {
+  color: #ffffff;
+  opacity: 1;
+}
+
+.dashboard-filters-panel .select2-dropdown {
+  background: #1a1a1a;
+  border: 1px solid rgba(255, 136, 0, 0.35);
+}
+
+.dashboard-filters-panel .select2-container--default .select2-results__option {
+  color: #e8eaed;
+}
+
+.dashboard-filters-panel
+  .select2-container--default
+  .select2-results__option--highlighted[aria-selected] {
+  background: rgba(255, 136, 0, 0.2);
+  color: #ffffff;
+}
+
+/* === Filter actions ==================================== */
+.dashboard-filters-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 4px;
+  padding-bottom: 10px;
+  flex-wrap: wrap;
+}
+
+.dashboard-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 5px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  min-height: 32px;
+  padding: 4px 10px;
+  cursor: pointer;
+  letter-spacing: 0.1px;
+  transition:
+    background 0.18s,
+    box-shadow 0.18s,
+    transform 0.12s;
+}
+
+.dashboard-filter-btn:active {
+  transform: translateY(1px);
+}
+
+.dashboard-filter-btn-apply {
+  background: linear-gradient(135deg, #ff8800 0%, #cc6e00 100%);
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(255, 136, 0, 0.35);
+}
+
+.dashboard-filter-btn-apply:hover {
+  background: linear-gradient(135deg, #ff9a28 0%, #d97800 100%);
+  box-shadow: 0 3px 12px rgba(255, 136, 0, 0.5);
+  color: #fff;
+}
+
+.dashboard-filter-btn-clear {
+  background: linear-gradient(135deg, #4a5568 0%, #374151 100%);
+  color: #e8eaed;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.dashboard-filter-btn-clear:hover {
+  background: linear-gradient(135deg, #5a6578 0%, #475161 100%);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.28);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
+}
+
+.dashboard-filter-btn-pdf {
+  background: #ffffff;
+  color: #111111;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.dashboard-filter-btn-pdf:hover {
+  background: #f0f0f0;
+  color: #000000;
+  border-color: rgba(0, 0, 0, 0.25);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+}
+
+/* =====================================================
+   UPLOAD ZONE
+   ===================================================== */
+.dashboard-upload-zone {
+  background: linear-gradient(135deg, #111111 0%, #1a1a1a 55%, #141414 100%);
+  border: 2px dashed rgba(255, 136, 0, 0.4);
+  border-radius: 10px;
+  padding: 38px 28px 32px;
+  text-align: center;
+  transition:
+    border-color 0.22s,
+    background 0.22s;
+  margin-bottom: 18px;
+}
+
+.dashboard-upload-zone:hover {
+  border-color: rgba(255, 136, 0, 0.78);
+}
+
+.dashboard-upload-zone-noperm {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  cursor: not-allowed;
+}
+
+.dashboard-upload-zone-noperm .dashboard-upload-icon-wrap {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.dashboard-upload-zone-noperm .dashboard-upload-main-text {
+  color: rgba(232, 234, 237, 0.5);
+}
+
+.dashboard-upload-icon-wrap {
+  font-size: 3rem;
+  color: #ff8800;
+  margin-bottom: 10px;
+  line-height: 1;
+}
+
+.dashboard-upload-main-text {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: #e8eaed;
+  margin-bottom: 4px;
+}
+
+.dashboard-upload-sub-text {
+  display: block;
+  font-size: 0.82rem;
+  color: rgba(232, 234, 237, 0.55);
+  margin-bottom: 22px;
+}
+
+.dashboard-upload-sub-text strong {
+  color: rgba(232, 234, 237, 0.78);
+  font-weight: 600;
+}
+
+.dashboard-upload-file-input {
+  display: none;
+}
+
+.dashboard-upload-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.dashboard-upload-file-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  padding: 0;
+}
+
+.btn-upload-choose {
+  background: #ffffff;
+  border: 1px solid #cccccc;
+  color: #111111;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0 20px;
+  border-radius: 6px;
+  height: 42px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background 0.18s,
+    color 0.18s,
+    border-color 0.18s,
+    box-shadow 0.18s;
+  margin-bottom: 0;
+  user-select: none;
+  letter-spacing: 0.1px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+
+.btn-upload-choose:hover {
+  background: #f0f0f0;
+  color: #000000;
+  border-color: #999999;
+  box-shadow: none;
+}
+
+.dashboard-upload-filename {
+  font-size: 0.82rem;
+  color: #e8eaed;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
+  font-weight: 500;
+}
+
+.dashboard-upload-filename:empty {
+  display: none;
+}
+
+.dashboard-upload-btn {
+  background: linear-gradient(135deg, #ff8800 0%, #cc6e00 100%);
+  border: none;
+  color: #ffffff;
+  font-weight: 600;
+  padding: 0 30px;
+  border-radius: 6px;
+  font-size: 0.95rem;
+  height: 42px;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  letter-spacing: 0.2px;
+  box-shadow: 0 3px 10px rgba(255, 136, 0, 0.32);
+  transition:
+    background 0.2s,
+    box-shadow 0.2s;
+  cursor: pointer;
+}
+
+.dashboard-upload-btn:hover {
+  background: linear-gradient(135deg, #ff9a28 0%, #d97800 100%);
+  box-shadow: 0 4px 14px rgba(255, 136, 0, 0.48);
+  color: #ffffff;
+}
+
+.dashboard-upload-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 6px rgba(255, 136, 0, 0.3);
+}
+
+/* =====================================================
+   DASHBOARD MODALS — dark theme (consolidated via :is())
+   ===================================================== */
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-content {
+  background: #111111;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.55);
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-header {
+  background: linear-gradient(135deg, #111111 0%, #1a1a1a 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 9px 9px 0 0;
+  padding: 16px 22px;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-title {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 1.05rem;
+  letter-spacing: 0.3px;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-header
+  .close {
+  color: #ffffff;
+  opacity: 0.75;
+  text-shadow: none;
+  font-size: 1.4rem;
+  transition:
+    opacity 0.18s,
+    color 0.18s;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-header
+  .close:hover {
+  opacity: 1;
+  color: #ffffff;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-body {
+  background: #111111;
+  padding: 22px 22px 10px 22px;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-body
+  .form-label {
+  color: #ffffff;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-body
+  .form-control {
+  background: #0d0d0d;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e8eaed;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition:
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-body
+  .form-control:focus {
+  background: #0d0d0d;
+  border-color: #ff8800;
+  box-shadow: 0 0 0 3px rgba(255, 136, 0, 0.18);
+  color: #ffffff;
+  outline: none;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-body
+  .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-body
+  select.form-control
+  option {
+  background: #111111;
+  color: #e8eaed;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-footer {
+  background: #0a0a0a;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 0 0 9px 9px;
+  padding: 14px 22px;
+}
+
+/* Cancel button */
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-footer
+  .btn-secondary {
+  background: linear-gradient(135deg, #6b7280 0%, #5a606c 100%);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 7px 20px;
+  transition:
+    background 0.18s,
+    color 0.18s;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-footer
+  .btn-secondary:hover {
+  background: linear-gradient(135deg, #7b8390 0%, #676f7c 100%);
+  color: #ffffff;
+}
+
+.swal-button--cancel,
+.swal-button--cancel.btn.btn-secondary {
+  background: linear-gradient(135deg, #6b7280 0%, #5a606c 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+  color: #ffffff !important;
+}
+
+.swal-button--cancel:hover,
+.swal-button--cancel.btn.btn-secondary:hover,
+.swal-button--cancel:focus,
+.swal-button--cancel.btn.btn-secondary:focus {
+  background: linear-gradient(135deg, #7b8390 0%, #676f7c 100%) !important;
+  color: #ffffff !important;
+}
+
+/* Save button */
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-footer
+  .btn-success {
+  background: linear-gradient(135deg, #ff8800 0%, #cc6e00 100%);
+  border: none;
+  color: #ffffff;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 7px 22px;
+  box-shadow: 0 3px 10px rgba(255, 136, 0, 0.3);
+  transition:
+    background 0.18s,
+    box-shadow 0.18s;
+}
+
+/* Uniform modal footer button sizing */
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-footer
+  .btn-secondary,
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-footer
+  .btn-success {
+  width: 170px;
+  height: 42px;
+  padding: 0 14px;
+  font-size: 0.9rem;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+:is(
+    #dashboardVendaModal,
+    #dashboardProdutoModal,
+    #dashboardCategoriaModal,
+    #dashboardCidadeModal,
+    #dashboardCsvRowModal
+  )
+  .modal-footer
+  .btn-success:hover {
+  background: linear-gradient(135deg, #ff9a28 0%, #d97800 100%);
+  box-shadow: 0 4px 14px rgba(255, 136, 0, 0.45);
+  color: #ffffff;
+}
+
+/* =====================================================
+   DASHBOARD MAIN PANEL HEADING — FPB black/orange
+   ===================================================== */
+.dashboard-main-panel-heading {
+  background: linear-gradient(135deg, #0a0a0a 0%, #111111 100%) !important;
+  border-bottom: 2px solid #ff8800 !important;
+}
+
+.dashboard-main-panel-heading .panel-title {
+  color: #ffffff !important;
+}
+
+.dashboard-main-panel-heading .panel-heading-btn .btn {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 136, 0, 0.35) !important;
+  color: #ffa85d !important;
+}
+
+.dashboard-main-panel-heading .panel-heading-btn .btn:hover {
+  background: rgba(255, 136, 0, 0.15) !important;
+  border-color: rgba(255, 136, 0, 0.7) !important;
+  color: #ffffff !important;
+}
+
+/* =====================================================
+   DASHBOARD ACTION BUTTONS — FPB palette overrides
+   ===================================================== */
+
+/* Adicionar / Guardar (btn-success) */
+#dashrows .btn-success,
+.dashboard-stats-table-panel .btn-success,
+.dashboard-stats-chart-panel .btn-success,
+#dashboardCsvCommitBtn {
+  background: linear-gradient(135deg, #ff8800 0%, #cc6e00 100%) !important;
+  border-color: #cc6e00 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(255, 136, 0, 0.3);
+  transition:
+    background 0.18s,
+    box-shadow 0.18s;
+}
+
+#dashrows .btn-success:hover,
+.dashboard-stats-table-panel .btn-success:hover,
+.dashboard-stats-chart-panel .btn-success:hover,
+#dashboardCsvCommitBtn:hover,
+#dashboardCsvCommitBtn:focus {
+  background: linear-gradient(135deg, #ff9a28 0%, #d97800 100%) !important;
+  border-color: #d97800 !important;
+  box-shadow: 0 3px 10px rgba(255, 136, 0, 0.45);
+  color: #ffffff !important;
+}
+
+#dashboardCsvCommitBtn:disabled {
+  background: linear-gradient(135deg, #ff8800 0%, #cc6e00 100%) !important;
+  border-color: #cc6e00 !important;
+  color: #ffffff !important;
+  opacity: 1 !important;
+  box-shadow: none !important;
+  filter: none !important;
+}
+
+/* Editar (btn-primary) → blue */
+#dashrows .btn-primary,
+.dashboard-stats-table-panel .btn-primary,
+.dashboard-stats-chart-panel .btn-primary,
+#dashboardCsvPreviewPage .btn-primary {
+  background: linear-gradient(135deg, #2e6f99 0%, #1f5679 100%) !important;
+  border: 1px solid #1a4a69 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(31, 86, 121, 0.3);
+  transition:
+    background 0.18s,
+    border-color 0.18s,
+    box-shadow 0.18s;
+}
+
+#dashrows .btn-primary:hover,
+.dashboard-stats-table-panel .btn-primary:hover,
+.dashboard-stats-chart-panel .btn-primary:hover,
+#dashboardCsvPreviewPage .btn-primary:hover {
+  background: linear-gradient(135deg, #3d84b3 0%, #2a6c95 100%) !important;
+  border-color: #245f84 !important;
+  box-shadow: 0 3px 8px rgba(31, 86, 121, 0.4);
+  color: #ffffff !important;
+}
+
+/* Eliminar (btn-danger) → red */
+#dashrows .btn-danger,
+.dashboard-stats-table-panel .btn-danger,
+.dashboard-stats-chart-panel .btn-danger {
+  background: linear-gradient(135deg, #b3261e 0%, #8f1d18 100%) !important;
+  border: none !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(179, 38, 30, 0.3);
+  transition:
+    background 0.18s,
+    box-shadow 0.18s;
+}
+
+#dashrows .btn-danger:hover:not(:disabled),
+.dashboard-stats-table-panel .btn-danger:hover:not(:disabled),
+.dashboard-stats-chart-panel .btn-danger:hover:not(:disabled) {
+  background: linear-gradient(135deg, #d0382c 0%, #a92b22 100%) !important;
+  box-shadow: 0 3px 8px rgba(179, 38, 30, 0.45);
+  color: #ffffff !important;
+}
+
+/* Button size uniformization */
+#dashrows .btn-success:not(.btn-xs):not(.dashboard-table-add-btn),
+#dashrows .btn-primary:not(.btn-xs),
+.dashboard-stats-chart-panel
+  .btn-success:not(.btn-xs):not(.dashboard-table-add-btn),
+.dashboard-stats-chart-panel .btn-primary:not(.btn-xs),
+#dashboardCsvCommitBtn {
+  min-width: 170px;
+  height: 42px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+  box-sizing: border-box;
+}
+
+/* Edit button — dark override */
+#dashrows .dashboard-row-edit-btn.btn.btn-primary,
+.dashboard-stats-table-panel .dashboard-row-edit-btn.btn.btn-primary,
+.dashboard-stats-chart-panel .dashboard-row-edit-btn.btn.btn-primary,
+#dashboardCsvPreviewPage .dashboard-row-edit-btn.btn.btn-primary {
+  background: linear-gradient(135deg, #222222 0%, #111111 100%) !important;
+  background-color: #181818 !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+#dashrows .dashboard-row-edit-btn.btn.btn-primary:hover,
+.dashboard-stats-table-panel .dashboard-row-edit-btn.btn.btn-primary:hover,
+.dashboard-stats-chart-panel .dashboard-row-edit-btn.btn.btn-primary:hover,
+#dashboardCsvPreviewPage .dashboard-row-edit-btn.btn.btn-primary:hover,
+#dashrows .dashboard-row-edit-btn.btn.btn-primary:focus,
+.dashboard-stats-table-panel .dashboard-row-edit-btn.btn.btn-primary:focus,
+.dashboard-stats-chart-panel .dashboard-row-edit-btn.btn.btn-primary:focus,
+#dashboardCsvPreviewPage .dashboard-row-edit-btn.btn.btn-primary:focus {
+  background: linear-gradient(135deg, #333333 0%, #1a1a1a 100%) !important;
+  background-color: #242424 !important;
+  border-color: rgba(255, 255, 255, 0.28) !important;
+  color: #ffffff !important;
+}
+
+/* =====================================================
+  SMALL MOBILE — max-width: 900px
+  ===================================================== */
+@media (max-width: 900px) {
+  .dashboard-stats-chart-panel .panel-body,
+  .dashboard-stats-table-panel .panel-body {
+    min-height: 200px;
+    padding: 10px;
+  }
+
+  #dashboardMonthlyChart,
+  #dashboardCategoryChart,
+  #dashboardChannelChart {
+    min-height: 180px;
+  }
+
+  .dashboard-filters-body {
+    padding: 12px 12px 6px;
+  }
+
+  .dashboard-upload-file-row {
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    background: transparent;
+    border: 0;
+  }
+
+  .btn-upload-choose {
+    width: auto;
+    min-width: 190px;
+  }
+
+  .dashboard-upload-filename {
+    display: block;
+    width: 100%;
+    max-width: 260px;
+    text-align: center;
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+    word-break: break-word;
+  }
+
+  #dashrows .btn,
+  .dashboard-stats-table-panel .btn,
+  .dashboard-stats-chart-panel .btn {
+    min-width: 34px;
+    min-height: 34px;
+  }
+
+  .dashboard-stats-table-panel .btn-xs,
+  :is(
+      #dashboardCsvTable,
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable
+    )
+    .btn-xs {
+    min-width: 32px;
+    min-height: 32px;
+    font-size: 0.8rem;
+    padding: 0 8px;
+  }
+
+  .dashboard-table-add-btn {
+    width: 120px;
+    min-width: 120px;
+    min-height: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+    padding: 0 10px;
+  }
+
+  .dashboard-table-delete-btn {
+    width: 120px;
+    min-width: 120px;
+    min-height: 36px;
+    height: 36px;
+    font-size: 0.8rem;
+    padding: 0 10px;
+  }
+
+  .dashboard-stats-table-panel
+    .mb-3.d-flex.justify-content-end.align-items-center {
+    width: 100%;
+    justify-content: flex-end !important;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-stats-table-panel
+    .mb-3.d-flex.justify-content-end.align-items-center
+    .dashboard-table-add-btn {
+    margin: 0 !important;
+  }
+
+  .dashboard-stats-table-panel
+    .mb-3.d-flex.justify-content-end.align-items-center
+    .dashboard-table-delete-btn {
+    margin: 0 !important;
+  }
+
+  #dashboardProdutosDeleteSelectedBtn,
+  #dashboardCategoriasDeleteSelectedBtn,
+  #dashboardCidadesDeleteSelectedBtn {
+    margin-left: auto !important;
+    margin-right: 0 !important;
+  }
+
+  .dashboard-bulk-select-col {
+    width: 44px;
+    min-width: 44px;
+  }
+
+  .dashboard-bulk-select-text {
+    display: none;
+  }
+
+  .dashboard-modal-action-btn {
+    width: 44%;
+    min-width: 0;
+    height: 40px;
+    padding: 0 10px;
+    font-size: 0.84rem;
+  }
+
+  #dashboardCsvPreviewTopDeleteWrap {
+    display: none !important;
+  }
+
+  .dashboard-csv-preview-bottom-actions {
+    width: 100%;
+    justify-content: space-between !important;
+    gap: 8px;
+    flex-wrap: nowrap;
+  }
+
+  .dashboard-csv-preview-bottom-actions .dashboard-modal-action-btn-secondary,
+  .dashboard-csv-preview-bottom-actions .dashboard-csv-preview-bottom-delete,
+  .dashboard-csv-preview-bottom-actions #dashboardCsvCommitBtn {
+    display: inline-flex !important;
+    width: calc(33.333% - 6px) !important;
+    min-width: 0 !important;
+    min-height: 40px !important;
+    height: 40px !important;
+    margin: 0 !important;
+    padding: 0 6px !important;
+    font-size: 0.78rem !important;
+  }
+
+  .dashboard-filters-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .dashboard-filters-actions .dashboard-filter-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    font-size: 0.78rem;
+    padding: 6px 8px;
+    white-space: nowrap;
+    line-height: 1.1;
+    border-radius: 6px;
+  }
+
+  .dashboard-filters-actions .dashboard-filter-btn-pdf {
+    grid-column: 1 / -1;
+  }
+
+  .dashboard-filters-actions > .ml-auto,
+  .dashboard-filters-actions > .ms-auto {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    margin-left: 0 !important;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    align-items: stretch;
+  }
+
+  .dashboard-filters-actions > .ml-auto .dashboard-table-add-btn,
+  .dashboard-filters-actions > .ms-auto .dashboard-table-add-btn,
+  .dashboard-filters-actions > .ml-auto .dashboard-table-delete-btn,
+  .dashboard-filters-actions > .ms-auto .dashboard-table-delete-btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    height: 38px;
+    font-size: 0.78rem;
+    padding: 6px 8px;
+    white-space: nowrap;
+    line-height: 1.1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dashboard-filters-actions > .ml-auto .dashboard-table-delete-btn,
+  .dashboard-filters-actions > .ms-auto .dashboard-table-delete-btn {
+    margin-left: 0 !important;
+  }
+
+  /* Modal footer — mobile sizing */
+  :is(
+      #dashboardVendaModal,
+      #dashboardProdutoModal,
+      #dashboardCategoriaModal,
+      #dashboardCidadeModal,
+      #dashboardCsvRowModal
+    )
+    .modal-footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px;
+  }
+
+  :is(
+      #dashboardVendaModal,
+      #dashboardProdutoModal,
+      #dashboardCategoriaModal,
+      #dashboardCidadeModal,
+      #dashboardCsvRowModal
+    )
+    .modal-footer
+    .btn-secondary,
+  :is(
+      #dashboardVendaModal,
+      #dashboardProdutoModal,
+      #dashboardCategoriaModal,
+      #dashboardCidadeModal,
+      #dashboardCsvRowModal
+    )
+    .modal-footer
+    .btn-success {
+    width: 44%;
+    min-width: 0;
+    height: 40px;
+    padding: 0 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    box-sizing: border-box;
+    font-size: 0.84rem;
+  }
+
+  #dashboardCsvRowModal .modal-body .row > .col-md-6 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  #dashboardCsvRowModal .modal-body .row > .col-md-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  #dashboardCsvRowModal .modal-body .form-label {
+    white-space: nowrap;
+  }
+
+  /* Grid / KPI overrides */
+  #content1 .col-md-3.col-sm-6.mb-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  #content1 .col-md-6.mb-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  #content1 .dashboard-stats-chart-panel .panel-body {
+    min-height: 250px;
+  }
+
+  #content1 #dashboardCategoryChart {
+    min-height: 230px;
+  }
+
+  /* ── DT controls: Sel. Todos LEFT + Procurar RIGHT, same line ──
+     Strategy: make the table position:static so the absolute thead
+     anchors to the WRAPPER (position:relative from 1138px block).
+     Then thead top:0 = wrapper top = search row top. ── */
+
+  /* First layout-row: flex, kill DT2 default margin for clean alignment */
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    > .dt-layout-row:first-child:not(.dt-layout-table) {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    flex-wrap: nowrap !important;
+    height: 34px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    gap: 6px !important;
+  }
+
+  /* Cells inside the first row */
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    > .dt-layout-row:first-child:not(.dt-layout-table)
+    > .dt-layout-cell {
+    display: flex !important;
+    align-items: center !important;
+    min-width: 0 !important;
+  }
+
+  /* Start cell (hidden dt-length): collapse it */
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    > .dt-layout-row:first-child:not(.dt-layout-table)
+    > .dt-layout-cell.dt-layout-start {
+    flex: 0 0 0px !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+  }
+
+  /* End cell (search): push right */
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    > .dt-layout-row:first-child:not(.dt-layout-table)
+    > .dt-layout-cell.dt-layout-end {
+    flex: 0 1 auto !important;
+    justify-content: flex-end !important;
+    margin: 0 0 0 auto !important;
+  }
+
+  /* dt-search: compact inline, right-aligned */
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    .dataTables_filter,
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    .dt-search {
+    float: none !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+    margin: 0 0 0 auto !important;
+  }
+
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    .dt-search
+    label {
+    margin: 0 !important;
+    font-size: 0.78rem !important;
+  }
+
+  :is(
+      #dashboardTopProductsTable_wrapper,
+      #dashboardCitiesTable_wrapper,
+      #dashboardVendasTable_wrapper,
+      #dashboardProdutosTable_wrapper,
+      #dashboardCategoriasTable_wrapper,
+      #dashboardCidadesTable_wrapper,
+      #dashboardCsvTable_wrapper,
+      #dashboardCsvPreviewTable_wrapper
+    )
+    .dt-search
+    input[type="search"] {
+    width: clamp(80px, 28vw, 120px) !important;
+    height: 28px !important;
+    padding: 2px 6px !important;
+    box-sizing: border-box !important;
+    font-size: 0.8rem !important;
+  }
+
+  /* Sel. Todos label: compact */
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    )
+    > thead
+    > tr
+    > th.dashboard-bulk-select-col
+    .dashboard-bulk-select-label {
+    gap: 4px !important;
+    font-size: 0.68rem !important;
+    white-space: nowrap !important;
+  }
+
+  /* TABLE: remove position:relative so thead anchors to the wrapper */
+  :is(
+    #dashboardVendasTable,
+    #dashboardProdutosTable,
+    #dashboardCategoriasTable,
+    #dashboardCidadesTable,
+    #dashboardCsvTable,
+    #dashboardCsvPreviewTable
+  ).dt-card-table {
+    position: static !important;
+  }
+
+  /* THEAD: anchored to wrapper top-left = same Y as the search row.
+     Wrapper already has position:relative (from 1138px block).
+     Vertically center in the 34px row: (34−28)/2 ≈ 3px. */
+  :is(
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable,
+      #dashboardCsvTable,
+      #dashboardCsvPreviewTable
+    ).dt-card-table
+    > thead {
+    position: absolute !important;
+    top: 3px !important;
+    left: 0 !important;
+    margin: 0 !important;
+    z-index: 4 !important;
+  }
+}
+
+/* =====================================================
+  TABLET — min-width: 901px  AND  max-width: 1138px
+  ===================================================== */
+@media (min-width: 901px) and (max-width: 1138px) {
+  .dashboard-table-add-btn {
+    width: auto;
+    min-width: 0;
+    min-height: 33px;
+    height: 38px;
+    font-size: 0.79rem;
+    padding: 5px 10px;
+  }
+
+  .dashboard-table-delete-btn {
+    width: auto;
+    min-width: 0;
+    min-height: 38px;
+    height: 38px;
+    font-size: 0.84rem;
+    padding: 0 14px;
+  }
+
+  .dashboard-stats-table-panel
+    .mb-3.d-flex.justify-content-end.align-items-center {
+    width: 100%;
+    justify-content: flex-end !important;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .dashboard-stats-table-panel
+    .mb-3.d-flex.justify-content-end.align-items-center
+    .dashboard-table-add-btn,
+  .dashboard-stats-table-panel
+    .mb-3.d-flex.justify-content-end.align-items-center
+    .dashboard-table-delete-btn {
+    width: auto;
+    min-width: 0;
+    margin: 0 !important;
+  }
+
+  .dashboard-stats-chart-panel .panel-body,
+  .dashboard-stats-table-panel .panel-body {
+    min-height: 230px;
+    padding: 12px;
+  }
+
+  #dashboardMonthlyChart,
+  #dashboardCategoryChart,
+  #dashboardChannelChart {
+    min-height: 210px;
+  }
+
+  .dashboard-upload-filename {
+    max-width: 220px;
+  }
+
+  .dashboard-stats-table-panel .btn-xs,
+  :is(
+      #dashboardCsvTable,
+      #dashboardVendasTable,
+      #dashboardProdutosTable,
+      #dashboardCategoriasTable,
+      #dashboardCidadesTable
+    )
+    .btn-xs {
+    min-width: 30px;
+    min-height: 30px;
+    font-size: 0.8rem;
+    padding: 0 8px;
+  }
+
+  .dashboard-filter-btn {
+    min-height: 33px;
+    font-size: 0.77rem;
+    padding: 5px 9px;
+  }
+
+  /* Grid / KPI overrides */
+  #content1 .col-md-3.col-sm-6.mb-3 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  #content1 .col-md-6.mb-3 {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  #content1 .dashboard-stats-chart-panel .panel-body,
+  #content1 .dashboard-stats-table-panel .panel-body {
+    min-height: 260px;
+    padding: 14px;
+  }
+
+  #content1 #dashboardMonthlyChart,
+  #content1 #dashboardCategoryChart,
+  #content1 #dashboardChannelChart {
+    min-height: 240px;
+  }
+
+  #content1 .dashboard-stats-panel .panel-body {
+    min-height: 84px;
+    padding: 10px 12px;
+  }
+
+  #content1 .dashboard-stats-panel .dashboard-kpi-value {
+    font-size: 1.48rem;
+  }
+
+  #content1 .dashboard-stats-panel .dashboard-kpi-icon {
+    width: 40px !important;
+    height: 40px !important;
+    flex: 0 0 40px !important;
+  }
+}
+
+/* =====================================================
+  UNIFORM ACTION BUTTONS — min-width: 901px
+  ===================================================== */
+@media (min-width: 901px) {
+  #dashboardCsvPreviewTopDeleteWrap {
+    display: none !important;
+  }
+
+  .dashboard-csv-preview-bottom-delete,
+  #dashboardCsvPreviewDeleteSelectedBtnBottom {
+    display: inline-flex !important;
+  }
+
+  .dashboard-table-add-btn,
+  .dashboard-table-delete-btn,
+  .dashboard-row-edit-btn,
+  .dashboard-row-download-btn,
+  .dashboard-filters-actions .dashboard-filter-btn,
+  .dashboard-filters-actions .dashboard-table-add-btn,
+  .dashboard-filters-actions .dashboard-table-delete-btn,
+  :is(
+      #dashboardVendaModal,
+      #dashboardProdutoModal,
+      #dashboardCategoriaModal,
+      #dashboardCidadeModal,
+      #dashboardCsvRowModal
+    )
+    .modal-footer
+    .btn-secondary,
+  :is(
+      #dashboardVendaModal,
+      #dashboardProdutoModal,
+      #dashboardCategoriaModal,
+      #dashboardCidadeModal,
+      #dashboardCsvRowModal
+    )
+    .modal-footer
+    .btn-success,
+  #dashboardCsvPreviewPage
+    .dashboard-csv-preview-bottom-actions
+    .dashboard-modal-action-btn-secondary,
+  #dashboardCsvPreviewTopDeleteWrap .dashboard-modal-action-btn,
+  #dashboardCsvPreviewDeleteSelectedBtnBottom,
+  #dashboardCsvCommitBtn {
+    width: 120px !important;
+    min-width: 120px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    padding: 0 10px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    line-height: 1 !important;
+  }
+}
+
+/* =====================================================
+  CSV PREVIEW DESKTOP FIT — remove horizontal scroll
+  ===================================================== */
+@media (min-width: 1139px) {
+  #dashboardCsvPreviewPage .table-responsive {
+    overflow-x: auto !important;
+  }
+
+  #dashboardCsvPreviewTable {
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  #dashboardCsvPreviewTable > thead > tr > th,
+  #dashboardCsvPreviewTable > tbody > tr > td {
+    white-space: nowrap !important;
+  }
+
+  #dashboardCsvPreviewTable > thead > tr > th.dashboard-bulk-select-col,
+  #dashboardCsvPreviewTable > tbody > tr > td.dashboard-bulk-select-col {
+    width: 88px !important;
+    min-width: 88px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+  }
+
+  #dashboardCsvPreviewTable
+    > thead
+    > tr
+    > th.dashboard-bulk-select-col
+    .dashboard-bulk-select-label {
+    white-space: nowrap !important;
+    flex-wrap: nowrap !important;
+    justify-content: center;
+  }
+
+  #dashboardCsvPreviewTable > tbody > tr > td .badge {
+    white-space: normal !important;
+    text-align: center;
+    max-width: 100%;
+  }
+
+  #dashboardCsvPreviewTable > thead > tr > th:last-child,
+  #dashboardCsvPreviewTable > tbody > tr > td:last-child {
+    width: 150px;
+    min-width: 150px;
+  }
+
+  #dashboardCsvPreviewTable
+    > tbody
+    > tr
+    > td:last-child
+    .dashboard-row-edit-btn {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+}

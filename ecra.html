@@ -1,0 +1,945 @@
+<!doctype html>
+<!--[if IE 8]> <html lang="en" class="ie8"> <![endif]-->
+<!--[if !IE]><!-->
+<html lang="en">
+  <!--<![endif]-->
+
+  <head>
+    <meta charset="utf-8" />
+    <title>Skydive</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <meta content="" name="OK4 Modular Concept" />
+    <meta content="" name="AA" />
+    <link rel="icon" id="platicon" href="img/logo.png" />
+    <!-- ================== BEGIN BASE CSS STYLE ================== -->
+
+    <link
+      href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700"
+      rel="stylesheet"
+    />
+    <link href="assets/plugins/jquery-ui/jquery-ui.min.css" rel="stylesheet" />
+    <link
+      rel="stylesheet"
+      href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css"
+    />
+    <link
+      href="assets/plugins/bootstrap/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link href="assets/plugins/font-awesome/css/all.min.css" rel="stylesheet" />
+    <!-- 	<link href="assets/css/default/app.min.css" rel="stylesheet" />
+ -->
+    <link href="assets/plugins/animate/animate4.min.css" rel="stylesheet" />
+    <link href="assets/css/default/style.min.css" rel="stylesheet" />
+    <link href="assets/css/default/style-responsive.min.css" rel="stylesheet" />
+    <link href="assets/css/default/theme/default.css" rel="stylesheet" />
+    <link
+      href="assets/plugins/bootstrap-social/bootstrap-social.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END BASE CSS STYLE ================== -->
+    <link rel="stylesheet" href="assets/css/default/theme/kanban.css" />
+    <!-- ================== BEGIN FLAG CSS STYLE ================== -->
+    <link href="assets/plugins/flag-icon/css/flag-icon.css" rel="stylesheet" />
+    <!-- ================== END FLAG CSS STYLE ================== -->
+
+    <!-- ================== BEGIN DATATABLES STYLE ================== -->
+    <link
+      href="assets/plugins/DataTables/media/css/dataTables.bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="assets/plugins/DataTables/extensions/Responsive/css/responsive.bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END DATATABLES STYLE ================== -->
+    <!-- ================== BEGIN DATATABLES2 STYLE ================== -->
+    <link
+      rel="stylesheet"
+      href="assets/plugins/DataTables2/datatables.min.css"
+    />
+    <!-- ================== END DATATABLES2 STYLE ================== -->
+
+    <!-- ================== BEGIN SELECT2 STYLE ================== -->
+    <link
+      href="assets/plugins/select2/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END SELECT2 STYLE ================== -->
+
+    <!-- ================== BEGIN d3 CSS ================== -->
+    <link href="assets/plugins/nvd3/build/nv.d3.css" rel="stylesheet" />
+    <!-- ================== END d3 CSS ================== -->
+
+    <!-- ================== BEGIN BASE JS ================== -->
+
+    <script src="assets/plugins/pace/pace.min.js"></script>
+    <script src="assets/plugins/jquery/jquery-3.3.1.min.js"></script>
+    <!-- SortableJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Sortable/1.15.0/Sortable.min.js"></script>
+
+    <!-- jQuery SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-sortablejs@latest/jquery-sortable.js"></script>
+
+    <!-- ================== BEGIN CRYPTO LEVEL JS ================== -->
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/core.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/enc-base64.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/hmac.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/sha256.js"
+    ></script>
+    <!-- ================== TAG-IT ================== -->
+    <link href="assets/plugins/tag-it/css/jquery.tagit.css" rel="stylesheet" />
+    <!-- ================== END CRYPTO LEVEL JS ================== -->
+    <script type="text/javascript" src="assets/plugins/md5.js/md5.js"></script>
+    <!-- ================== BEGIN gritter CSS STYLE ================== -->
+    <link
+      href="assets/plugins/gritter/css/jquery.gritter.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END gritter CSS STYLE ================== -->
+
+    <!-- ================== BEGIN SELECT2 CSS STYLE ================== -->
+    <link
+      href="assets/plugins/select2/dist/css/select2.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END SELECT2 CSS STYLE ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL CSS ================== -->
+    <link
+      href="assets/plugins/jstree/dist/themes/default/style.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL CSS ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL CSS ================== -->
+    <link
+      href="assets/plugins/signature/css/signature-pad.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL CSS ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
+    <link
+      href="assets/plugins/jquery-smart-wizard/src/css/smart_wizard.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL STYLE ================== -->
+
+    <!-- ================== BEGIN PAGE LEVEL STYLE ================== -->
+    <link
+      href="assets/plugins/sweetalert2/dist/sweetalert2.min.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END PAGE LEVEL STYLE ================== -->
+
+    <!-- ================== BEGIN PAGE FROALA STYLE ================== -->
+    <link rel="stylesheet" href="assets/plugins/froala/css/froala_editor.css" />
+    <link rel="stylesheet" href="assets/plugins/froala/css/froala_style.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/code_view.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/draggable.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/colors.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/emoticons.css"
+    />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/image_manager.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/image.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/line_breaker.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/table.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/char_counter.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/video.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/fullscreen.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/file.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/quick_insert.css"
+    />
+    <link rel="stylesheet" href="assets/plugins/froala/css/plugins/help.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/froala/css/plugins/special_characters.css"
+    />
+    <!-- ================== END PAGE FROALA STYLE ================== -->
+    <!-- ================== BEGIN FULLCALENDAR STYLE ================== -->
+    <link
+      href="https://unpkg.com/@fullcalendar/core@6.1.7/main.css"
+      rel="stylesheet"
+    />
+    <!-- ================== END FULLCALENDAR STYLE ================== -->
+    <!-- BEGIN TOASTR.JS LIB -->
+    <link rel="stylesheet" href="assets/plugins/toastr/toastr.min.css" />
+    <script src="assets/plugins/toastr/toastr.min.js"></script>
+    <!-- END TOASTR.JS LIB -->
+    <!-- BEGIN LEAFLET MAPS -->
+    <link rel="stylesheet" href="assets/plugins/local-leaflet/leaflet.css" />
+    <link
+      rel="stylesheet"
+      href="assets/plugins/local-leaflet/leaflet-routing-machine.css"
+    />
+    <!-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet-sidebar-v2/3.0.1/leaflet-sidebar.min.css" /> -->
+    <!-- <link rel="stylesheet" href="https://raw.githubusercontent.com/noerw/leaflet-sidebar-v2/refs/heads/master/css/leaflet-sidebar.min.css" /> -->
+    <!-- END LEAFLET MAPS -->
+    <!-- BEGIN GOOGLE TRANSLATOR -->
+    <script src="assets/plugins/google-translate/google-translate.js"></script>
+    <!-- END GOOGLE TRANSLATOR -->
+    <link
+      rel="stylesheet"
+      href="assets/plugins/jquery.contextMenu/css/jquery.contextMenu.css"
+    />
+    <!-- ================== BEGIN CRYPTO LEVEL JS ================== -->
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/core.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/enc-base64.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/hmac.js"
+    ></script>
+    <script
+      type="text/javascript"
+      src="assets/plugins/cryptojs/sha256.js"
+    ></script>
+    <!-- ================== TAG-IT ================== -->
+    <link href="assets/plugins/tag-it/css/jquery.tagit.css" rel="stylesheet" />
+    <!-- ================== END CRYPTO LEVEL JS ================== -->
+    <script type="text/javascript" src="assets/plugins/md5.js/md5.js"></script>
+    <script type="text/javascript" src="js/main.js"></script>
+    <!-- ================================================
+	check.js - Verificar Sessão Aberta
+	================================================ -->
+    <!-- <script id='checkjsscript' type="text/javascript" src="js/check.js"></script> -->
+    <!-- ================== END BASE JS ================== -->
+    <link rel="stylesheet" href="./styles.css?v=20260228h" />
+    <style>
+      .select2-manifesto {
+        z-index: 11000 !important;
+        height: 25px !important;
+      }
+      .select2-manifesto + .select2-container .select2-selection--single {
+        height: 25px !important;
+        padding: 0 !important;
+        line-height: 25px !important;
+        min-height: 25px !important;
+      }
+
+      .select2-manifesto + .select2-container .select2-selection__rendered {
+        line-height: 25px !important;
+        padding: 0 5px !important;
+      }
+
+      .select2-manifesto + .select2-container .select2-selection__arrow {
+        height: 25px !important;
+        line-height: 25px !important;
+      }
+
+      .lista_manifesto_tempo {
+        right: 0 !important;
+        z-index: 100000;
+        margin-right: 32px;
+        margin-top: 15px;
+        justify-content: center;
+        align-items: center;
+      }
+      .lista_manifesto_tempo ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        border: 1px solid #ccc;
+        width: 70px;
+        background-color: white; /* Para garantir que fique visível sobre outros elementos */
+      }
+      .lista_manifesto_tempo li {
+        padding: 5px;
+        cursor: pointer;
+        color: black;
+      }
+      .lista_manifesto_tempo li:hover {
+        background-color: #f0f0f0;
+      }
+
+      .scroll-container {
+        height: 100%;
+        overflow-y: auto;
+      }
+
+      .card-header {
+        background-color: #242a30 !important;
+      }
+
+      .card {
+        border: none;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+
+      .diagram-wrapper {
+        z-index: 1000;
+        display: flex;
+        align-items: stretch;
+        border-radius: 5px;
+        border: 1px solid #636363;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        margin-bottom: 10px;
+      }
+
+      .diagram-wrapper-merge-main {
+        z-index: 10000;
+        align-items: stretch;
+        border-radius: 5px;
+        border: 1px solid #636363;
+        margin-bottom: 10px;
+      }
+
+      .diagram-wrapper-merge {
+        z-index: 10000;
+        display: flex;
+        align-items: stretch;
+      }
+
+      .left-stack {
+        display: flex;
+        flex-direction: column;
+        width: 70%;
+      }
+
+      .right-stack {
+        display: flex;
+        flex-direction: column;
+        width: 10%;
+      }
+
+      .diagram-box {
+        padding: 2px;
+        text-align: center;
+        font-size: 12px;
+        box-sizing: border-box;
+      }
+
+      .horizontal-rect-instutor {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 0 !important;
+        padding-inline: 5px !important;
+        position: relative;
+        padding-right: 72px !important;
+        min-width: 0;
+      }
+
+      .horizontal-rect,
+      .horizontal-rect .diagram-box {
+        min-width: 0;
+      }
+
+      .diagram-wrapper-merge:not(:last-child) {
+        border-bottom: 1px solid #636363;
+      }
+
+      .left-stack .horizontal-rect:not(:last-child) {
+        border-bottom: 1px solid #636363;
+      }
+
+      .right-stack .horizontal-rect:not(:last-child) {
+        border-bottom: 1px solid #636363;
+      }
+
+      .vertical-rect {
+        width: 20%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+      }
+
+      .diagram-wrapper {
+        position: relative;
+      }
+
+      .vertical-rect-right {
+        border-left: 1px solid #636363;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+      }
+
+      .vertical-rect-left {
+        border-right: 1px solid #636363;
+        justify-content: center;
+        display: flex;
+        align-items: center;
+        font-size: 10px;
+        width: 20% !important;
+      }
+
+      .card-voos {
+        flex-shrink: 0;
+        border-radius: 0 !important;
+        margin-right: 15px;
+      }
+
+      #lista_manifesto {
+        display: flex;
+        align-items: stretch;
+        overflow-x: auto;
+        min-height: 90vh;
+      }
+
+      @media (max-width: 767.98px) {
+        #lista_manifesto {
+          flex-wrap: wrap;
+          overflow-x: hidden;
+          align-content: flex-start;
+          padding: 0 5px;
+        }
+
+        .card-voos {
+          width: 100% !important;
+          max-width: 100% !important;
+          margin-right: 0;
+          margin-bottom: 10px;
+        }
+
+        .left-stack,
+        .right-stack {
+          width: 100%;
+        }
+
+        .diagram-wrapper,
+        .diagram-wrapper-merge {
+          flex-wrap: wrap;
+        }
+
+        .horizontal-rect-instutor {
+          padding-right: 58px !important;
+        }
+      }
+
+      @media (min-width: 768px) and (max-width: 1024px) {
+        #lista_manifesto {
+          flex-wrap: wrap;
+          align-content: flex-start;
+        }
+
+        .card-voos {
+          max-width: calc(50% - 10px);
+          width: calc(50% - 10px) !important;
+        }
+
+        .horizontal-rect-instutor {
+          padding-right: 64px !important;
+        }
+      }
+      .card-voos-header {
+        border-radius: 0 !important;
+      }
+      .card-voos-header-red {
+        background-color: #ff6060 !important;
+      }
+      .card-voos-header-green {
+        background-color: #78c88a !important;
+      }
+
+      .drop_manifesto.dragover .diagram-wrapper.drag_marcacao {
+        pointer-events: none;
+      }
+      .drop-preview {
+        pointer-events: none;
+      }
+
+      .drop_espera {
+        padding: 10px;
+      }
+    </style>
+  </head>
+
+  <body id="bodysupremus">
+    <!-- begin #page-container -->
+    <div id="page-container" class="fade">
+      <div id="page">
+        <div id="lista_manifesto" class="col-md-12"></div>
+      </div>
+      <div id="footerhook"></div>
+    </div>
+  </body>
+  <script>
+    $(function () {
+      $("#footerhook").load("footer.html");
+    });
+    // ON LOAD ==============================================================================================================================
+    var var_ws = new WebSocket("ws://192.168.10.114:8085");
+    $(document).ready(async function () {
+      await loadManifesto(15);
+
+      setInterval(async () => {
+        await loadManifesto(15);
+      }, 15000);
+
+      setTimeout(() => {
+        var_ws.onopen = function () {
+          console.log("Connected to WebSocket server");
+        };
+
+        var_ws.onmessage = async function (event) {
+          await loadManifesto(15);
+        };
+
+        var_ws.onclose = function () {
+          console.log("Disconnected from WebSocket server");
+        };
+      }, 1000);
+    });
+
+    // LOAD =================================================================================================================
+    // CARREGAR INFO DE LISTA DE ESPERA
+    var arrayEspera = [];
+    // CARREGAR LISTA DE MANIFESTOS
+    var sky_aviao = [];
+    var sky_piloto = [];
+    var sky_instrutor = [];
+    var sky_altura = [];
+    var sky_manifesto = [];
+    var sky_marcacao = [];
+    async function loadManifesto(minutosMargem, esc = 0) {
+      let datahora = new Date();
+      datahora.setMinutes(datahora.getMinutes() - minutosMargem);
+      let info = {};
+      info.datahora = minutosMargem;
+      info.esc = esc;
+      await $.ajax({
+        type: "POST",
+        url: "connect.php",
+        data: {
+          origin: "module/marc/php/manifestodb.php",
+          function: "loadManifestoEcra",
+          attr: JSON.stringify(info),
+        },
+      })
+        .done(async function (response) {
+          let obj = JSON.parse(response);
+          if (obj.val == 1) {
+            sky_manifesto = obj.sky_manifesto;
+            sky_piloto = obj.sky_piloto;
+            sky_aviao = obj.sky_aviao;
+            sky_instrutor = obj.sky_instrutor;
+            sky_marcacao = obj.sky_marcacao;
+            sky_altura = obj.sky_altura;
+            await htmlManifesto();
+          } else {
+            console.log(obj.msg);
+          }
+        })
+        .fail(function (jqXHR, textStatus) {
+          console.log("Request failed: " + textStatus);
+        });
+    }
+
+    async function htmlManifesto() {
+      const viewportWidth = window.innerWidth;
+      const isMobile = viewportWidth <= 767;
+      const isTablet = viewportWidth > 767 && viewportWidth <= 1024;
+      const cardFontSize = isMobile ? 16 : isTablet ? 18 : 20;
+      const rowHeight = isMobile ? 38 : isTablet ? 42 : 45;
+      const countFontSize = isMobile ? 16 : isTablet ? 18 : 22;
+      const textFontSize = isMobile ? 15 : isTablet ? 18 : 20;
+      const selectFontSize = isMobile ? 16 : isTablet ? 18 : 20;
+      const alturaSelectFontSize = isMobile ? 15 : isTablet ? 16 : 18;
+      const loFontSize = isMobile ? 18 : isTablet ? 20 : 24;
+      const headerMetaFont = isMobile ? 14 : 17;
+      const headerCountFont = isMobile ? 15 : 18;
+      const supportIconFontSize = isMobile ? 18 : isTablet ? 21 : 25;
+      const supportImageSize = isMobile ? 18 : isTablet ? 22 : 25;
+      const supportRightPhoto = isMobile ? "30%" : isTablet ? "28%" : "27%";
+      const supportRightVideo = isMobile ? "23%" : isTablet ? "22.5%" : "22%";
+
+      let htmlListaManifesto = "";
+      for (let index = 0; index < sky_manifesto.length; index++) {
+        const aM = sky_manifesto[index];
+        let count = 0;
+        let data = new Date(aM.hora_saida_more.replace(" ", "T"));
+        let aviao = sky_aviao.filter((item) => item.id == aM.id_aviao)[0];
+        // let pioto = sky_piloto.filter((item) => item.id == aM.id_piloto)[0].nome;
+        let dataAtual = new Date();
+        let diferencaEmMinutos = Math.abs(
+          ((data - dataAtual) / (1000 * 60)).toFixed(0),
+        );
+        htmlListaManifesto += `
+				<div class="card card-voos p-0" style="width:100%;max-width:600px;font-size:${cardFontSize}px !important" id="manifesto_form_${aM.id}">
+					<div class="card-header card-voos-header ${data < dataAtual ? "card-voos-header-red" : "card-voos-header-green"} bg-primary text-white d-flex justify-content-between">
+						<span style="width:40%;font-size:${headerMetaFont}px">${aM.n} - ${data < dataAtual ? `${diferencaEmMinutos}min ago` : `Take off in: ${diferencaEmMinutos}min`}  </span>
+						<div style="width:5%;text-align:right;font-size:${headerCountFont}px" class="ml-auto" id="manifesto_aviao_lugares_${aM.id}">
+
+						</div>
+					</div>
+					<div class="row" style='width:100%;margin: 0!important'>
+						<div class='col-md-6' style='margin: 0!important;display:flex' id="div_manifesto_aviao_${aM.id}">
+							<p style='margin-right:10px;margin-top:10px;'><strong>Avião:</strong></p> <select id="manifesto_aviao_${aM.id}" class="form-control form-control-sm select2-manifesto"  style="height:${rowHeight}px !important;font-size:${selectFontSize}px !important" onchange="changeManifesto(${aM.id}, 'id_aviao', this.value)"></select>
+						</div>
+						<div class='col-md-6' style='margin: 0!important;display:flex' id="div_manifesto_piloto_${aM.id}">
+							<p style='margin-right:10px;margin-top:10px;'><strong>Piloto:</strong></p> <select id="manifesto_piloto_${aM.id}" class="form-control form-control-sm select2-manifesto"  style="height:${rowHeight}px !important;font-size:${selectFontSize}px !important" onchange="changeManifesto(${aM.id}, 'id_piloto', this.value)"></select>
+						</div>
+					</div>
+					<div class="drop_manifesto p-10" style='height:100%'  id="manifesto_marcacoes_${aM.id}">`;
+        var htmlListaManifesto2 = "";
+        for (let index3 = 0; index3 < sky_marcacao.length; index3++) {
+          const arrayG = sky_marcacao[index3]; // Grupo
+          if (arrayG.id_manifesto == aM.id) {
+            htmlListaManifesto2 = "";
+            for (let index2 = 0; index2 < arrayG.marcacaoes.length; index2++) {
+              const marcM = arrayG.marcacaoes[index2]; // Marcação
+              if (index2 == 0) {
+                htmlListaManifesto += `
+										<div class="diagram-wrapper drag_marcacao" data-marcacao_grupo_id="${arrayG.marcacao_grupo_id}">
+											<div class="diagram-box vertical-rect-left" style="font-size:${textFontSize}px !important;">${marcM.tipo_grupo_descricao}</div>
+											<div class="left-stack">
+									`;
+                htmlListaManifesto2 += `<div class="right-stack">`;
+              }
+              var hideBox = false;
+              if (marcM.id_paraquedista_tipo == 4) {
+                hideBox = true;
+              }
+              // Primeiro Instrutor
+              if (marcM.sky_manifesto_paraquedista.length > 0) {
+                // Primeiro Instrutor
+                count++;
+                var instroname = "";
+                sky_instrutor.map((item) =>
+                  item.id == marcM.sky_manifesto_paraquedista[0].id_paraquedista
+                    ? (instroname = item.name)
+                    : "",
+                );
+
+                htmlListaManifesto += `
+									<div class="horizontal-rect" style='display:flex;height:${rowHeight}px !important;${index2 != 0 ? "border-top:2px solid black;" : ""}${marcM.cor != null ? `background-color:${marcM.cor};` : ""}'>
+										<div class="diagram-box" style='width:30px;font-size:${countFontSize}px;'>${count}</div>
+										<div class="diagram-box horizontal-rect-instutor w-100" id="div_marcacao_instrutor_${marcM.sky_manifesto_paraquedista[0].id}">
+											<div class="diagram-box" style="position:relative;font-size:${textFontSize}px;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><b>${instroname.toUpperCase()}</b></div>
+											<div class="form-check form-switch" style='width:15px;padding-top:0;position:absolute;right:${supportRightPhoto};${hideBox ? `visibility:hidden;` : ""}' title="Suporte">
+												${parseInt(marcM.sky_manifesto_paraquedista[0].suporte_foto) == 1 ? `<label class="form-check-label" style="font-size:${supportIconFontSize}px" for="marcacao_instrutor_suporte_foto_${marcM.sky_manifesto_paraquedista[0].id}"><i class="fas fa-camera"></i></label>` : ""}
+											</div>
+											<div class="form-check form-switch" style='width:15px;padding-top:0;position:absolute;right:${supportRightVideo};${hideBox ? `visibility:hidden;` : ""}' title="Suporte">
+												${parseInt(marcM.sky_manifesto_paraquedista[0].suporte_video) == 1 ? `<label class="form-check-label" style="font-size:${supportIconFontSize}px" for="marcacao_instrutor_suporte_video_${marcM.sky_manifesto_paraquedista[0].id}"><i class="fas fa-video"></i></label>` : ""}
+											</div>
+											${marcM.sky_manifesto_paraquedista[0].load_organizer == 1 ? `<b style='position:absolute;right:11%;font-size:${loFontSize}px;'>LO</b>` : ""}
+										</div>
+									</div>
+									`;
+                htmlListaManifesto2 += `<div class="horizontal-rect" style='display:flex;height:${rowHeight}px !important;${index2 != 0 ? "border-top:2px solid black;" : ""}'> &nbsp; </div>`;
+              }
+              count++;
+              htmlListaManifesto += `
+									<div class="horizontal-rect" style='display:flex;height:${rowHeight}px !important;${marcM.sky_manifesto_paraquedista.length == 0 && index2 != 0 ? "border-top:2px solid black;" : ""}${marcM.cor != null ? `background-color:${marcM.cor};` : ""}'>
+										<div class="diagram-box" style='width:30px;font-size:${countFontSize}px;'>${count}</div>
+										<div class="diagram-box" style="position:relative;font-size:${textFontSize}px;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding-right:40px;">
+											${marcM.client_date_birth == 1 ? "<i class='fas fa-birthday-cake'></i>&nbsp;" : ""}&nbsp;${marcM.client_name}${marcM.load_organizer == 1 ? ` <b style='position:absolute;right:11%;font-size:${loFontSize}px;'>LO</b>` : ""}</div>
+									</div>
+								`;
+              htmlListaManifesto2 += `<div class="horizontal-rect" style='display:flex;height:${rowHeight}px !important;${marcM.sky_manifesto_paraquedista.length == 0 && index2 != 0 ? "border-top:2px solid black;" : ""}'>
+									<select id="marcacao_altura_${marcM.id}" onchange="changeAltura(${marcM.id},${arrayG.marcacao_grupo_id}, ${aM.id})" class="form-control form-control-sm" style="height:${rowHeight}px;width:100%;padding:1px;text-align:center;-webkit-appearance: none;-moz-appearance: none; appearance: none;height:${rowHeight}px !important;font-size:${alturaSelectFontSize}px;">
+												</select></div>`;
+              if (parseInt(marcM.n_participantes) > 1) {
+                for (
+                  let indexpart = 2;
+                  indexpart <= parseInt(marcM.n_participantes);
+                  indexpart++
+                ) {
+                  count++;
+                  htmlListaManifesto += `
+										<div style='justify-content: center;display:flex;align-items: center;font-size:${textFontSize}px;height:${rowHeight}px;${marcM.cor != null ? `background-color: ${marcM.cor}` : ""}' class="diagram-box horizontal-rect">
+											<div class="diagram-box" style='width:30px;font-size:${textFontSize}px;'>${count}</div>
+											<div class="diagram-box" style="position:relative;font-size:${textFontSize}px;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">Paraquedista ${indexpart}</div>
+										</div>`;
+                  htmlListaManifesto2 += `<div class="horizontal-rect" style='display:flex;height:${rowHeight}px !important;${index2 != 0 ? "border-top:2px solid black;" : ""}'> &nbsp; </div>`;
+                }
+              }
+              // Segundo Instrutor
+              if (marcM.sky_manifesto_paraquedista.length > 1) {
+                for (
+                  let indexP = 1;
+                  indexP < marcM.sky_manifesto_paraquedista.length;
+                  indexP++
+                ) {
+                  count++;
+                  const outrosInstrutor =
+                    marcM.sky_manifesto_paraquedista[indexP]; // Outros instrutores
+                  var instroname = "";
+                  sky_instrutor.map((item) =>
+                    item.id ==
+                    marcM.sky_manifesto_paraquedista[indexP].id_paraquedista
+                      ? (instroname = item.name)
+                      : "",
+                  );
+                  htmlListaManifesto += `
+										<div class="horizontal-rect" style='display:flex;height:${rowHeight}px !important;${marcM.cor != null ? `background-color:${marcM.cor}` : ""}'>
+											<div class="diagram-box" style='width:30px;font-size:${countFontSize}px;'>${count}</div>
+											<div class="diagram-box horizontal-rect horizontal-rect-instutor w-100" id="div_marcacao_instrutor_${outrosInstrutor.id}">
+												<div class="diagram-box" style="position:relative;font-size:${textFontSize}px;text-align:left;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"><b>${instroname.toUpperCase()}</b></div>
+												<div class="form-check form-switch" style='width:15px;padding-top:0;position:absolute;right:${supportRightPhoto};${hideBox ? `visibility:hidden;` : ""}' title="Load Organizer">
+													${parseInt(outrosInstrutor.suporte_foto) == 1 ? `<label class="form-check-label" for="marcacao_instrutor_suporte_foto_${outrosInstrutor.id}"><img style="width:${supportImageSize}px" src="./assets/img/icons/foto-externo.png"/></label>` : "&nbsp;"}
+												</div>
+												<div class="form-check form-switch" style='width:15px;padding-top:0;position:absolute;right:${supportRightVideo};${hideBox ? `visibility:hidden;` : ""}' title="Suporte">
+													${parseInt(outrosInstrutor.suporte_video) == 1 ? `<label class="form-check-label" for="marcacao_instrutor_suporte_video_${outrosInstrutor.id}"><img style="width:${supportImageSize}px" src="./assets/img/icons/video-externo.png"/></label>` : "&nbsp;"}
+												</div>
+												${parseInt(outrosInstrutor.load_organizer) == 1 ? `<b style='position:absolute;right:11%;font-size:${loFontSize}px;'>LO</b>` : ""}
+											</div>
+										</div>
+										`;
+                  htmlListaManifesto2 += `<div class="horizontal-rect" style='display:flex;height:${rowHeight}px !important'> &nbsp; </div>`;
+                }
+              }
+            }
+            htmlListaManifesto2 += `</div>`;
+            htmlListaManifesto += `
+											</div>${htmlListaManifesto2}
+											<div style="width:0.1%" class="diagram-box vertical-rect-right"></div>
+										</div>
+							`;
+          }
+        }
+
+        htmlListaManifesto += `</div>
+				</div>
+			`;
+      }
+
+      // let htmlSelectInstrutor = `<option value="0">Selecione o instrutor...</option>`+sky_instrutor.map((item) => item.esp.includes(1) || item.esp.includes(2) ? `<option value='${item.id}'>${item.name}</option>` : "")
+      // let htmlSelectInstrutor = `<option value="0">Selecione o instrutor...</option>`+sky_instrutor.map((item) => `<option value='${item.id}'>${item.name}</option>`)
+      let htmlSelectInstrutor =
+        `<option value="0">Selecione o instrutor...</option>` +
+        sky_instrutor.map((item) =>
+          item.esp.includes(1)
+            ? `<option value='${item.id}'>${item.name}</option>`
+            : "",
+        );
+      let htmlSelectCamara =
+        `<option value="0">Selecione o instrutor...</option>` +
+        sky_instrutor.map((item) =>
+          item.esp.includes(2)
+            ? `<option value='${item.id}'>${item.name}</option>`
+            : "",
+        );
+      let htmlSelectAviao =
+        `<option value="0">Selecione uma opção...</option>` +
+        sky_aviao.map(
+          (item) => `<option value='${item.id}'>${item.descricao}</option>`,
+        );
+      let htmlSelectPiloto =
+        `<option value="0">Selecione uma opção...</option>` +
+        sky_piloto.map(
+          (item) => `<option value='${item.id}'>${item.nome}</option>`,
+        );
+      let htmlSelectAltura = sky_altura.map(
+        (item) => `<option value='${item.altura}'>${item.altura}</option>`,
+      );
+
+      // Aplicar o html
+      $("#lista_manifesto").html(htmlListaManifesto);
+
+      // Aplicar select2 aos select do manifesto
+      for (let index = 0; index < sky_manifesto.length; index++) {
+        const manifesto = sky_manifesto[index];
+        $(`#manifesto_aviao_${manifesto.id}`).html(htmlSelectAviao);
+        $(`#manifesto_aviao_${manifesto.id}`).val(
+          manifesto.id_aviao != null ? manifesto.id_aviao : 0,
+        );
+        //$(`#manifesto_aviao_${manifesto.id}`).addClass('select2-manifesto').select2({
+        //	width: '100%',
+        //	dropdownParent: $(`#div_manifesto_aviao_${manifesto.id}`)
+        //});
+        $(`#manifesto_piloto_${manifesto.id}`).html(htmlSelectPiloto);
+        $(`#manifesto_piloto_${manifesto.id}`).val(
+          manifesto.id_piloto != null ? manifesto.id_piloto : 0,
+        );
+        //$(`#manifesto_piloto_${manifesto.id}`).addClass('select2-manifesto').select2({
+        //	width: '100%',
+        //	dropdownParent: $(`#div_manifesto_piloto_${manifesto.id}`)
+        //});
+        let aviao = sky_aviao.filter(
+          (item) => item.id == manifesto.id_aviao,
+        )[0];
+        let totalLugaresOcupado = 0;
+        for (let index2 = 0; index2 < sky_marcacao.length; index2++) {
+          const grupo = sky_marcacao[index2]; // Grupo
+          if (grupo.id_manifesto == manifesto.id) {
+            console.log(sky_marcacao[index2]);
+            for (let index3 = 0; index3 < grupo.marcacaoes.length; index3++) {
+              const marcacao = grupo.marcacaoes[index3];
+              //totalLugaresOcupado += 1;
+              if (parseInt(marcacao.n_participantes) > 1) {
+                totalLugaresOcupado +=
+                  parseInt(marcacao.n_participantes) +
+                  marcacao.sky_manifesto_paraquedista.length;
+              } else {
+                totalLugaresOcupado +=
+                  1 + marcacao.sky_manifesto_paraquedista.length;
+              }
+            }
+          }
+        }
+        $(`#manifesto_aviao_lugares_${manifesto.id}`).text(
+          aviao.lugares - totalLugaresOcupado,
+        );
+      }
+
+      // *** INSTRUTORES ***
+      // Criar um mapa para rastrear todos os instrutores por id_manifesto
+      const instrutoresPorManifesto = {};
+
+      // Passo 1: Mapear os instrutores selecionados por id_manifesto
+      for (let index = 0; index < sky_marcacao.length; index++) {
+        const grupo = sky_marcacao[index];
+        for (let index2 = 0; index2 < grupo.marcacaoes.length; index2++) {
+          const marcacao = grupo.marcacaoes[index2];
+          const idManifesto = marcacao.id_manifesto;
+          if (!instrutoresPorManifesto[idManifesto]) {
+            instrutoresPorManifesto[idManifesto] = new Set();
+          }
+          for (
+            let index3 = 0;
+            index3 < marcacao.sky_manifesto_paraquedista.length;
+            index3++
+          ) {
+            const instrutor = marcacao.sky_manifesto_paraquedista[index3];
+            if (instrutor.id_paraquedista) {
+              instrutoresPorManifesto[idManifesto].add(
+                String(instrutor.id_paraquedista),
+              ); // Garantir string
+            }
+          }
+        }
+      }
+
+      // Passo 2: Aplicar select2 aos selects dos instrutores
+      for (let index = 0; index < sky_marcacao.length; index++) {
+        const grupo = sky_marcacao[index];
+
+        for (let index2 = 0; index2 < grupo.marcacaoes.length; index2++) {
+          const marcacao = grupo.marcacaoes[index2];
+          const idManifesto = marcacao.id_manifesto;
+          $(`#marcacao_altura_${marcacao.id}`).html(htmlSelectAltura);
+          $(`#marcacao_altura_${marcacao.id}`).val(marcacao.altura);
+          for (
+            let index3 = 0;
+            index3 < marcacao.sky_manifesto_paraquedista.length;
+            index3++
+          ) {
+            const instrutor = marcacao.sky_manifesto_paraquedista[index3]; // Corrigido "instutor" para "instrutor"
+
+            // Clonar a lista original de instrutores
+            let selectOptions = $("<select>")
+              .html(htmlSelectInstrutor)
+              .find("option")
+              .clone();
+            // Criar uma nova coleção filtrada
+            let filteredOptions = $();
+            const instrutoresUsados = instrutoresPorManifesto[idManifesto];
+            selectOptions.each(function () {
+              const optionValue = $(this).val();
+              // Adicionar à nova coleção apenas se não estiver em instrutoresUsados ou for o instrutor atual
+              if (
+                !instrutoresUsados.has(optionValue) ||
+                optionValue === String(instrutor.id_paraquedista)
+              ) {
+                filteredOptions = filteredOptions.add($(this).clone());
+              }
+            });
+
+            let selectOptions2 = $("<select>")
+              .html(htmlSelectCamara)
+              .find("option")
+              .clone();
+            // Criar uma nova coleção filtrada
+            let filteredOptions2 = $();
+            const instrutoresUsados2 = instrutoresPorManifesto[idManifesto];
+            selectOptions2.each(function () {
+              const optionValue = $(this).val();
+              // Adicionar à nova coleção apenas se não estiver em instrutoresUsados ou for o instrutor atual
+              if (
+                !instrutoresUsados2.has(optionValue) ||
+                optionValue === String(instrutor.id_paraquedista)
+              ) {
+                filteredOptions2 = filteredOptions2.add($(this).clone());
+              }
+            });
+            // Aplicar o HTML filtrado ao select
+            if ($(`#marcacao_instrutor_${instrutor.id}`).hasClass("primeiro")) {
+              $(`#marcacao_instrutor_${instrutor.id}`).html(filteredOptions);
+            } else {
+              $(`#marcacao_instrutor_${instrutor.id}`).html(filteredOptions2);
+            }
+            $(`#marcacao_instrutor_${instrutor.id}`).val(
+              instrutor.id_paraquedista != null
+                ? String(instrutor.id_paraquedista)
+                : "0",
+            ); // Garantir string
+            //$(`#marcacao_instrutor_${instrutor.id}`).addClass('select2-manifesto').select2({
+            //	dropdownParent: $(`#manifesto_marcacoes_${marcacao.id_manifesto}`)
+            //});
+          }
+        }
+      }
+
+      // loadDrag();
+
+      // Para abrir a lista de +tempo no manifesto
+      $(".btn_lista_manifesto_tempo").click(function (e) {
+        let lista = $(this).siblings(".lista_manifesto_tempo");
+        let isVisible = lista.is(":visible");
+
+        $(".lista_manifesto_tempo").hide();
+
+        if (!isVisible) {
+          lista.show();
+          let botao = $(this);
+          lista.css({
+            top: botao.outerHeight(),
+          });
+        }
+
+        e.stopPropagation();
+      });
+
+      $(document).click(function (e) {
+        if (!$(e.target).closest(".opcoes_lista_manifesto_tempo").length) {
+          $(".lista_manifesto_tempo").hide();
+        }
+      });
+    }
+  </script>
+</html>

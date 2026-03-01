@@ -1,0 +1,490 @@
+<!-- begin #footer -->
+<div id="footer" class="footer">
+
+</div>
+<style>
+	.id-card-holder {
+		width: 100%;
+		max-width: 400px;
+		padding: 4px;
+		margin: 0 auto;
+		background-color: #1f1f1f;
+		border-radius: 5px;
+		position: relative;
+		font-family: 'verdana';
+	}
+
+	.id-card-holder:after {
+		content: '';
+		width: 7px;
+		display: block;
+		background-color: #0a0a0a;
+		height: 200px;
+		position: absolute;
+		top: 220px;
+		border-radius: 0 5px 5px 0;
+	}
+
+	.id-card-holder:before {
+		content: '';
+		width: 7px;
+		display: block;
+		background-color: #0a0a0a;
+		height: 200px;
+		position: absolute;
+		top: 220px;
+		left: calc(100% - 10px);
+		border-radius: 5px 0 0 5px;
+	}
+
+	.id-card {
+
+		background-color: #fff;
+		padding: 10px;
+		border-radius: 10px;
+		text-align: center;
+		box-shadow: 0 0 1.5px 0px #b9b9b9;
+	}
+
+	.id-card img {
+		margin: 0 auto;
+	}
+
+	.headerid_card img {
+		width: 100px;
+		margin-top: 15px;
+	}
+
+	.photo img {
+		width: 80px;
+		margin-top: 15px;
+	}
+
+	#all>h2 {
+		font-size: 15px;
+		margin: 5px 0;
+	}
+
+	#all>h3 {
+		font-size: 12px;
+		margin: 2.5px 0;
+		font-weight: 300;
+	}
+
+	.qr-code img {
+		width: 150px;
+	}
+
+	#all>p {
+		font-size: 5px;
+		margin: 2px;
+	}
+
+	.id-card-hook {
+		background-color: #000;
+		width: 70px;
+		margin: 0 auto;
+		height: 15px;
+		border-radius: 5px 5px 0 0;
+	}
+
+	.id-card-hook:after {
+		content: '';
+		background-color: #d7d6d3;
+		width: 47px;
+		height: 6px;
+		display: block;
+		margin: 0px auto;
+		position: relative;
+		top: 6px;
+		border-radius: 4px;
+	}
+
+	.id-card-tag-strip {
+		width: 45px;
+		height: 40px;
+		background-color: #004990;
+		margin: 0 auto;
+		border-radius: 5px;
+		position: relative;
+		top: 9px;
+		z-index: 1;
+		border: 1px solid #0041ad;
+	}
+
+	.id-card-tag-strip:after {
+		content: '';
+		display: block;
+		width: 100%;
+		height: 1px;
+		background-color: #c1c1c1;
+		position: relative;
+		top: 10px;
+	}
+
+	.id-card-tag {
+		width: 0;
+		height: 0;
+		border-left: 100px solid transparent;
+		border-right: 100px solid transparent;
+		border-top: 100px solid #004990;
+		margin: -10px auto -30px auto;
+	}
+
+	.id-card-tag:after {
+		content: '';
+		display: block;
+		width: 0;
+		height: 0;
+		border-left: 50px solid transparent;
+		border-right: 50px solid transparent;
+		border-top: 100px solid #fff;
+		margin: -10px auto -30px auto;
+		position: relative;
+		top: -130px;
+		left: -50px;
+	}
+
+	.theme-panel-custom-side {
+		height: 100px !important;
+		top: 250px !important;
+	}
+
+	@media (max-width: 767.98px) {
+		.id-card-holder:after,
+		.id-card-holder:before {
+			display: none;
+		}
+
+		#modalbuff .modal-dialog,
+		#spinner .modal-dialog {
+			margin-top: 10vh !important;
+		}
+	}
+</style>
+<!-- end #footer -->
+<!-- ================== BEGIN MODALS  ================== -->
+<div class="modal" id="addfase" data-keyboard="false" data-backdrop="static" style="z-index: 9999;"></div>
+<div class="modal" id="addfase2" data-keyboard="false" data-backdrop="static"></div>
+<div style="z-index: 10001 !important;" id="modalimg" class="modal" data-keyboard="false" data-backdrop="static">
+	<div  class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-body" id="img">
+
+			</div>
+			<div class="modal-footer">
+				<a type="button" class="btn btn-white" id="modalimgdownload" download style='display:none;'>Download</a>
+				<button type="button" class="btn btn-white" id="modalimgfechar">Fechar</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="modalbuff" style="z-index: 10001 !important">
+	<div class='modal-dialog' style="margin-top: 10vh;">
+		<div class='modal-content' style="background-color: #6666ff;">
+			<div class='modal-body'>
+				<center>
+					<br>
+					<span class='fa fa-sync fa-spin' style='font-size:60px; color:#ffffff;'></span>
+					<br>
+					<br>
+					<h3 style="color:#ffffff;" id=''>Em actualização...<br>Por Favor, Aguarde.</h3>
+				</center>
+				<br>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal" id="spinner" style="z-index: 10001 !important">
+	<div class='modal-dialog modal-sm' style="margin-top: 15%;">
+		<div class='modal-content'>
+			<div class='modal-body' style="background-color: white;">
+				<center>
+					<img src="assets/plugins/superbox/img/ajax-loader.gif" style="width:64px;height:64px;"/>
+					<h5 style="color: #000000;">Por favor, aguarde...</h5>
+				</center>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal QR -->
+<div class="modal fade" id="modalqr" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+
+				<h4 class="modal-title">Códigos QR</h4>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+						aria-hidden="true">&times;</span></button>
+			</div>
+			<div class="modal-body">
+				<div class='col-md-12'>
+					<center>
+						<div id="pdfsend">
+							<div class="id-card-holder">
+								<div id="all" class="id-card">
+									<div class="header_idcard">
+										<img src="assets/img/logo/ok4-01.png"
+											style='width:80%;padding-top:30px;padding-bottom:20px'>
+									</div>
+
+									<h2 style="font-size:25px;"><strong id="qrnome">DELIVERY POINT</strong></h2>
+									<hr>
+									<div id="img1" class="qr-code">
+										<!--<img src="https://www.shopify.com/growth-tools-assets/qr-code/shopify-faae7065b7b351d28495b345ed76096c03de28bac346deb1e85db632862fd0e4.png">-->
+										<canvas width="150" height="150"></canvas>
+									</div>
+									<hr>
+									<h2 id="qrcod" style="font-size:20px;">LINE 2</h2>
+									<p id="qrfuncao" style="font-size:10px;"></p>
+									<hr>
+									<p style='font-size:9px'><strong>{OK4 alentapp}</strong></p>
+									<p style='font-size:9px'>powered by: alentapp ®</strong></p>
+								</div>
+							</div>
+						</div>
+					</center>
+					<div class='clearfix'></div>
+				</div>
+
+			</div>
+			<div class='clearfix'></div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-white" id='qrbtn'>Exportar</button>
+				<button type="button" class="btn btn-white" data-dismiss="modal">Fechar</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal" id="jjamodalperfil">
+
+</div>
+<div class="modal" id="modalalert" style="z-index:2000;" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header" style='background-color:red'>
+				<h3 class="modal-title" style='color:white !important'>Alerta</h3>
+			</div>
+			<!-- <div class="modal-body red" id="modalerrtext" style='background-color:red;color:white'>
+				<center>
+					<i class='fa fa-skull' style='font-size:150px;'></i>
+					<h1 style='color:white'>Acção não permitida.<br>Adeus!</h1><br>
+				</center>
+			</div> -->
+			<div class="modal-footer" style='background-color:red'>
+				&nbsp;
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- ================== END MODALS    ================== -->
+
+<!-- ================== BEGIN FROALA LEVEL JS ================== -->
+<script type="text/javascript" src="assets/plugins/froala/js/froala_editor.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/align.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/char_counter.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/code_beautifier.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/code_view.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/colors.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/draggable.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/emoticons.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/entities.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/file.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/font_size.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/font_family.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/fullscreen.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/image.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/image_manager.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/line_breaker.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/inline_style.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/link.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/lists.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/paragraph_format.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/paragraph_style.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/quick_insert.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/quote.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/table.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/save.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/url.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/video.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/help.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/print.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/special_characters.min.js"></script>
+<script type="text/javascript" src="assets/plugins/froala/js/plugins/word_paste.min.js"></script>
+<!-- ================== END FROALA LEVEL JS ================== -->
+
+<!-- ================== BEGIN BASE JS ================== -->
+<!-- <script src="assets/plugins/jquery/jquery-1.11.1.min.js"></script> -->
+<script src="assets/plugins/jquery-ui/jquery-ui.min.js"></script>
+<script src="assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- <script type="text/javascript" src="assets/draggable/draggable.bundle.legacy.js"></script> -->
+<!--[if lt IE 9]>
+		<script src="assets/crossbrowserjs/html5shiv.js"></script>
+		<script src="assets/crossbrowserjs/respond.min.js"></script>
+		<script src="assets/crossbrowserjs/excanvas.min.js"></script>
+	<![endif]-->
+<script src="assets/plugins/slimscroll/jquery.slimscroll.min.js"></script>
+<script src="assets/plugins/js-cookie/js.cookie.js"></script>
+<script src="assets/js/theme/default.min.js"></script>
+<script src="assets/js/apps.min.js"></script>
+<!-- ================== END BASE JS ================== -->
+
+<!-- ================== BEGIN sweetalert JS ================== -->
+<script src="assets/plugins/bootstrap-sweetalert/sweetalert.min.js"></script>
+<!-- ================== END sweetalert JS ================== -->
+<script>
+	// Renomear o swal da versão antiga para evitar conflito
+	const oldSwal = swal;
+</script>
+
+<!-- ================== BEGIN dataTables JS ================== -->
+<!-- REMOVIDO: DataTables 1.x conflitava com DataTables 2.x bundle (que já inclui Responsive 3.0.2) -->
+<!-- <script src="assets/plugins/DataTables/media/js/jquery.dataTables.js"></script> -->
+<!-- <script src="assets/plugins/DataTables/media/js/dataTables.bootstrap.min.js"></script> -->
+<!-- <script src="assets/plugins/DataTables/extensions/Responsive/js/dataTables.responsive.min.js"></script> -->
+<!-- ================== END dataTables JS ================== -->
+ <!-- ================== BEGIN dataTables2 JS (DataTables 2.1.3 bundle completo) ================== -->
+<script src="assets/plugins/DataTables2/datatables.min.js"></script>
+<!-- ================== END dataTables2 JS ================== -->
+
+<!-- ================== BEGIN SELECT2 JS ================== -->
+<script src="assets/plugins/select2/dist/js/select2.min.js"></script>
+<!-- ================== END SELECT2 JS ================== -->
+
+<!-- ================== BEGIN d3 LEVEL JS ================== -->
+<script src="assets/plugins/d3/d3.min.js"></script>
+<script src="assets/plugins/nvd3/build/nv.d3.js"></script>
+<!-- ================== END d3 LEVEL JS ================== -->
+
+<!-- ================== BEGIN gritter JS ================== -->
+<script src="assets/plugins/gritter/js/jquery.gritter.js"></script>
+<!-- ================== END gritter JS ================== -->
+
+<!-- ================== BEGIN contextMenu JS ================== -->
+<script src="assets/plugins/jquery.contextMenu/js/jquery.contextMenu.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+<script src="assets/plugins/jquery.contextMenu/js/jquery.ui.position.js"></script>
+<!-- ================== END contextMenu JS ================== -->
+
+<!-- ================== BEGIN JSTREE LEVEL JS ================== -->
+<script src="assets/plugins/jstree/dist/jstree.min.js"></script>
+<!-- ================== END JSTREE LEVEL JS ================== -->
+
+<!-- ================== BEGIN signature LEVEL JS ================== -->
+<script src="assets/plugins/signature/js/signature_pad.js"></script>
+<!-- ================== END signature LEVEL JS ================== -->
+
+<!-- ================== BEGIN smartwizard LEVEL JS ================== -->
+<script src="assets/plugins/jquery-smart-wizard/src/js/jquery.smartWizard.js"></script>
+<!-- ================== END smartwizard LEVEL JS ================== -->
+
+<!-- ================== BEGIN wysihtml5 LEVEL JS ================== -->
+<script src="assets/plugins/bootstrap-wysihtml5/dist/bootstrap3-wysihtml5.all.min.js"></script>
+<!-- ================== END wysihtml5 LEVEL JS ================== -->
+
+<!-- ================== BEGIN jquery-qr LEVEL JS ================== -->
+<script src="assets/plugins/jquery-qr/qrcode.js"></script>
+<!-- ================== END jquery-qr LEVEL JS ================== -->
+
+<!-- ================== BEGIN html2canvas  LEVEL JS ================== -->
+<script src="assets/plugins/jsPDF/libs/html2canvas/dist/html2canvas.js"></script>
+<script src="assets/plugins/jsPDF/jspdf.js"></script>
+<script src="assets/plugins/jsPDF/plugins/addimage.js"></script>
+<script src="assets/plugins/jsPDF/plugins/addhtml.js"></script>
+<!-- ================== END html2canvas  LEVEL JS ================== -->
+
+<script type="text/javascript" src="assets/plugins/jquery-browser-plugin/jquery.browser.min.js"></script>
+<script type="text/javascript" src="assets/plugins/jquery.redirect/jquery.redirect.js"></script>
+
+<!-- ================== BEGIN PAGE LEVEL JS ================== -->
+<script src="assets/plugins/apexcharts/dist/apexcharts.min.js"></script>
+<script src="assets/plugins/flot/jquery.flot.min.js"></script>
+<script src="assets/plugins/flot/jquery.flot.pie.min.js"></script>
+<script src="assets/plugins/chart-js/Chart.js"></script>
+<script src="assets/plugins/canvas.js/canvasjs.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/raphael/2.1.0/raphael-min.js"></script>
+<script src="//cdnjs.cloudflare.com/ajax/libs/morris.js/0.5.1/morris.min.js"></script>
+<!-- ================== END PAGE LEVEL JS ================== -->
+
+<!-- ================== BEGIN JSON TO EXCEL JS ================== -->
+<script type="text/javascript" src="assets/plugins/jsondataexcel/js/xlsx.core.min.js"></script>
+<script type="text/javascript" src="assets/plugins/jsondataexcel/js/Blob.js"></script>
+<script type="text/javascript" src="assets/plugins/jsondataexcel/js/FileSaver.js"></script>
+<script type="text/javascript" src="assets/plugins/jsondataexcel/js/jhxlsx.js"></script>
+<!-- ================== END JSON TO EXCEL JS ================== -->
+<script type="module" src="assets/plugins/libexcel/dist/excellentexport.js"></script>
+<!-- ================== BEGIN ICS ================== -->
+<script type="text/javascript" src="assets/plugins/ics.js/ics.min.js"></script>
+<!-- ================== END ICS ================== -->
+<!-- ================== BEGIN POPPER ================== -->
+<script type="text/javascript" src="assets/plugins/popper/popper.min.js"></script>
+<!-- ================== END POPPER ================== -->
+<!-- ================== BEGIN sweetalert JS ================== -->
+<script src="assets/plugins/sweetalert2/dist/sweetalert2.min.js"></script>
+<!-- ================== END sweetalert JS ================== -->
+<!-- ================== BEGIN LEAFLET ================== -->
+<script src="assets/plugins/local-leaflet/leaflet.js"></script>
+<script src="assets/plugins/local-leaflet/leaflet-routing-machine.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-rotatedmarker/leaflet.rotatedMarker.min.js"></script>
+<script src="assets/plugins/local-leaflet/leaflet-image.js"></script>
+
+<!-- ================== TAG IT ================== -->
+<script type="text/javascript" src="assets/plugins/tag-it/js/tag-it.js"></script>
+
+<script src="assets/plugins/exceljs/exceljs.min.js"></script>
+<!-- ================== END LEAFLET ================== -->
+<script>
+	$(document).ready(function () {
+		App.init();
+		// if($.browser.chrome) {
+		// 	if(retrievedObject.utilizador != 1 && retrievedObject.utilizador != 2 && retrievedObject.utilizador != 8){
+		// 		var checkStatus;
+
+		// 		var element = new Image();
+		// 		// var element = document.createElement('any');
+		// 		Object.defineProperty(element, 'id', {
+		// 		  get:function() {
+		// 		    checkStatus='on';
+		// 		    throw	new Error("This is a hack to check If chrome Devtools is open. Pay no attention.............................................................................................................");
+		// 		  }
+		// 		});
+
+		// 		setInterval(function() {
+		// 		    checkStatus = 'off';
+		// 		    console.dir(element);
+		// 		    if(checkStatus == 'off'){
+		// 		    	$("#modalalert").modal("hide");
+		// 		    }else{
+		// 		    	$("#modalalert").modal("show");
+		// 		    	setTimeout( function() { logoutmaq(1); } , 3000);
+		// 		    }
+		// 		   // document.querySelector('#devtool-status').innerHTML = checkStatus;
+		// 		}, 1000);
+		// 	}
+		// // }else
+		// if ($.browser.mozilla || $.browser.chrome) {
+		// 	$("#btnperfil").hide();
+		// 	if (retrievedObject.utilizador != 1 && retrievedObject.utilizador != 2) {
+		// 		setInterval(function () {
+		// 			var minimalUserResponseInMiliseconds = 100; var before = new Date().getTime(); debugger; var after = new Date().getTime(); if (after - before > minimalUserResponseInMiliseconds) {
+		// 				$("#modalalert").modal("show");
+		// 				setTimeout(function () { logoutmaq(1); }, 3000);
+		// 			}
+		// 		}, 1000);
+		// 	}
+		// } else {
+		// 	logoutmaq(1);
+		// }
+
+		$(function () {
+			$('[data-toggle="popover"]').popover();
+		});
+	});
+
+
+</script>
+<script src="assets/plugins/devtools/index.js"></script>
+</body>
+
+</html>

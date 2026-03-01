@@ -1,0 +1,34 @@
+<!-- begin #content -->
+<div id="content" class="content">
+  <!-- begin page-header -->
+  <h1 class="page-header">Dashboard</h1>
+  <!-- end page-header -->
+
+  <!-- begin row -->
+  <!-- <div class="row" id="topbar">
+
+        </div> -->
+  <!-- end row -->
+  <!-- begin panel -->
+  <div class="row" id="dashrows"></div>
+  <!-- end panel -->
+</div>
+<!-- end #content -->
+
+<link rel="stylesheet" href="module/core/css/dashboard.css?v=20260228" />
+
+<!-- begin scroll to top btn -->
+<a
+  href="javascript:;"
+  class="btn btn-icon btn-circle btn-success btn-scroll-to-top fade"
+  data-click="scroll-top"
+  ><i class="fa fa-angle-up"></i
+></a>
+
+<script type="text/javascript">
+  var newtemporal = new Date().valueOf();
+  $.getScript("module/core/js/dashboard.js?v=" + newtemporal, function () {
+    topbar();
+  });
+</script>
+<!-- Display the countdown timer in an element -->
