@@ -2209,6 +2209,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     margin: 0 !important;
   }
 
+  #dashboardVendasDeleteSelectedBtn,
   #dashboardProdutosDeleteSelectedBtn,
   #dashboardCategoriasDeleteSelectedBtn,
   #dashboardCidadesDeleteSelectedBtn {

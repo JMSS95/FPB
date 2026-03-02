@@ -1909,6 +1909,175 @@ async function createDataTable(
     });
   }
 
+  function getDataTableSortKey(dataTable, tableSelector) {
+    var node = dataTable && dataTable.table ? dataTable.table().node() : null;
+    var tableId = node ? $(node).attr("id") : "";
+    var base = (tableId || tableSelector || "datatable").toString();
+    return base.replace(/[^a-zA-Z0-9_\-]/g, "_");
+  }
+
+  function getDataTableOrderableColumns(dataTable) {
+    var settings = dataTable.settings()[0] || {};
+    var columns = settings.aoColumns || [];
+    var $headers = $(dataTable.table().header()).find("th");
+    var result = [];
+
+    for (var index = 0; index < columns.length; index++) {
+      var column = columns[index];
+      if (!column || column.bSortable !== true) {
+        continue;
+      }
+
+      var $th = $headers.eq(index).clone();
+      $th.find("i, svg, .fa, .fas, .far, .fab, .fal, .fad").remove();
+      var label = $.trim($th.text());
+      var normalized = (label || "")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+
+      if (
+        label === "" ||
+        normalized === "sel." ||
+        normalized === "sel" ||
+        normalized.indexOf("sel. todos") > -1
+      ) {
+        continue;
+      }
+
+      result.push({
+        index: index,
+        label: label,
+      });
+    }
+
+    return result;
+  }
+
+  function renderDataTableCardSortToolbar(
+    dataTable,
+    tableSelector,
+    maxWidth,
+    tableKey,
+  ) {
+    var isCard = isCardTableViewport(maxWidth);
+    var $wrapper = $(dataTable.table().container());
+    var toolbarClass = "dt-card-sort-toolbar";
+    var $existingToolbar = $wrapper.children("." + toolbarClass).first();
+
+    if (!isCard) {
+      if ($existingToolbar.length) {
+        $existingToolbar.remove();
+      }
+      return;
+    }
+
+    var columns = getDataTableOrderableColumns(dataTable);
+    if (!columns.length) {
+      if ($existingToolbar.length) {
+        $existingToolbar.remove();
+      }
+      return;
+    }
+
+    if (!$existingToolbar.length) {
+      var html =
+        "<div class='" +
+        toolbarClass +
+        " d-flex flex-wrap align-items-center mb-2' style='gap:8px;'>" +
+        "<span style='font-size:12px;font-weight:600;'>Ordenar:</span>" +
+        "<select class='form-control form-control-sm dt-card-sort-column' style='max-width:230px;'></select>" +
+        "<select class='form-control form-control-sm dt-card-sort-direction' style='max-width:130px;'>" +
+        "<option value='asc'>Ascendente</option>" +
+        "<option value='desc'>Descendente</option>" +
+        "</select>" +
+        "</div>";
+      $wrapper.prepend(html);
+      $existingToolbar = $wrapper.children("." + toolbarClass).first();
+    }
+
+    var $columnSelect = $existingToolbar.find(".dt-card-sort-column");
+    var $directionSelect = $existingToolbar.find(".dt-card-sort-direction");
+
+    var currentOrder = dataTable.order();
+    var currentColumn = columns[0].index;
+    var currentDirection = "asc";
+
+    if (Array.isArray(currentOrder) && currentOrder.length > 0) {
+      var firstOrder = currentOrder[0];
+      var orderColumn = parseInt(firstOrder[0], 10);
+      var orderDirection = (firstOrder[1] || "asc").toString().toLowerCase();
+      var existsInOptions = columns.some(function (item) {
+        return item.index === orderColumn;
+      });
+      if (existsInOptions) {
+        currentColumn = orderColumn;
+      }
+      if (orderDirection === "asc" || orderDirection === "desc") {
+        currentDirection = orderDirection;
+      }
+    }
+
+    var optionsHtml = "";
+    for (var i = 0; i < columns.length; i++) {
+      var col = columns[i];
+      optionsHtml +=
+        "<option value='" + col.index + "'>" + col.label + "</option>";
+    }
+
+    if ($columnSelect.html() !== optionsHtml) {
+      $columnSelect.html(optionsHtml);
+    }
+    $columnSelect.val(String(currentColumn));
+    $directionSelect.val(currentDirection);
+
+    var eventNamespace = ".dtCardSort_" + tableKey;
+    $columnSelect.off("change" + eventNamespace);
+    $directionSelect.off("change" + eventNamespace);
+
+    var applySort = function () {
+      var selectedColumn = parseInt($columnSelect.val(), 10);
+      var selectedDirection = ($directionSelect.val() || "asc")
+        .toString()
+        .toLowerCase();
+      if (isNaN(selectedColumn)) {
+        return;
+      }
+      if (selectedDirection !== "asc" && selectedDirection !== "desc") {
+        selectedDirection = "asc";
+      }
+
+      dataTable.order([[selectedColumn, selectedDirection]]).draw(false);
+    };
+
+    $columnSelect.on("change" + eventNamespace, applySort);
+    $directionSelect.on("change" + eventNamespace, applySort);
+  }
+
+  function bindDataTableCardSortResize(
+    dataTable,
+    tableSelector,
+    maxWidth,
+    tableKey,
+  ) {
+    var resizeNamespace = "resize.dtCardSort_" + tableKey;
+    var timerVarName = "_dtCardSortResizeTimer_" + tableKey;
+
+    $(window)
+      .off(resizeNamespace)
+      .on(resizeNamespace, function () {
+        clearTimeout(window[timerVarName]);
+        window[timerVarName] = setTimeout(function () {
+          renderDataTableCardSortToolbar(
+            dataTable,
+            tableSelector,
+            maxWidth,
+            tableKey,
+          );
+        }, 220);
+      });
+  }
+
   return new Promise((resolve, reject) => {
     let table = id != null ? "#" + id : ".table";
     $(table).addClass("table table-hover table-compact table-order-column");
@@ -2118,6 +2287,20 @@ async function createDataTable(
         var desktopLimit = typeof limit === "number" && limit > 0 ? limit : 10;
         dataTable.page.len(desktopLimit).draw(false);
       }
+
+      var tableSortKey = getDataTableSortKey(dataTable, table);
+      renderDataTableCardSortToolbar(
+        dataTable,
+        table,
+        cardViewportMax,
+        tableSortKey,
+      );
+      bindDataTableCardSortResize(
+        dataTable,
+        table,
+        cardViewportMax,
+        tableSortKey,
+      );
 
       $("button").removeClass(
         "dt-button buttons-excel buttons-html5 buttons-pdf",
