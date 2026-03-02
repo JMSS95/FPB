@@ -780,6 +780,20 @@ function formatDashboardCurrency(value) {
   );
 }
 
+function parseDashboardLocaleNumber(value) {
+  var raw = (value || "").toString().trim();
+  if (raw === "") {
+    return NaN;
+  }
+
+  var normalized = raw.replace(/\s/g, "").replace(/€/g, "");
+  if (normalized.indexOf(",") > -1) {
+    normalized = normalized.replace(/\./g, "").replace(",", ".");
+  }
+
+  return parseFloat(normalized);
+}
+
 function formatDashboardInt(value) {
   var number = parseInt(value, 10);
   if (isNaN(number)) {
@@ -1512,6 +1526,7 @@ function renderDashboardVendasTable(arrayVendas) {
   for (var index = 0; index < arrayVendas.length; index++) {
     var venda = arrayVendas[index];
     var vendaId = venda.id != null ? venda.id : "";
+    var vendaIdVenda = venda.id_venda != null ? venda.id_venda : "";
     var dataHora = venda.DataHora != null ? venda.DataHora : "";
     var produto = venda.produto != null ? venda.produto : "";
     var categoria = venda.categoria != null ? venda.categoria : "";
@@ -1539,6 +1554,9 @@ function renderDashboardVendasTable(arrayVendas) {
           vendaId +
           "'></td>"
         : "") +
+      "<td>" +
+      vendaIdVenda +
+      "</td>" +
       "<td>" +
       dataHora +
       "</td>" +
@@ -1570,6 +1588,12 @@ function renderDashboardVendasTable(arrayVendas) {
 
   $("#dashboardVendasTableBody").html(tableBody);
   if ($.fn.DataTable && !$.fn.DataTable.isDataTable("#dashboardVendasTable")) {
+    var vendasTableOptions = getDashboardResponsiveOptions(
+      "dashboardVendasTable",
+      canDelete ? [0] : [],
+    );
+    vendasTableOptions.order = [[canDelete ? 1 : 0, "desc"]];
+
     createDataTable(
       "dashboardVendasTable",
       false,
@@ -1579,10 +1603,7 @@ function renderDashboardVendasTable(arrayVendas) {
       [],
       true,
       false,
-      getDashboardResponsiveOptions(
-        "dashboardVendasTable",
-        canDelete ? [0] : [],
-      ),
+      vendasTableOptions,
     );
   }
   clearDashboardTableGlobalSearch("dashboardVendasTable");
@@ -1599,6 +1620,7 @@ function renderDashboardVendasTable(arrayVendas) {
 var dashboardVendasFilterFn = null;
 var dashboardVendasDateRange = { start: "", end: "" };
 var dashboardVendasRowsById = {};
+var dashboardVendasCascadeSyncing = false;
 
 function getDashboardVendasTable() {
   if (!$.fn.DataTable || !$.fn.DataTable.isDataTable("#dashboardVendasTable")) {
@@ -1624,6 +1646,155 @@ function clearDashboardTableGlobalSearch(tableId) {
   }
 }
 
+function normalizeDashboardVendasFilterArray(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  return values
+    .map(function (value) {
+      return (value || "").toString().trim().toLowerCase();
+    })
+    .filter(function (value) {
+      return value !== "";
+    });
+}
+
+function getDashboardVendasRowsArray() {
+  var rows = [];
+  for (var id in dashboardVendasRowsById) {
+    if (Object.prototype.hasOwnProperty.call(dashboardVendasRowsById, id)) {
+      rows.push(dashboardVendasRowsById[id]);
+    }
+  }
+  return rows;
+}
+
+function syncDashboardVendasDependentFilters(changedFilterId) {
+  if (dashboardVendasCascadeSyncing) {
+    return;
+  }
+
+  var $categoria = $("#dashboardVendasCategoria");
+  var $cidade = $("#dashboardVendasCidade");
+  var $canal = $("#dashboardVendasCanal");
+
+  if (!$categoria.length || !$cidade.length || !$canal.length) {
+    return;
+  }
+
+  var categoriasSel = normalizeDashboardVendasFilterArray($categoria.val());
+  var cidadesSel = normalizeDashboardVendasFilterArray($cidade.val());
+  var canaisSel = normalizeDashboardVendasFilterArray($canal.val());
+  var startDate = ($("#dashboardVendasStartDate").val() || "").trim();
+  var endDate = ($("#dashboardVendasEndDate").val() || "").trim();
+  var rows = getDashboardVendasRowsArray();
+
+  function rowMatchesDate(row) {
+    var rowDate = row && row.DataHora ? row.DataHora.toString().substring(0, 10) : "";
+    if (startDate !== "" && rowDate < startDate) {
+      return false;
+    }
+    if (endDate !== "" && rowDate > endDate) {
+      return false;
+    }
+    return true;
+  }
+
+  var allowedCategoriasMap = {};
+  var allowedCidadesMap = {};
+  var allowedCanaisMap = {};
+
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i] || {};
+    if (!rowMatchesDate(row)) {
+      continue;
+    }
+
+    var categoriaRaw = row.categoria != null ? row.categoria.toString().trim() : "";
+    var categoria = categoriaRaw.toLowerCase();
+    var cidadeRaw = row.cidade != null ? row.cidade.toString().trim() : "";
+    var cidade = cidadeRaw.toLowerCase();
+    var canalRaw = row.canal_venda != null ? row.canal_venda.toString().trim() : "";
+    var canal = canalRaw.toLowerCase();
+
+    if (
+      (cidadesSel.length === 0 || cidadesSel.indexOf(cidade) > -1) &&
+      (canaisSel.length === 0 || canaisSel.indexOf(canal) > -1) &&
+      categoriaRaw !== ""
+    ) {
+      allowedCategoriasMap[categoriaRaw] = true;
+    }
+
+    if (
+      (categoriasSel.length === 0 || categoriasSel.indexOf(categoria) > -1) &&
+      (canaisSel.length === 0 || canaisSel.indexOf(canal) > -1) &&
+      cidadeRaw !== ""
+    ) {
+      allowedCidadesMap[cidadeRaw] = true;
+    }
+
+    if (
+      (categoriasSel.length === 0 || categoriasSel.indexOf(categoria) > -1) &&
+      (cidadesSel.length === 0 || cidadesSel.indexOf(cidade) > -1) &&
+      canalRaw !== ""
+    ) {
+      allowedCanaisMap[canalRaw] = true;
+    }
+  }
+
+  var allowedCategorias = Object.keys(allowedCategoriasMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+  var allowedCidades = Object.keys(allowedCidadesMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+  var allowedCanais = Object.keys(allowedCanaisMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+
+  function applyMultiOptions($select, options) {
+    var selected = Array.isArray($select.val()) ? $select.val() : [];
+    var selectedMap = {};
+    for (var idx = 0; idx < selected.length; idx++) {
+      selectedMap[selected[idx].toString().trim().toLowerCase()] = true;
+    }
+
+    var validSelected = [];
+    $select.empty();
+
+    for (var j = 0; j < options.length; j++) {
+      var optionValue = options[j];
+      var optionLower = optionValue.toString().trim().toLowerCase();
+      var isSelected = selectedMap[optionLower] === true;
+
+      $select.append($("<option></option>").val(optionValue).text(optionValue));
+      if (isSelected) {
+        validSelected.push(optionValue);
+      }
+    }
+
+    $select.val(validSelected);
+    if ($select.hasClass("select2-hidden-accessible")) {
+      $select.trigger("change.select2");
+    }
+  }
+
+  dashboardVendasCascadeSyncing = true;
+
+  if (changedFilterId !== "dashboardVendasCategoria") {
+    applyMultiOptions($categoria, allowedCategorias);
+  }
+  if (changedFilterId !== "dashboardVendasCidade") {
+    applyMultiOptions($cidade, allowedCidades);
+  }
+  if (changedFilterId !== "dashboardVendasCanal") {
+    applyMultiOptions($canal, allowedCanais);
+  }
+
+  dashboardVendasCascadeSyncing = false;
+}
+
 function initializeDashboardVendasSelectFilters() {
   if (!$.fn.select2) {
     return;
@@ -1633,7 +1804,6 @@ function initializeDashboardVendasSelectFilters() {
     "#dashboardVendasCategoria",
     "#dashboardVendasCidade",
     "#dashboardVendasCanal",
-    "#dashboardVendasProduto",
   ];
 
   for (var i = 0; i < filterSelectors.length; i++) {
@@ -1655,6 +1825,19 @@ function initializeDashboardVendasSelectFilters() {
       dropdownAutoWidth: true,
     });
   }
+
+  $(
+    "#dashboardVendasCategoria, #dashboardVendasCidade, #dashboardVendasCanal, #dashboardVendasStartDate, #dashboardVendasEndDate",
+  )
+    .off("change.dashboardVendasCascade")
+    .on("change.dashboardVendasCascade", function () {
+      if (dashboardVendasCascadeSyncing) {
+        return;
+      }
+      syncDashboardVendasDependentFilters(this.id);
+    });
+
+  syncDashboardVendasDependentFilters("");
 }
 
 function applyDashboardVendasFilters() {
@@ -1669,7 +1852,6 @@ function applyDashboardVendasFilters() {
   var categoria = filtros.categoria;
   var cidade = filtros.cidade;
   var canal = filtros.canal;
-  var produto = filtros.produto;
 
   dashboardVendasDateRange.start = startDate;
   dashboardVendasDateRange.end = endDate;
@@ -1701,15 +1883,6 @@ function applyDashboardVendasFilters() {
           return item !== "";
         })
     : [];
-  var produtoFiltros = Array.isArray(produto)
-    ? produto
-        .map(function (item) {
-          return (item || "").toString().trim().toLowerCase();
-        })
-        .filter(function (item) {
-          return item !== "";
-        })
-    : [];
   var canDelete = $("#dashboardVendaCanDelete").val() === "1";
   var colOffset = canDelete ? 1 : 0;
 
@@ -1729,20 +1902,17 @@ function applyDashboardVendasFilters() {
       return true;
     }
 
-    var rowDate = data[colOffset]
-      ? data[colOffset].toString().substring(0, 10)
+    var rowDate = data[colOffset + 1]
+      ? data[colOffset + 1].toString().substring(0, 10)
       : "";
-    var rowProduto = data[colOffset + 1]
-      ? data[colOffset + 1].toString().toLowerCase()
+    var rowCategoria = data[colOffset + 3]
+      ? data[colOffset + 3].toString().trim().toLowerCase()
       : "";
-    var rowCategoria = data[colOffset + 2]
-      ? data[colOffset + 2].toString().trim().toLowerCase()
-      : "";
-    var rowCanal = data[colOffset + 5]
-      ? data[colOffset + 5].toString().trim().toLowerCase()
-      : "";
-    var rowCidade = data[colOffset + 6]
+    var rowCanal = data[colOffset + 6]
       ? data[colOffset + 6].toString().trim().toLowerCase()
+      : "";
+    var rowCidade = data[colOffset + 7]
+      ? data[colOffset + 7].toString().trim().toLowerCase()
       : "";
 
     if (
@@ -1757,13 +1927,6 @@ function applyDashboardVendasFilters() {
     if (canalFiltros.length > 0 && canalFiltros.indexOf(rowCanal) === -1) {
       return false;
     }
-    if (
-      produtoFiltros.length > 0 &&
-      produtoFiltros.indexOf(rowProduto) === -1
-    ) {
-      return false;
-    }
-
     if (
       dashboardVendasDateRange.start !== "" &&
       rowDate < dashboardVendasDateRange.start
@@ -1788,7 +1951,6 @@ function getDashboardVendasFiltersPayload() {
   var categoriaSelecionada = $("#dashboardVendasCategoria").val();
   var cidadeSelecionada = $("#dashboardVendasCidade").val();
   var canalSelecionado = $("#dashboardVendasCanal").val();
-  var produtoSelecionado = $("#dashboardVendasProduto").val();
 
   return {
     startDate: ($("#dashboardVendasStartDate").val() || "").trim(),
@@ -1796,7 +1958,6 @@ function getDashboardVendasFiltersPayload() {
     categoria: Array.isArray(categoriaSelecionada) ? categoriaSelecionada : [],
     cidade: Array.isArray(cidadeSelecionada) ? cidadeSelecionada : [],
     canal: Array.isArray(canalSelecionado) ? canalSelecionado : [],
-    produto: Array.isArray(produtoSelecionado) ? produtoSelecionado : [],
   };
 }
 
@@ -1806,7 +1967,8 @@ function clearDashboardVendasFilters() {
   $("#dashboardVendasCategoria").val([]).trigger("change");
   $("#dashboardVendasCidade").val([]).trigger("change");
   $("#dashboardVendasCanal").val([]).trigger("change");
-  $("#dashboardVendasProduto").val([]).trigger("change");
+
+  syncDashboardVendasDependentFilters("");
 
   var table = getDashboardVendasTable();
   if (!table) {
@@ -2031,6 +2193,8 @@ async function downloadDashboardVendasPdf() {
 function renderDashboardProdutosTable(arrayProdutos) {
   dashboardProdutosRowsById = {};
   var tableBody = "";
+  var minPreco = Number.POSITIVE_INFINITY;
+  var maxPreco = Number.NEGATIVE_INFINITY;
   var canEdit = $("#dashboardProdutoCanEdit").val() === "1";
   var canDelete = $("#dashboardProdutoCanDelete").val() === "1";
   var showActions = canEdit;
@@ -2053,6 +2217,16 @@ function renderDashboardProdutosTable(arrayProdutos) {
 
     if (idProduto !== "") {
       dashboardProdutosRowsById[idProduto] = produto;
+    }
+
+    var precoRaw = parseFloat(produto.preco_uni);
+    if (!isNaN(precoRaw)) {
+      if (precoRaw < minPreco) {
+        minPreco = precoRaw;
+      }
+      if (precoRaw > maxPreco) {
+        maxPreco = precoRaw;
+      }
     }
 
     var actionsHtml = "";
@@ -2117,6 +2291,9 @@ function renderDashboardProdutosTable(arrayProdutos) {
     );
   }
   clearDashboardTableGlobalSearch("dashboardProdutosTable");
+  setDashboardProdutosPriceBounds(minPreco, maxPreco, true);
+  initializeDashboardProdutosSelectFilters();
+  applyDashboardProdutosFilters();
   bindDashboardBulkSelectionHandlers(
     "dashboardProdutosTable",
     "dashboard-produtos-row-select",
@@ -2125,7 +2302,543 @@ function renderDashboardProdutosTable(arrayProdutos) {
   );
 }
 
+var dashboardProdutosFilterFn = null;
 var dashboardProdutosRowsById = {};
+var dashboardProdutosCascadeSyncing = false;
+var dashboardProdutosPriceBounds = { min: null, max: null };
+
+function getDashboardProdutosTable() {
+  if (
+    !$.fn.DataTable ||
+    !$.fn.DataTable.isDataTable("#dashboardProdutosTable")
+  ) {
+    return null;
+  }
+  return $("#dashboardProdutosTable").DataTable();
+}
+
+function normalizeDashboardProdutosFilterArray(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  return values
+    .map(function (value) {
+      return (value || "").toString().trim().toLowerCase();
+    })
+    .filter(function (value) {
+      return value !== "";
+    });
+}
+
+function normalizeDashboardSearchTerm(value) {
+  return (value || "")
+    .toString()
+    .trim()
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
+}
+
+function getDashboardProdutosRowsArray() {
+  var rows = [];
+  for (var id in dashboardProdutosRowsById) {
+    if (Object.prototype.hasOwnProperty.call(dashboardProdutosRowsById, id)) {
+      rows.push(dashboardProdutosRowsById[id]);
+    }
+  }
+  return rows;
+}
+
+function setDashboardProdutosPriceBounds(minValue, maxValue, forceValues) {
+  var $precoMin = $("#dashboardProdutosPrecoMin");
+  var $precoMax = $("#dashboardProdutosPrecoMax");
+
+  if (!$precoMin.length || !$precoMax.length) {
+    return;
+  }
+
+  var min = parseFloat(minValue);
+  var max = parseFloat(maxValue);
+
+  if (isNaN(min) || isNaN(max)) {
+    dashboardProdutosPriceBounds.min = null;
+    dashboardProdutosPriceBounds.max = null;
+    $precoMin.removeAttr("min").removeAttr("max");
+    $precoMax.removeAttr("min").removeAttr("max");
+    return;
+  }
+
+  dashboardProdutosPriceBounds.min = min;
+  dashboardProdutosPriceBounds.max = max;
+
+  $precoMin.attr("min", min.toFixed(2)).attr("max", max.toFixed(2));
+  $precoMax.attr("min", min.toFixed(2)).attr("max", max.toFixed(2));
+
+  if (forceValues) {
+    $precoMin.val(min.toFixed(2));
+    $precoMax.val(max.toFixed(2));
+  }
+}
+
+function clampDashboardProdutosPriceInputs() {
+  var $precoMin = $("#dashboardProdutosPrecoMin");
+  var $precoMax = $("#dashboardProdutosPrecoMax");
+
+  if (!$precoMin.length || !$precoMax.length) {
+    return;
+  }
+
+  var globalMin = dashboardProdutosPriceBounds.min;
+  var globalMax = dashboardProdutosPriceBounds.max;
+  if (globalMin === null || globalMax === null) {
+    return;
+  }
+
+  var minVal = parseDashboardLocaleNumber($precoMin.val() || "");
+  var maxVal = parseDashboardLocaleNumber($precoMax.val() || "");
+
+  if (!isNaN(minVal)) {
+    var minUpperBound = !isNaN(maxVal) ? Math.min(globalMax, maxVal) : globalMax;
+    minVal = Math.max(globalMin, Math.min(minVal, minUpperBound));
+    $precoMin.val(minVal.toFixed(2));
+  }
+
+  if (!isNaN(maxVal)) {
+    var maxLowerBound = !isNaN(minVal) ? Math.max(globalMin, minVal) : globalMin;
+    maxVal = Math.max(maxLowerBound, Math.min(maxVal, globalMax));
+    $precoMax.val(maxVal.toFixed(2));
+  }
+}
+
+function configureDashboardProdutosPriceInputs() {
+  var $precoMin = $("#dashboardProdutosPrecoMin");
+  var $precoMax = $("#dashboardProdutosPrecoMax");
+
+  if (!$precoMin.length || !$precoMax.length) {
+    return;
+  }
+
+  $precoMin
+    .off(
+      "wheel.dashboardProdutosPrice keydown.dashboardProdutosPrice blur.dashboardProdutosPrice change.dashboardProdutosPrice",
+    )
+    .on("wheel.dashboardProdutosPrice", function (event) {
+      event.preventDefault();
+      this.blur();
+    })
+    .on("keydown.dashboardProdutosPrice", function (event) {
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        event.preventDefault();
+      }
+    })
+    .on("blur.dashboardProdutosPrice change.dashboardProdutosPrice", function () {
+      clampDashboardProdutosPriceInputs();
+    });
+
+  $precoMax
+    .off(
+      "wheel.dashboardProdutosPrice keydown.dashboardProdutosPrice blur.dashboardProdutosPrice change.dashboardProdutosPrice",
+    )
+    .on("wheel.dashboardProdutosPrice", function (event) {
+      event.preventDefault();
+      this.blur();
+    })
+    .on("keydown.dashboardProdutosPrice", function (event) {
+      if (event.key === "ArrowUp" || event.key === "ArrowDown") {
+        event.preventDefault();
+      }
+    })
+    .on("blur.dashboardProdutosPrice change.dashboardProdutosPrice", function () {
+      clampDashboardProdutosPriceInputs();
+    });
+}
+
+function validateDashboardProdutosPriceRange(showToast) {
+  var precoMinRaw = $("#dashboardProdutosPrecoMin").val() || "";
+  var precoMaxRaw = $("#dashboardProdutosPrecoMax").val() || "";
+  var precoMin = parseDashboardLocaleNumber(precoMinRaw);
+  var precoMax = parseDashboardLocaleNumber(precoMaxRaw);
+
+  if (!isNaN(precoMin) && precoMin < 0) {
+    if (showToast) {
+      toaster("O preço mínimo não pode ser negativo.", "warning");
+    }
+    return false;
+  }
+
+  if (!isNaN(precoMax) && precoMax < 0) {
+    if (showToast) {
+      toaster("O preço máximo não pode ser negativo.", "warning");
+    }
+    return false;
+  }
+
+  var globalMin = dashboardProdutosPriceBounds.min;
+  var globalMax = dashboardProdutosPriceBounds.max;
+  if (globalMin !== null && !isNaN(precoMin) && precoMin < globalMin) {
+    if (showToast) {
+      toaster(
+        "O preço mínimo não pode ser inferior a " +
+          globalMin.toFixed(2).replace(".", ",") +
+          ".",
+        "warning",
+      );
+    }
+    return false;
+  }
+
+  if (globalMax !== null && !isNaN(precoMax) && precoMax > globalMax) {
+    if (showToast) {
+      toaster(
+        "O preço máximo não pode ser superior a " +
+          globalMax.toFixed(2).replace(".", ",") +
+          ".",
+        "warning",
+      );
+    }
+    return false;
+  }
+
+  if (!isNaN(precoMin) && !isNaN(precoMax) && precoMin > precoMax) {
+    if (showToast) {
+      toaster("O preço mínimo não pode ser maior que o preço máximo.", "warning");
+    }
+    return false;
+  }
+
+  return true;
+}
+
+function syncDashboardProdutosDependentFilters(changedFilterId) {
+  if (dashboardProdutosCascadeSyncing) {
+    return;
+  }
+
+  if (!validateDashboardProdutosPriceRange(false)) {
+    return;
+  }
+
+  var $produto = $("#dashboardProdutosDescricaoFilter");
+  var $tipo = $("#dashboardProdutosTipoFilter");
+  var $estadoVendas = $("#dashboardProdutosVendasEstado");
+
+  if (!$produto.length || !$tipo.length || !$estadoVendas.length) {
+    return;
+  }
+
+  var produtosSel = normalizeDashboardProdutosFilterArray($produto.val());
+  var tiposSel = normalizeDashboardProdutosFilterArray($tipo.val());
+  var estadoVendasSel = ($estadoVendas.val() || "").trim();
+  var precoMin = parseDashboardLocaleNumber(
+    $("#dashboardProdutosPrecoMin").val() || "",
+  );
+  var precoMax = parseDashboardLocaleNumber(
+    $("#dashboardProdutosPrecoMax").val() || "",
+  );
+  var rows = getDashboardProdutosRowsArray();
+
+  function rowMatchesEstado(row, estado) {
+    var totalVendas = parseInt(row.total_vendas, 10) || 0;
+    if (estado === "com") {
+      return totalVendas > 0;
+    }
+    if (estado === "sem") {
+      return totalVendas === 0;
+    }
+    return true;
+  }
+
+  function rowMatchesPreco(row) {
+    var rowPreco = parseFloat(row.preco_uni);
+    if (!isNaN(precoMin) && !isNaN(rowPreco) && rowPreco < precoMin) {
+      return false;
+    }
+    if (!isNaN(precoMax) && !isNaN(rowPreco) && rowPreco > precoMax) {
+      return false;
+    }
+    return true;
+  }
+
+  var allowedProdutosMap = {};
+  var allowedTiposMap = {};
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i] || {};
+    var produtoRaw = row.descricao != null ? row.descricao.toString().trim() : "";
+    var produto = produtoRaw.toLowerCase();
+    var tipoRaw = row.tipo_produto != null ? row.tipo_produto.toString().trim() : "";
+    var tipo = tipoRaw.toLowerCase();
+
+    if (!rowMatchesPreco(row)) {
+      continue;
+    }
+
+    if (
+      (tiposSel.length === 0 || tiposSel.indexOf(tipo) > -1) &&
+      rowMatchesEstado(row, estadoVendasSel) &&
+      produtoRaw !== ""
+    ) {
+      allowedProdutosMap[produtoRaw] = true;
+    }
+
+    if (
+      (produtosSel.length === 0 || produtosSel.indexOf(produto) > -1) &&
+      rowMatchesEstado(row, estadoVendasSel) &&
+      tipoRaw !== ""
+    ) {
+      allowedTiposMap[tipoRaw] = true;
+    }
+  }
+
+  var allowedProdutos = Object.keys(allowedProdutosMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+  var allowedTipos = Object.keys(allowedTiposMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+
+  function applyMultiOptions($select, options) {
+    var selected = Array.isArray($select.val()) ? $select.val() : [];
+    var selectedMap = {};
+    for (var idx = 0; idx < selected.length; idx++) {
+      selectedMap[selected[idx].toString().trim().toLowerCase()] = true;
+    }
+
+    var validSelected = [];
+    $select.empty();
+
+    for (var j = 0; j < options.length; j++) {
+      var optionValue = options[j];
+      var optionLower = optionValue.toString().trim().toLowerCase();
+      var isSelected = selectedMap[optionLower] === true;
+
+      $select.append($("<option></option>").val(optionValue).text(optionValue));
+      if (isSelected) {
+        validSelected.push(optionValue);
+      }
+    }
+
+    $select.val(validSelected);
+    if ($select.hasClass("select2-hidden-accessible")) {
+      $select.trigger("change.select2");
+    }
+  }
+
+  dashboardProdutosCascadeSyncing = true;
+
+  if (changedFilterId !== "dashboardProdutosDescricaoFilter") {
+    applyMultiOptions($produto, allowedProdutos);
+  }
+  if (changedFilterId !== "dashboardProdutosTipoFilter") {
+    applyMultiOptions($tipo, allowedTipos);
+  }
+
+  dashboardProdutosCascadeSyncing = false;
+}
+
+function initializeDashboardProdutosSelectFilters() {
+  if (!$.fn.select2) {
+    return;
+  }
+
+  var $produto = $("#dashboardProdutosDescricaoFilter");
+  var $tipo = $("#dashboardProdutosTipoFilter");
+  if (!$produto.length || !$tipo.length) {
+    return;
+  }
+
+  if ($produto.hasClass("select2-hidden-accessible")) {
+    $produto.select2("destroy");
+  }
+
+  $produto.select2({
+    placeholder: $produto.attr("data-placeholder") || "Selecionar",
+    width: "100%",
+    closeOnSelect: false,
+    allowClear: true,
+    dropdownAutoWidth: true,
+    matcher: function (params, data) {
+      var term = normalizeDashboardSearchTerm(params.term || "");
+      if (term === "") {
+        return data;
+      }
+
+      var text = normalizeDashboardSearchTerm(data.text || "");
+      if (text.indexOf(term) > -1) {
+        return data;
+      }
+      return null;
+    },
+  });
+
+  if ($tipo.hasClass("select2-hidden-accessible")) {
+    $tipo.select2("destroy");
+  }
+
+  $tipo.select2({
+    placeholder: $tipo.attr("data-placeholder") || "Selecionar",
+    width: "100%",
+    closeOnSelect: false,
+    allowClear: true,
+    dropdownAutoWidth: true,
+  });
+
+  configureDashboardProdutosPriceInputs();
+
+  $(
+    "#dashboardProdutosDescricaoFilter, #dashboardProdutosTipoFilter, #dashboardProdutosVendasEstado, #dashboardProdutosPrecoMin, #dashboardProdutosPrecoMax",
+  )
+    .off("change.dashboardProdutosCascade input.dashboardProdutosCascade")
+    .on("change.dashboardProdutosCascade input.dashboardProdutosCascade", function () {
+      if (dashboardProdutosCascadeSyncing) {
+        return;
+      }
+      syncDashboardProdutosDependentFilters(this.id);
+    });
+
+  syncDashboardProdutosDependentFilters("");
+}
+
+function getDashboardProdutosFiltersPayload() {
+  var produtoSelecionado = $("#dashboardProdutosDescricaoFilter").val();
+  var tipoSelecionado = $("#dashboardProdutosTipoFilter").val();
+  return {
+    produtos: Array.isArray(produtoSelecionado) ? produtoSelecionado : [],
+    tipos: Array.isArray(tipoSelecionado) ? tipoSelecionado : [],
+    precoMin: ($("#dashboardProdutosPrecoMin").val() || "").trim(),
+    precoMax: ($("#dashboardProdutosPrecoMax").val() || "").trim(),
+    estadoVendas: ($("#dashboardProdutosVendasEstado").val() || "").trim(),
+  };
+}
+
+function applyDashboardProdutosFilters() {
+  var table = getDashboardProdutosTable();
+  if (!table) {
+    return;
+  }
+
+  clampDashboardProdutosPriceInputs();
+
+  if (!validateDashboardProdutosPriceRange(true)) {
+    return;
+  }
+
+  var filtros = getDashboardProdutosFiltersPayload();
+  var produtosFiltro = filtros.produtos
+    .map(function (item) {
+      return (item || "").toString().trim().toLowerCase();
+    })
+    .filter(function (item) {
+      return item !== "";
+    });
+  var tiposFiltro = filtros.tipos
+    .map(function (item) {
+      return (item || "").toString().trim().toLowerCase();
+    })
+    .filter(function (item) {
+      return item !== "";
+    });
+  var precoMin = parseDashboardLocaleNumber(filtros.precoMin);
+  var precoMax = parseDashboardLocaleNumber(filtros.precoMax);
+  var estadoVendas = filtros.estadoVendas;
+  var canDelete = $("#dashboardProdutoCanDelete").val() === "1";
+  var colOffset = canDelete ? 1 : 0;
+
+  if (dashboardProdutosFilterFn !== null) {
+    var idx = $.fn.dataTable.ext.search.indexOf(dashboardProdutosFilterFn);
+    if (idx > -1) {
+      $.fn.dataTable.ext.search.splice(idx, 1);
+    }
+  }
+
+  dashboardProdutosFilterFn = function (settings, data) {
+    if (
+      !settings ||
+      !settings.nTable ||
+      settings.nTable.id !== "dashboardProdutosTable"
+    ) {
+      return true;
+    }
+
+    var rowId = parseInt(data[colOffset], 10);
+    var row = !isNaN(rowId) ? dashboardProdutosRowsById[rowId] : null;
+    var rowDescricao = row
+      ? (row.descricao || "").toString().trim().toLowerCase()
+      : data[colOffset + 1]
+        ? data[colOffset + 1].toString().trim().toLowerCase()
+        : "";
+    var rowTipo = row
+      ? (row.tipo_produto || "").toString().trim().toLowerCase()
+      : data[colOffset + 2]
+        ? data[colOffset + 2].toString().trim().toLowerCase()
+        : "";
+    var rowPreco = row
+      ? parseFloat(row.preco_uni)
+      : parseDashboardLocaleNumber(data[colOffset + 3] || "");
+    var totalVendas = row ? parseInt(row.total_vendas, 10) || 0 : 0;
+
+    if (produtosFiltro.length > 0 && produtosFiltro.indexOf(rowDescricao) === -1) {
+      return false;
+    }
+    if (tiposFiltro.length > 0 && tiposFiltro.indexOf(rowTipo) === -1) {
+      return false;
+    }
+    if (!isNaN(precoMin) && !isNaN(rowPreco) && rowPreco < precoMin) {
+      return false;
+    }
+    if (!isNaN(precoMax) && !isNaN(rowPreco) && rowPreco > precoMax) {
+      return false;
+    }
+    if (estadoVendas === "com" && totalVendas < 1) {
+      return false;
+    }
+    if (estadoVendas === "sem" && totalVendas > 0) {
+      return false;
+    }
+
+    return true;
+  };
+
+  $.fn.dataTable.ext.search.push(dashboardProdutosFilterFn);
+  table.draw();
+}
+
+function clearDashboardProdutosFilters() {
+  $("#dashboardProdutosDescricaoFilter").val([]).trigger("change");
+  $("#dashboardProdutosTipoFilter").val([]).trigger("change");
+  if (
+    dashboardProdutosPriceBounds.min !== null &&
+    dashboardProdutosPriceBounds.max !== null
+  ) {
+    $("#dashboardProdutosPrecoMin").val(
+      dashboardProdutosPriceBounds.min.toFixed(2),
+    );
+    $("#dashboardProdutosPrecoMax").val(
+      dashboardProdutosPriceBounds.max.toFixed(2),
+    );
+  } else {
+    $("#dashboardProdutosPrecoMin").val("");
+    $("#dashboardProdutosPrecoMax").val("");
+  }
+  $("#dashboardProdutosVendasEstado").val("");
+
+  syncDashboardProdutosDependentFilters("");
+
+  var table = getDashboardProdutosTable();
+  if (!table) {
+    return;
+  }
+
+  if (dashboardProdutosFilterFn !== null) {
+    var idx = $.fn.dataTable.ext.search.indexOf(dashboardProdutosFilterFn);
+    if (idx > -1) {
+      $.fn.dataTable.ext.search.splice(idx, 1);
+    }
+    dashboardProdutosFilterFn = null;
+  }
+
+  table.draw();
+}
 
 function openDashboardProdutoModal() {
   $("#dashboardProdutoRowId").val("");
@@ -2242,6 +2955,50 @@ async function deleteSelectedDashboardProdutos() {
     backendFunction: "deleteDashboardProdutoBulk",
     esc: 4,
   });
+}
+
+async function downloadDashboardProdutosPdf() {
+  var filtros = getDashboardProdutosFiltersPayload();
+
+  showDashboardLoadingAlert(
+    "A gerar PDF",
+    "Aguarde, estamos a preparar o relatório...",
+  );
+
+  try {
+    var response = await $.ajax({
+      type: "POST",
+      url: "connect.php",
+      dataType: "text",
+      headers: {
+        Authorization: "Bearer " + md5(localStorage.getItem("sessionObject")),
+      },
+      data: {
+        package: overal({
+          origin: "module/core/php/dashboarddb.php",
+          function: "exportDashboardProdutosPdf",
+          attr: JSON.stringify(filtros),
+        }),
+      },
+    });
+
+    var obj = parseDashboardResponse(response);
+    if (obj.val == 1) {
+      toaster(obj.msg, "success");
+      if (obj.link) {
+        window.open(obj.link, "_blank");
+      }
+    } else {
+      toaster(obj.msg || "Erro ao gerar PDF.", "warning");
+    }
+  } catch (error) {
+    toaster(
+      "Erro ao gerar PDF: " + (error.statusText || error.message || error),
+      "error",
+    );
+  } finally {
+    closeDashboardLoadingAlert();
+  }
 }
 
 // --- Generic simple entity CRUD (shared by Categorias + Cidades) ---
@@ -2440,13 +3197,440 @@ var dashboardCategoriasConfig = {
 
 var dashboardCategoriasRowsById = {};
 
-function renderDashboardCategoriasTable(arrayCategorias) {
-  dashboardCategoriasRowsById = {};
-  renderDashboardSimpleEntityTable(
-    dashboardCategoriasConfig,
-    arrayCategorias,
-    dashboardCategoriasRowsById,
+var dashboardCategoriasFilterFn = null;
+var dashboardCategoriasCascadeSyncing = false;
+
+function getDashboardCategoriasTable() {
+  if (
+    !$.fn.DataTable ||
+    !$.fn.DataTable.isDataTable("#dashboardCategoriasTable")
+  ) {
+    return null;
+  }
+  return $("#dashboardCategoriasTable").DataTable();
+}
+
+function normalizeDashboardCategoriasFilterArray(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  return values
+    .map(function (value) {
+      return (value || "").toString().trim().toLowerCase();
+    })
+    .filter(function (value) {
+      return value !== "";
+    });
+}
+
+function getDashboardCategoriasRowsArray() {
+  var rows = [];
+  for (var id in dashboardCategoriasRowsById) {
+    if (Object.prototype.hasOwnProperty.call(dashboardCategoriasRowsById, id)) {
+      rows.push(dashboardCategoriasRowsById[id]);
+    }
+  }
+  return rows;
+}
+
+function syncDashboardCategoriasDependentFilters(changedFilterId) {
+  if (dashboardCategoriasCascadeSyncing) {
+    return;
+  }
+
+  var $categoria = $("#dashboardCategoriasFilter");
+  var $estadoProdutos = $("#dashboardCategoriasProdutosEstado");
+  var $estadoVendas = $("#dashboardCategoriasVendasEstado");
+
+  if (!$categoria.length || !$estadoProdutos.length || !$estadoVendas.length) {
+    return;
+  }
+
+  var categoriasSel = normalizeDashboardCategoriasFilterArray($categoria.val());
+  var estadoProdutosSel = ($estadoProdutos.val() || "").trim();
+  var estadoVendasSel = ($estadoVendas.val() || "").trim();
+  var rows = getDashboardCategoriasRowsArray();
+
+  function rowMatchesEstadoProdutos(row, estado) {
+    var totalProdutos = parseInt(row.total_produtos, 10) || 0;
+    if (estado === "com") {
+      return totalProdutos > 0;
+    }
+    if (estado === "sem") {
+      return totalProdutos === 0;
+    }
+    return true;
+  }
+
+  function rowMatchesEstadoVendas(row, estado) {
+    var totalVendas = parseInt(row.total_vendas, 10) || 0;
+    if (estado === "com") {
+      return totalVendas > 0;
+    }
+    if (estado === "sem") {
+      return totalVendas === 0;
+    }
+    return true;
+  }
+
+  var allowedCategoriasMap = {};
+  var hasComProdutos = false;
+  var hasSemProdutos = false;
+  var hasComVendas = false;
+  var hasSemVendas = false;
+
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i] || {};
+    var categoriaRaw =
+      row.descricao != null ? row.descricao.toString().trim() : "";
+    var categoria = categoriaRaw.toLowerCase();
+
+    if (
+      rowMatchesEstadoProdutos(row, estadoProdutosSel) &&
+      rowMatchesEstadoVendas(row, estadoVendasSel) &&
+      categoriaRaw !== ""
+    ) {
+      allowedCategoriasMap[categoriaRaw] = true;
+    }
+
+    if (
+      (categoriasSel.length === 0 || categoriasSel.indexOf(categoria) > -1) &&
+      rowMatchesEstadoVendas(row, estadoVendasSel)
+    ) {
+      var totalProdutos = parseInt(row.total_produtos, 10) || 0;
+      if (totalProdutos > 0) {
+        hasComProdutos = true;
+      } else {
+        hasSemProdutos = true;
+      }
+    }
+
+    if (
+      (categoriasSel.length === 0 || categoriasSel.indexOf(categoria) > -1) &&
+      rowMatchesEstadoProdutos(row, estadoProdutosSel)
+    ) {
+      var totalVendas = parseInt(row.total_vendas, 10) || 0;
+      if (totalVendas > 0) {
+        hasComVendas = true;
+      } else {
+        hasSemVendas = true;
+      }
+    }
+  }
+
+  var allowedCategorias = Object.keys(allowedCategoriasMap).sort(
+    function (a, b) {
+      return a.localeCompare(b, "pt", { sensitivity: "base" });
+    },
   );
+
+  function applyCategoriaOptions(options) {
+    var selected = Array.isArray($categoria.val()) ? $categoria.val() : [];
+    var selectedMap = {};
+    for (var idx = 0; idx < selected.length; idx++) {
+      selectedMap[selected[idx].toString().trim().toLowerCase()] = true;
+    }
+
+    var validSelected = [];
+    $categoria.empty();
+
+    for (var j = 0; j < options.length; j++) {
+      var optionValue = options[j];
+      var optionLower = optionValue.toString().trim().toLowerCase();
+      var isSelected = selectedMap[optionLower] === true;
+
+      $categoria.append(
+        $("<option></option>").val(optionValue).text(optionValue),
+      );
+
+      if (isSelected) {
+        validSelected.push(optionValue);
+      }
+    }
+
+    $categoria.val(validSelected);
+    if ($categoria.hasClass("select2-hidden-accessible")) {
+      $categoria.trigger("change.select2");
+    }
+  }
+
+  function applyStateOptions($select, hasCom, hasSem) {
+    var current = ($select.val() || "").trim();
+    var isProdutos = $select.attr("id").indexOf("Produtos") > -1;
+    var options = [
+      { value: "", label: "Todos" },
+      { value: "com", label: isProdutos ? "Com produtos" : "Com vendas" },
+      { value: "sem", label: isProdutos ? "Sem produtos" : "Sem vendas" },
+    ];
+
+    $select.empty();
+    for (var k = 0; k < options.length; k++) {
+      $select.append(
+        $("<option></option>").val(options[k].value).text(options[k].label),
+      );
+    }
+
+    var allowedValues = options.map(function (opt) {
+      return opt.value;
+    });
+    if (allowedValues.indexOf(current) > -1) {
+      $select.val(current);
+    } else {
+      $select.val("");
+    }
+  }
+
+  dashboardCategoriasCascadeSyncing = true;
+
+  if (changedFilterId !== "dashboardCategoriasFilter") {
+    applyCategoriaOptions(allowedCategorias);
+  }
+
+  if (changedFilterId !== "dashboardCategoriasProdutosEstado") {
+    applyStateOptions($estadoProdutos, hasComProdutos, hasSemProdutos);
+  }
+
+  if (changedFilterId !== "dashboardCategoriasVendasEstado") {
+    applyStateOptions($estadoVendas, hasComVendas, hasSemVendas);
+  }
+
+  dashboardCategoriasCascadeSyncing = false;
+}
+
+function initializeDashboardCategoriasSelectFilters() {
+  if (!$.fn.select2) {
+    return;
+  }
+
+  var $categoria = $("#dashboardCategoriasFilter");
+  if (!$categoria.length) {
+    return;
+  }
+
+  if ($categoria.hasClass("select2-hidden-accessible")) {
+    $categoria.select2("destroy");
+  }
+
+  $categoria.select2({
+    placeholder: $categoria.attr("data-placeholder") || "Selecionar",
+    width: "100%",
+    closeOnSelect: false,
+    allowClear: true,
+    dropdownAutoWidth: true,
+  });
+
+  $(
+    "#dashboardCategoriasFilter, #dashboardCategoriasProdutosEstado, #dashboardCategoriasVendasEstado",
+  )
+    .off("change.dashboardCategoriasCascade")
+    .on("change.dashboardCategoriasCascade", function () {
+      if (dashboardCategoriasCascadeSyncing) {
+        return;
+      }
+      syncDashboardCategoriasDependentFilters(this.id);
+    });
+
+  syncDashboardCategoriasDependentFilters("");
+}
+
+function getDashboardCategoriasFiltersPayload() {
+  var categoriasSelecionadas = $("#dashboardCategoriasFilter").val();
+
+  return {
+    categorias: Array.isArray(categoriasSelecionadas)
+      ? categoriasSelecionadas
+      : [],
+    estadoProdutos: (
+      $("#dashboardCategoriasProdutosEstado").val() || ""
+    ).trim(),
+    estadoVendas: ($("#dashboardCategoriasVendasEstado").val() || "").trim(),
+  };
+}
+
+function applyDashboardCategoriasFilters() {
+  var table = getDashboardCategoriasTable();
+  if (!table) {
+    return;
+  }
+
+  var filtros = getDashboardCategoriasFiltersPayload();
+  var categoriasFiltro = filtros.categorias
+    .map(function (item) {
+      return (item || "").toString().trim().toLowerCase();
+    })
+    .filter(function (item) {
+      return item !== "";
+    });
+  var estadoProdutos = filtros.estadoProdutos;
+  var estadoVendas = filtros.estadoVendas;
+  var canDelete = $("#dashboardCategoriaCanDelete").val() === "1";
+  var colOffset = canDelete ? 1 : 0;
+
+  if (dashboardCategoriasFilterFn !== null) {
+    var idx = $.fn.dataTable.ext.search.indexOf(dashboardCategoriasFilterFn);
+    if (idx > -1) {
+      $.fn.dataTable.ext.search.splice(idx, 1);
+    }
+  }
+
+  dashboardCategoriasFilterFn = function (settings, data, dataIndex) {
+    if (
+      !settings ||
+      !settings.nTable ||
+      settings.nTable.id !== "dashboardCategoriasTable"
+    ) {
+      return true;
+    }
+
+    var rowNode =
+      settings && settings.aoData && settings.aoData[dataIndex]
+        ? settings.aoData[dataIndex].nTr
+        : null;
+    var rowId = rowNode ? parseInt($(rowNode).attr("data-row-id"), 10) : NaN;
+    var row = !isNaN(rowId) ? dashboardCategoriasRowsById[rowId] : null;
+    var rowDescricao = data[colOffset]
+      ? data[colOffset].toString().trim().toLowerCase()
+      : "";
+    var totalProdutos = row ? parseInt(row.total_produtos, 10) || 0 : 0;
+    var totalVendas = row ? parseInt(row.total_vendas, 10) || 0 : 0;
+
+    if (
+      categoriasFiltro.length > 0 &&
+      categoriasFiltro.indexOf(rowDescricao) === -1
+    ) {
+      return false;
+    }
+    if (estadoProdutos === "com" && totalProdutos < 1) {
+      return false;
+    }
+    if (estadoProdutos === "sem" && totalProdutos > 0) {
+      return false;
+    }
+    if (estadoVendas === "com" && totalVendas < 1) {
+      return false;
+    }
+    if (estadoVendas === "sem" && totalVendas > 0) {
+      return false;
+    }
+
+    return true;
+  };
+
+  $.fn.dataTable.ext.search.push(dashboardCategoriasFilterFn);
+  table.draw();
+}
+
+function clearDashboardCategoriasFilters() {
+  $("#dashboardCategoriasFilter").val([]).trigger("change");
+  $("#dashboardCategoriasProdutosEstado").val("");
+  $("#dashboardCategoriasVendasEstado").val("");
+
+  var table = getDashboardCategoriasTable();
+  if (!table) {
+    return;
+  }
+
+  if (dashboardCategoriasFilterFn !== null) {
+    var idx = $.fn.dataTable.ext.search.indexOf(dashboardCategoriasFilterFn);
+    if (idx > -1) {
+      $.fn.dataTable.ext.search.splice(idx, 1);
+    }
+    dashboardCategoriasFilterFn = null;
+  }
+
+  table.draw();
+}
+
+function renderDashboardCategoriasTable(arrayCategorias) {
+  var tableBody = "";
+  var canDelete = $("#dashboardCategoriaCanDelete").val() === "1";
+  var canEdit = $("#dashboardCategoriaCanEdit").val() === "1";
+
+  dashboardCategoriasRowsById = {};
+
+  if (
+    $.fn.DataTable &&
+    $.fn.DataTable.isDataTable("#dashboardCategoriasTable")
+  ) {
+    $("#dashboardCategoriasTable").DataTable().clear().destroy();
+  }
+
+  for (var index = 0; index < arrayCategorias.length; index++) {
+    var categoria = arrayCategorias[index] || {};
+    var categoriaId = categoria.id != null ? categoria.id : "";
+    var descricao = categoria.descricao != null ? categoria.descricao : "";
+    var totalProdutos = parseInt(categoria.total_produtos, 10) || 0;
+    var totalVendas = parseInt(categoria.total_vendas, 10) || 0;
+
+    if (categoriaId !== "") {
+      dashboardCategoriasRowsById[categoriaId] = categoria;
+    }
+
+    var produtosLabel =
+      totalProdutos > 0 ? "Sim (" + totalProdutos + ")" : "Não (0)";
+    var vendasLabel = totalVendas > 0 ? "Sim (" + totalVendas + ")" : "Não (0)";
+
+    var actionsHtml = "";
+    if (canEdit && categoriaId !== "") {
+      actionsHtml +=
+        "<a class='btn btn-primary btn-xs dashboard-row-edit-btn' title='Editar' onclick='editDashboardCategoria(" +
+        categoriaId +
+        ")'><i class='fas fa-edit'></i> Editar</a>";
+    }
+
+    tableBody +=
+      "<tr data-row-id='" +
+      categoriaId +
+      "'>" +
+      (canDelete
+        ? "<td class='text-center dashboard-bulk-select-col'><input type='checkbox' class='dashboard-bulk-row-select dashboard-categorias-row-select' data-id='" +
+          categoriaId +
+          "'></td>"
+        : "") +
+      "<td>" +
+      descricao +
+      "</td>" +
+      "<td>" +
+      produtosLabel +
+      "</td>" +
+      "<td>" +
+      vendasLabel +
+      "</td>" +
+      (canEdit ? "<td class='text-nowrap'>" + actionsHtml + "</td>" : "") +
+      "</tr>";
+  }
+
+  $("#dashboardCategoriasTableBody").html(tableBody);
+  if (
+    $.fn.DataTable &&
+    !$.fn.DataTable.isDataTable("#dashboardCategoriasTable")
+  ) {
+    createDataTable(
+      "dashboardCategoriasTable",
+      false,
+      "",
+      false,
+      10,
+      [],
+      true,
+      false,
+      getDashboardResponsiveOptions(
+        "dashboardCategoriasTable",
+        canDelete ? [0] : [],
+      ),
+    );
+  }
+
+  clearDashboardTableGlobalSearch("dashboardCategoriasTable");
+  bindDashboardBulkSelectionHandlers(
+    "dashboardCategoriasTable",
+    "dashboard-categorias-row-select",
+    "dashboardCategoriasSelectAll",
+    "dashboardCategoriasDeleteSelectedBtn",
+  );
+  initializeDashboardCategoriasSelectFilters();
+  applyDashboardCategoriasFilters();
 }
 
 function openDashboardCategoriaModal() {
@@ -2481,6 +3665,50 @@ async function deleteSelectedDashboardCategorias() {
   });
 }
 
+async function downloadDashboardCategoriasPdf() {
+  var filtros = getDashboardCategoriasFiltersPayload();
+
+  showDashboardLoadingAlert(
+    "A gerar PDF",
+    "Aguarde, estamos a preparar o relatório...",
+  );
+
+  try {
+    var response = await $.ajax({
+      type: "POST",
+      url: "connect.php",
+      dataType: "text",
+      headers: {
+        Authorization: "Bearer " + md5(localStorage.getItem("sessionObject")),
+      },
+      data: {
+        package: overal({
+          origin: "module/core/php/dashboarddb.php",
+          function: "exportDashboardCategoriasPdf",
+          attr: JSON.stringify(filtros),
+        }),
+      },
+    });
+
+    var obj = parseDashboardResponse(response);
+    if (obj.val == 1) {
+      toaster(obj.msg, "success");
+      if (obj.link) {
+        window.open(obj.link, "_blank");
+      }
+    } else {
+      toaster(obj.msg || "Erro ao gerar PDF.", "warning");
+    }
+  } catch (error) {
+    toaster(
+      "Erro ao gerar PDF: " + (error.statusText || error.message || error),
+      "error",
+    );
+  } finally {
+    closeDashboardLoadingAlert();
+  }
+}
+
 // --- Cidades (config + thin wrappers) ---
 
 var dashboardCidadesConfig = {
@@ -2507,13 +3735,540 @@ var dashboardCidadesConfig = {
 
 var dashboardCidadesRowsById = {};
 
+var dashboardCidadesFilterFn = null;
+var dashboardCidadesCascadeSyncing = false;
+
+function getDashboardCidadesTable() {
+  if (
+    !$.fn.DataTable ||
+    !$.fn.DataTable.isDataTable("#dashboardCidadesTable")
+  ) {
+    return null;
+  }
+  return $("#dashboardCidadesTable").DataTable();
+}
+
+function normalizeDashboardCidadesFilterArray(values) {
+  if (!Array.isArray(values)) {
+    return [];
+  }
+
+  return values
+    .map(function (value) {
+      return (value || "").toString().trim().toLowerCase();
+    })
+    .filter(function (value) {
+      return value !== "";
+    });
+}
+
+function getDashboardCidadesRowsArray() {
+  var rows = [];
+  for (var id in dashboardCidadesRowsById) {
+    if (Object.prototype.hasOwnProperty.call(dashboardCidadesRowsById, id)) {
+      rows.push(dashboardCidadesRowsById[id]);
+    }
+  }
+  return rows;
+}
+
+function syncDashboardCidadesDependentFilters(changedFilterId) {
+  if (dashboardCidadesCascadeSyncing) {
+    return;
+  }
+
+  var $cidade = $("#dashboardCidadesCidadeFilter");
+  var $distrito = $("#dashboardCidadesDistritoFilter");
+  var $concelho = $("#dashboardCidadesConcelhoFilter");
+  var $produto = $("#dashboardCidadesProdutoFilter");
+
+  if (
+    !$cidade.length ||
+    !$distrito.length ||
+    !$concelho.length ||
+    !$produto.length
+  ) {
+    return;
+  }
+
+  var cidadesSel = normalizeDashboardCidadesFilterArray($cidade.val());
+  var distritosSel = normalizeDashboardCidadesFilterArray($distrito.val());
+  var concelhosSel = normalizeDashboardCidadesFilterArray($concelho.val());
+  var produtosSel = normalizeDashboardCidadesFilterArray($produto.val());
+  var estadoVendasSel = $("#dashboardCidadesVendasEstado").val() || "";
+  var rows = getDashboardCidadesRowsArray();
+
+  var allowedCidadesMap = {};
+  var allowedDistritosMap = {};
+  var allowedConcelhosMap = {};
+  var allowedProdutosMap = {};
+
+  for (var i = 0; i < rows.length; i++) {
+    var row = rows[i] || {};
+    var cidadeRaw =
+      row.descricao != null ? row.descricao.toString().trim() : "";
+    var distritoRaw =
+      row.distrito != null ? row.distrito.toString().trim() : "";
+    var concelhoRaw =
+      row.concelho != null ? row.concelho.toString().trim() : "";
+
+    var cidade = cidadeRaw.toLowerCase();
+    var distrito = distritoRaw.toLowerCase();
+    var concelho = concelhoRaw.toLowerCase();
+    var produtosTokens =
+      row.produtos_tokens != null
+        ? row.produtos_tokens
+            .toString()
+            .split("||")
+            .map(function (item) {
+              return (item || "").toString().trim().toLowerCase();
+            })
+            .filter(function (item) {
+              return item !== "";
+            })
+        : [];
+    var matchProduto =
+      produtosSel.length === 0 ||
+      produtosSel.some(function (produtoValue) {
+        return produtosTokens.indexOf(produtoValue) > -1;
+      });
+    var totalVendas = parseInt(row.total_vendas, 10) || 0;
+    var matchEstadoVendas =
+      estadoVendasSel === "" ||
+      (estadoVendasSel === "com" && totalVendas > 0) ||
+      (estadoVendasSel === "sem" && totalVendas === 0);
+
+    if (
+      (distritosSel.length === 0 || distritosSel.indexOf(distrito) > -1) &&
+      (concelhosSel.length === 0 || concelhosSel.indexOf(concelho) > -1) &&
+      matchProduto &&
+      matchEstadoVendas &&
+      cidadeRaw !== ""
+    ) {
+      allowedCidadesMap[cidadeRaw] = true;
+    }
+
+    if (
+      (cidadesSel.length === 0 || cidadesSel.indexOf(cidade) > -1) &&
+      (concelhosSel.length === 0 || concelhosSel.indexOf(concelho) > -1) &&
+      matchProduto &&
+      matchEstadoVendas &&
+      distritoRaw !== ""
+    ) {
+      allowedDistritosMap[distritoRaw] = true;
+    }
+
+    if (
+      (cidadesSel.length === 0 || cidadesSel.indexOf(cidade) > -1) &&
+      (distritosSel.length === 0 || distritosSel.indexOf(distrito) > -1) &&
+      matchProduto &&
+      matchEstadoVendas &&
+      concelhoRaw !== ""
+    ) {
+      allowedConcelhosMap[concelhoRaw] = true;
+    }
+
+    if (
+      (cidadesSel.length === 0 || cidadesSel.indexOf(cidade) > -1) &&
+      (distritosSel.length === 0 || distritosSel.indexOf(distrito) > -1) &&
+      (concelhosSel.length === 0 || concelhosSel.indexOf(concelho) > -1) &&
+      matchEstadoVendas
+    ) {
+      for (
+        var tokenIndex = 0;
+        tokenIndex < produtosTokens.length;
+        tokenIndex++
+      ) {
+        var produtoRaw = (produtosTokens[tokenIndex] || "").toString().trim();
+        if (produtoRaw !== "") {
+          allowedProdutosMap[produtoRaw] = true;
+        }
+      }
+    }
+  }
+
+  var allowedCidades = Object.keys(allowedCidadesMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+  var allowedDistritos = Object.keys(allowedDistritosMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+  var allowedConcelhos = Object.keys(allowedConcelhosMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+  var allowedProdutos = Object.keys(allowedProdutosMap).sort(function (a, b) {
+    return a.localeCompare(b, "pt", { sensitivity: "base" });
+  });
+
+  function applyOptions($select, options, keepSelectedIfMissing) {
+    if (keepSelectedIfMissing === undefined) {
+      keepSelectedIfMissing = true;
+    }
+
+    var selected = Array.isArray($select.val()) ? $select.val() : [];
+    var selectedMap = {};
+    for (var i = 0; i < selected.length; i++) {
+      selectedMap[selected[i].toString().trim().toLowerCase()] = true;
+    }
+
+    var optionMap = {};
+    for (var k = 0; k < options.length; k++) {
+      optionMap[options[k].toString().trim().toLowerCase()] = options[k];
+    }
+    if (keepSelectedIfMissing) {
+      for (var s = 0; s < selected.length; s++) {
+        var selectedValue =
+          selected[s] != null ? selected[s].toString().trim() : "";
+        var selectedKey = selectedValue.toLowerCase();
+        if (selectedValue !== "" && optionMap[selectedKey] == null) {
+          optionMap[selectedKey] = selectedValue;
+        }
+      }
+    }
+
+    var mergedOptions = Object.keys(optionMap)
+      .map(function (key) {
+        return optionMap[key];
+      })
+      .sort(function (a, b) {
+        return a.localeCompare(b, "pt", { sensitivity: "base" });
+      });
+
+    var validSelected = [];
+    $select.empty();
+
+    for (var j = 0; j < mergedOptions.length; j++) {
+      var optionValue = mergedOptions[j];
+      var optionLower = optionValue.toString().trim().toLowerCase();
+      var isSelected = selectedMap[optionLower] === true;
+
+      $select.append($("<option></option>").val(optionValue).text(optionValue));
+
+      if (isSelected) {
+        validSelected.push(optionValue);
+      }
+    }
+
+    $select.val(validSelected);
+    if ($select.hasClass("select2-hidden-accessible")) {
+      $select.trigger("change.select2");
+    }
+  }
+
+  dashboardCidadesCascadeSyncing = true;
+  if (changedFilterId !== "dashboardCidadesCidadeFilter") {
+    applyOptions($cidade, allowedCidades);
+  }
+  if (changedFilterId !== "dashboardCidadesDistritoFilter") {
+    applyOptions($distrito, allowedDistritos);
+  }
+  if (changedFilterId !== "dashboardCidadesConcelhoFilter") {
+    applyOptions($concelho, allowedConcelhos);
+  }
+  if (changedFilterId !== "dashboardCidadesProdutoFilter") {
+    applyOptions($produto, allowedProdutos, false);
+  }
+  dashboardCidadesCascadeSyncing = false;
+}
+
+function initializeDashboardCidadesSelectFilters() {
+  if (!$.fn.select2) {
+    return;
+  }
+
+  var filterSelectors = [
+    "#dashboardCidadesCidadeFilter",
+    "#dashboardCidadesDistritoFilter",
+    "#dashboardCidadesConcelhoFilter",
+    "#dashboardCidadesProdutoFilter",
+  ];
+
+  for (var i = 0; i < filterSelectors.length; i++) {
+    var selector = filterSelectors[i];
+    var $filter = $(selector);
+    if (!$filter.length) {
+      continue;
+    }
+
+    if ($filter.hasClass("select2-hidden-accessible")) {
+      $filter.select2("destroy");
+    }
+
+    $filter.select2({
+      placeholder: $filter.attr("data-placeholder") || "Selecionar",
+      width: "100%",
+      closeOnSelect: false,
+      allowClear: true,
+      dropdownAutoWidth: true,
+    });
+
+    $filter
+      .off("change.dashboardCidadesCascade")
+      .on("change.dashboardCidadesCascade", function () {
+        if (dashboardCidadesCascadeSyncing) {
+          return;
+        }
+        syncDashboardCidadesDependentFilters(this.id);
+      });
+  }
+
+  $("#dashboardCidadesVendasEstado")
+    .off("change.dashboardCidadesCascade")
+    .on("change.dashboardCidadesCascade", function () {
+      if (dashboardCidadesCascadeSyncing) {
+        return;
+      }
+      syncDashboardCidadesDependentFilters(this.id);
+    });
+
+  syncDashboardCidadesDependentFilters("");
+}
+
+function getDashboardCidadesFiltersPayload() {
+  var cidadesSelecionadas = $("#dashboardCidadesCidadeFilter").val();
+  var distritosSelecionados = $("#dashboardCidadesDistritoFilter").val();
+  var concelhosSelecionados = $("#dashboardCidadesConcelhoFilter").val();
+  var produtosSelecionados = $("#dashboardCidadesProdutoFilter").val();
+
+  return {
+    cidades: Array.isArray(cidadesSelecionadas) ? cidadesSelecionadas : [],
+    distritos: Array.isArray(distritosSelecionados)
+      ? distritosSelecionados
+      : [],
+    concelhos: Array.isArray(concelhosSelecionados)
+      ? concelhosSelecionados
+      : [],
+    produtos: Array.isArray(produtosSelecionados) ? produtosSelecionados : [],
+    estadoVendas: ($("#dashboardCidadesVendasEstado").val() || "").trim(),
+  };
+}
+
+function applyDashboardCidadesFilters() {
+  var table = getDashboardCidadesTable();
+  if (!table) {
+    return;
+  }
+
+  var filtros = getDashboardCidadesFiltersPayload();
+  var cidadesFiltro = filtros.cidades
+    .map(function (item) {
+      return (item || "").toString().trim().toLowerCase();
+    })
+    .filter(function (item) {
+      return item !== "";
+    });
+  var distritosFiltro = filtros.distritos
+    .map(function (item) {
+      return (item || "").toString().trim().toLowerCase();
+    })
+    .filter(function (item) {
+      return item !== "";
+    });
+  var concelhosFiltro = filtros.concelhos
+    .map(function (item) {
+      return (item || "").toString().trim().toLowerCase();
+    })
+    .filter(function (item) {
+      return item !== "";
+    });
+  var produtosFiltro = filtros.produtos
+    .map(function (item) {
+      return (item || "").toString().trim().toLowerCase();
+    })
+    .filter(function (item) {
+      return item !== "";
+    });
+  var estadoVendas = filtros.estadoVendas;
+  var canDelete = $("#dashboardCidadeCanDelete").val() === "1";
+  var colOffset = canDelete ? 1 : 0;
+
+  if (dashboardCidadesFilterFn !== null) {
+    var idx = $.fn.dataTable.ext.search.indexOf(dashboardCidadesFilterFn);
+    if (idx > -1) {
+      $.fn.dataTable.ext.search.splice(idx, 1);
+    }
+  }
+
+  dashboardCidadesFilterFn = function (settings, data, dataIndex) {
+    if (
+      !settings ||
+      !settings.nTable ||
+      settings.nTable.id !== "dashboardCidadesTable"
+    ) {
+      return true;
+    }
+
+    var rowNode =
+      settings && settings.aoData && settings.aoData[dataIndex]
+        ? settings.aoData[dataIndex].nTr
+        : null;
+    var rowId = rowNode ? parseInt($(rowNode).attr("data-row-id"), 10) : NaN;
+    var row = !isNaN(rowId) ? dashboardCidadesRowsById[rowId] : null;
+    var rowDescricao = data[colOffset]
+      ? data[colOffset].toString().trim().toLowerCase()
+      : "";
+    var rowDistrito =
+      row && row.distrito ? row.distrito.toString().trim().toLowerCase() : "";
+    var rowConcelho =
+      row && row.concelho ? row.concelho.toString().trim().toLowerCase() : "";
+    var rowProdutosTokens =
+      row && row.produtos_tokens
+        ? row.produtos_tokens
+            .toString()
+            .split("||")
+            .map(function (item) {
+              return (item || "").toString().trim().toLowerCase();
+            })
+            .filter(function (item) {
+              return item !== "";
+            })
+        : [];
+    var totalVendas = row ? parseInt(row.total_vendas, 10) || 0 : 0;
+
+    if (
+      cidadesFiltro.length > 0 &&
+      cidadesFiltro.indexOf(rowDescricao) === -1
+    ) {
+      return false;
+    }
+    if (
+      distritosFiltro.length > 0 &&
+      distritosFiltro.indexOf(rowDistrito) === -1
+    ) {
+      return false;
+    }
+    if (
+      concelhosFiltro.length > 0 &&
+      concelhosFiltro.indexOf(rowConcelho) === -1
+    ) {
+      return false;
+    }
+    if (produtosFiltro.length > 0) {
+      var hasProduto = false;
+      for (var i = 0; i < produtosFiltro.length; i++) {
+        if (rowProdutosTokens.indexOf(produtosFiltro[i]) > -1) {
+          hasProduto = true;
+          break;
+        }
+      }
+      if (!hasProduto) {
+        return false;
+      }
+    }
+    if (estadoVendas === "com" && totalVendas < 1) {
+      return false;
+    }
+    if (estadoVendas === "sem" && totalVendas > 0) {
+      return false;
+    }
+
+    return true;
+  };
+
+  $.fn.dataTable.ext.search.push(dashboardCidadesFilterFn);
+  table.draw();
+}
+
+function clearDashboardCidadesFilters() {
+  $("#dashboardCidadesCidadeFilter").val([]).trigger("change");
+  $("#dashboardCidadesDistritoFilter").val([]).trigger("change");
+  $("#dashboardCidadesConcelhoFilter").val([]).trigger("change");
+  $("#dashboardCidadesProdutoFilter").val([]).trigger("change");
+  $("#dashboardCidadesVendasEstado").val("");
+
+  var table = getDashboardCidadesTable();
+  if (!table) {
+    return;
+  }
+
+  if (dashboardCidadesFilterFn !== null) {
+    var idx = $.fn.dataTable.ext.search.indexOf(dashboardCidadesFilterFn);
+    if (idx > -1) {
+      $.fn.dataTable.ext.search.splice(idx, 1);
+    }
+    dashboardCidadesFilterFn = null;
+  }
+
+  table.draw();
+}
+
 function renderDashboardCidadesTable(arrayCidades) {
+  var tableBody = "";
+  var canDelete = $("#dashboardCidadeCanDelete").val() === "1";
+  var canEdit = $("#dashboardCidadeCanEdit").val() === "1";
+
   dashboardCidadesRowsById = {};
-  renderDashboardSimpleEntityTable(
-    dashboardCidadesConfig,
-    arrayCidades,
-    dashboardCidadesRowsById,
+
+  if ($.fn.DataTable && $.fn.DataTable.isDataTable("#dashboardCidadesTable")) {
+    $("#dashboardCidadesTable").DataTable().clear().destroy();
+  }
+
+  for (var index = 0; index < arrayCidades.length; index++) {
+    var cidade = arrayCidades[index] || {};
+    var cidadeId = cidade.id != null ? cidade.id : "";
+    var descricao = cidade.descricao != null ? cidade.descricao : "";
+    var totalProdutos = parseInt(cidade.total_produtos, 10) || 0;
+    var produtosVendidosLabel =
+      totalProdutos > 0 ? "Sim (" + totalProdutos + ")" : "Sem produtos";
+
+    if (cidadeId !== "") {
+      dashboardCidadesRowsById[cidadeId] = cidade;
+    }
+
+    var actionsHtml = "";
+    if (canEdit && cidadeId !== "") {
+      actionsHtml +=
+        "<a class='btn btn-primary btn-xs dashboard-row-edit-btn' title='Editar' onclick='editDashboardCidade(" +
+        cidadeId +
+        ")'><i class='fas fa-edit'></i> Editar</a>";
+    }
+
+    tableBody +=
+      "<tr data-row-id='" +
+      cidadeId +
+      "'>" +
+      (canDelete
+        ? "<td class='text-center dashboard-bulk-select-col'><input type='checkbox' class='dashboard-bulk-row-select dashboard-cidades-row-select' data-id='" +
+          cidadeId +
+          "'></td>"
+        : "") +
+      "<td>" +
+      descricao +
+      "</td>" +
+      "<td class='text-center'>" +
+      produtosVendidosLabel +
+      "</td>" +
+      (canEdit ? "<td class='text-nowrap'>" + actionsHtml + "</td>" : "") +
+      "</tr>";
+  }
+
+  $("#dashboardCidadesTableBody").html(tableBody);
+  if ($.fn.DataTable && !$.fn.DataTable.isDataTable("#dashboardCidadesTable")) {
+    createDataTable(
+      "dashboardCidadesTable",
+      false,
+      "",
+      false,
+      10,
+      [],
+      true,
+      false,
+      getDashboardResponsiveOptions(
+        "dashboardCidadesTable",
+        canDelete ? [0] : [],
+      ),
+    );
+  }
+
+  clearDashboardTableGlobalSearch("dashboardCidadesTable");
+  bindDashboardBulkSelectionHandlers(
+    "dashboardCidadesTable",
+    "dashboard-cidades-row-select",
+    "dashboardCidadesSelectAll",
+    "dashboardCidadesDeleteSelectedBtn",
   );
+  initializeDashboardCidadesSelectFilters();
+  applyDashboardCidadesFilters();
 }
 
 function openDashboardCidadeModal() {
@@ -2546,6 +4301,50 @@ async function deleteSelectedDashboardCidades() {
     backendFunction: "deleteDashboardCidadeBulk",
     esc: 6,
   });
+}
+
+async function downloadDashboardCidadesPdf() {
+  var filtros = getDashboardCidadesFiltersPayload();
+
+  showDashboardLoadingAlert(
+    "A gerar PDF",
+    "Aguarde, estamos a preparar o relatório...",
+  );
+
+  try {
+    var response = await $.ajax({
+      type: "POST",
+      url: "connect.php",
+      dataType: "text",
+      headers: {
+        Authorization: "Bearer " + md5(localStorage.getItem("sessionObject")),
+      },
+      data: {
+        package: overal({
+          origin: "module/core/php/dashboarddb.php",
+          function: "exportDashboardCidadesPdf",
+          attr: JSON.stringify(filtros),
+        }),
+      },
+    });
+
+    var obj = parseDashboardResponse(response);
+    if (obj.val == 1) {
+      toaster(obj.msg, "success");
+      if (obj.link) {
+        window.open(obj.link, "_blank");
+      }
+    } else {
+      toaster(obj.msg || "Erro ao gerar PDF.", "warning");
+    }
+  } catch (error) {
+    toaster(
+      "Erro ao gerar PDF: " + (error.statusText || error.message || error),
+      "error",
+    );
+  } finally {
+    closeDashboardLoadingAlert();
+  }
 }
 
 function renderDashboardCsvTable(arrayCsv) {
@@ -2713,6 +4512,60 @@ async function deleteSelectedDashboardCsvFiles() {
 var dashboardCsvPreviewRows = [];
 var dashboardCsvCanImport = false;
 var dashboardCsvCanDelete = false;
+var dashboardCsvPreviewUploadTempPath = "";
+
+function getDashboardCsvPreviewCounts() {
+  var valid = 0;
+  var invalid = 0;
+
+  for (var i = 0; i < dashboardCsvPreviewRows.length; i++) {
+    var validation = getDashboardCsvPreviewValidationState(
+      dashboardCsvPreviewRows[i],
+    );
+    if (validation.valid) {
+      valid++;
+    } else {
+      invalid++;
+    }
+  }
+
+  return {
+    total: dashboardCsvPreviewRows.length,
+    valid: valid,
+    invalid: invalid,
+  };
+}
+
+async function discardDashboardCsvPreviewTempUpload() {
+  if (!dashboardCsvPreviewUploadTempPath) {
+    return;
+  }
+
+  try {
+    await $.ajax({
+      type: "POST",
+      url: "connect.php",
+      dataType: "text",
+      headers: {
+        Authorization: "Bearer " + md5(localStorage.getItem("sessionObject")),
+      },
+      data: {
+        package: overal({
+          origin: "module/core/php/dashboarddb.php",
+          function: "discardDashboardCsvUpload",
+          attr: JSON.stringify({
+            uploadTempPath: dashboardCsvPreviewUploadTempPath,
+          }),
+        }),
+      },
+    });
+  } catch (error) {
+    toaster("Não foi possível limpar o ficheiro temporário do CSV.", "warning");
+  } finally {
+    dashboardCsvPreviewUploadTempPath = "";
+  }
+}
+
 function getDashboardCsvPreviewValidationState(row) {
   if (typeof row._validation_valid === "boolean") {
     return {
@@ -2905,7 +4758,8 @@ function openDashboardCsvPreviewPage() {
   renderDashboardCsvPreviewTable();
 }
 
-function cancelDashboardCsvPreviewPage() {
+async function cancelDashboardCsvPreviewPage() {
+  await discardDashboardCsvPreviewTempUpload();
   _stopDashboardCsvPreviewResizeWatch();
   dashboardCsvPreviewRows = [];
   reworkbar(2);
@@ -3001,7 +4855,6 @@ function renderDashboardCsvPreviewTable() {
 
   var isCard = isDashboardCardViewport();
   var renderGen = ++_dashboardCsvPreviewRenderGen;
-
   /* Pre-add card class so CSS card layout applies immediately */
   if (isCard) {
     $("#dashboardCsvPreviewTable").addClass("dt-card-table");
@@ -3352,8 +5205,13 @@ async function deleteDashboardCsvPreviewRow(rowIndex) {
 }
 
 function confirmCommitDashboardCsvPreview() {
+  var counts = getDashboardCsvPreviewCounts();
   modconf(
-    "Tem a certeza que deseja confirmar a inserção das linhas válidas?",
+    "Tem a certeza que deseja confirmar a inserção? Linhas válidas: " +
+      counts.valid +
+      " de " +
+      counts.total +
+      (counts.invalid > 0 ? " (inválidas: " + counts.invalid + ")" : ""),
     "commitDashboardCsvPreview()",
   );
 }
@@ -3397,7 +5255,10 @@ async function commitDashboardCsvPreview() {
         package: overal({
           origin: "module/core/php/dashboarddb.php",
           function: "commitDashboardCsvPreview",
-          attr: JSON.stringify({ rows: validRows }),
+          attr: JSON.stringify({
+            rows: validRows,
+            uploadTempPath: dashboardCsvPreviewUploadTempPath,
+          }),
         }),
       },
     });
@@ -3411,6 +5272,7 @@ async function commitDashboardCsvPreview() {
           (obj.skippedRows || 0),
         "success",
       );
+      dashboardCsvPreviewUploadTempPath = "";
       dashboardCsvPreviewRows = [];
       reloadDashboardPage();
     } else {
@@ -3428,6 +5290,8 @@ async function commitDashboardCsvPreview() {
 }
 
 async function uploadDashboardCsv() {
+  await discardDashboardCsvPreviewTempUpload();
+
   const input = document.getElementById("dashboardCsvFiles");
   if (!input || !input.files || input.files.length === 0) {
     toaster("Selecione um ficheiro CSV.", "warning");
@@ -3482,8 +5346,11 @@ async function uploadDashboardCsv() {
       return;
     }
 
+    dashboardCsvPreviewUploadTempPath = (obj.uploadTempPath || "").toString();
+
     dashboardCsvPreviewRows = Array.isArray(obj.rows) ? obj.rows : [];
     if (dashboardCsvPreviewRows.length < 1) {
+      await discardDashboardCsvPreviewTempUpload();
       toaster(
         obj.msg || "O ficheiro não contém linhas para importar.",
         "warning",

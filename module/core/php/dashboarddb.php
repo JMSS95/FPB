@@ -47,6 +47,41 @@ class Dashboarddb
 		return ($intValue > 0) ? $intValue : null;
 	}
 
+	function getDashboardCsvIdVendaValidation($value)
+	{
+		$rawValue = $this->normalizeDashboardCsvValue($value);
+		if ($rawValue === '') {
+			return [
+				'valid' => false,
+				'id' => null,
+				'msg' => 'ID Venda em falta'
+			];
+		}
+
+		if (!preg_match('/^\d+$/', $rawValue)) {
+			return [
+				'valid' => false,
+				'id' => null,
+				'msg' => 'ID Venda com caracteres inválidos'
+			];
+		}
+
+		$idVenda = (int)$rawValue;
+		if ($idVenda <= 0) {
+			return [
+				'valid' => false,
+				'id' => null,
+				'msg' => 'ID Venda inválido'
+			];
+		}
+
+		return [
+			'valid' => true,
+			'id' => $idVenda,
+			'msg' => ''
+		];
+	}
+
 	function parseDashboardCsvDateTime($value)
 	{
 		$value = $this->normalizeDashboardCsvValue($value);
@@ -425,7 +460,8 @@ class Dashboarddb
 
 		$idVendaCount = [];
 		foreach ($rows as $row) {
-			$idVenda = $this->parseDashboardCsvInt($row['id_venda'] ?? '');
+			$idVendaValidation = $this->getDashboardCsvIdVendaValidation($row['id_venda'] ?? '');
+			$idVenda = $idVendaValidation['id'];
 			if ($idVenda !== null) {
 				if (!isset($idVendaCount[$idVenda])) {
 					$idVendaCount[$idVenda] = 0;
@@ -439,7 +475,8 @@ class Dashboarddb
 
 		$validatedRows = [];
 		foreach ($rows as $row) {
-			$idVenda = $this->parseDashboardCsvInt($row['id_venda'] ?? '');
+			$idVendaValidation = $this->getDashboardCsvIdVendaValidation($row['id_venda'] ?? '');
+			$idVenda = $idVendaValidation['id'];
 			$dataHora = $this->parseDashboardCsvDateTime($row['datahora'] ?? '');
 			$tipoProduto = $this->normalizeDashboardCsvValue($row['tipo_produto'] ?? '');
 			$descricaoArtigo = $this->normalizeDashboardCsvValue($row['descricao_artigo'] ?? '');
@@ -453,9 +490,9 @@ class Dashboarddb
 			$validationValid = true;
 			$validationMsg = 'Válida';
 
-			if ($idVenda === null) {
+			if (!$idVendaValidation['valid']) {
 				$validationValid = false;
-				$validationMsg = 'ID Venda inválido';
+				$validationMsg = $idVendaValidation['msg'];
 			} else if ($dataHora === null) {
 				$validationValid = false;
 				$validationMsg = 'DataHora inválida';
@@ -510,6 +547,21 @@ class Dashboarddb
 
 		$result['rows'] = $validatedRows;
 		return $result;
+	}
+
+	function getDashboardCsvStoragePaths($userId)
+	{
+		$workspacePath = dirname(__DIR__, 3);
+		$finalRelativePath = "uploads/dashboard/csv/user".$userId;
+		$tempRelativePath = "uploads/dashboard/csv_tmp/user".$userId;
+
+		return [
+			'workspacePath' => $workspacePath,
+			'finalRelativePath' => $finalRelativePath,
+			'tempRelativePath' => $tempRelativePath,
+			'finalAbsolutePath' => $workspacePath."/".$finalRelativePath,
+			'tempAbsolutePath' => $workspacePath."/".$tempRelativePath,
+		];
 	}
 
 	function getDashboardVendasModalOptions()
@@ -885,6 +937,44 @@ class Dashboarddb
 		return json_encode(array('val' => $delete['val'], 'msg' => $delete['msg']));
 	}
 
+	function allowDashboardDescricaoDuplicates($table)
+	{
+		global $conn;
+
+		$allowedTables = ['categorias', 'cidade'];
+		if (!in_array($table, $allowedTables, true)) {
+			return;
+		}
+
+		try {
+			$sqlIndexes = "SELECT INDEX_NAME
+			FROM INFORMATION_SCHEMA.STATISTICS
+			WHERE TABLE_SCHEMA = DATABASE()
+			AND TABLE_NAME = :table_name
+			AND COLUMN_NAME = 'descricao'
+			AND NON_UNIQUE = 0
+			AND INDEX_NAME <> 'PRIMARY'";
+
+			$stmtIndexes = $conn->prepare($sqlIndexes);
+			$stmtIndexes->execute([
+				':table_name' => $table
+			]);
+			$indexes = $stmtIndexes->fetchAll(PDO::FETCH_ASSOC);
+
+			foreach ($indexes as $index) {
+				$indexName = isset($index['INDEX_NAME']) ? trim((string)$index['INDEX_NAME']) : '';
+				if ($indexName == '') {
+					continue;
+				}
+
+				$safeIndexName = str_replace('`', '', $indexName);
+				$sqlDrop = "ALTER TABLE `".$table."` DROP INDEX `".$safeIndexName."`";
+				$conn->exec($sqlDrop);
+			}
+		} catch (Exception $e) {
+		}
+	}
+
 	function addDashboardCategoria($info)
 	{
 		$info = json_decode($info, true);
@@ -898,6 +988,12 @@ class Dashboarddb
 		if ($descricao == '') {
 			return json_encode(array('val' => 2, 'msg' => 'Preencha os campos obrigatórios para adicionar a categoria.'));
 		}
+
+		if (mb_strlen($descricao, 'UTF-8') > 100) {
+			return json_encode(array('val' => 2, 'msg' => 'A descrição da categoria não pode ter mais de 100 caracteres.'));
+		}
+
+		$this->allowDashboardDescricaoDuplicates('categorias');
 
 		$dados = array(
 			'descricao' => $descricao
@@ -921,6 +1017,12 @@ class Dashboarddb
 		if ($id <= 0 || $descricao == '') {
 			return json_encode(array('val' => 2, 'msg' => 'Preencha os campos obrigatórios para editar a categoria.'));
 		}
+
+		if (mb_strlen($descricao, 'UTF-8') > 100) {
+			return json_encode(array('val' => 2, 'msg' => 'A descrição da categoria não pode ter mais de 100 caracteres.'));
+		}
+
+		$this->allowDashboardDescricaoDuplicates('categorias');
 
 		$dados = array(
 			'descricao' => $descricao
@@ -947,6 +1049,70 @@ class Dashboarddb
 		return json_encode(array('val' => $delete['val'], 'msg' => $delete['msg']));
 	}
 
+	function ensureDashboardCategoriasStatsColumns()
+	{
+		global $conn;
+
+		$columns = [
+			'total_produtos' => "ALTER TABLE categorias ADD COLUMN total_produtos INT UNSIGNED NOT NULL DEFAULT 0",
+			'total_vendas' => "ALTER TABLE categorias ADD COLUMN total_vendas INT UNSIGNED NOT NULL DEFAULT 0",
+			'total_receita' => "ALTER TABLE categorias ADD COLUMN total_receita DECIMAL(14,2) NOT NULL DEFAULT 0.00"
+		];
+
+		try {
+			foreach ($columns as $columnName => $sqlAdd) {
+				$sqlCheck = "SELECT COUNT(*)
+				FROM INFORMATION_SCHEMA.COLUMNS
+				WHERE TABLE_SCHEMA = DATABASE()
+					AND TABLE_NAME = 'categorias'
+					AND COLUMN_NAME = :column_name";
+
+				$stmtCheck = $conn->prepare($sqlCheck);
+				$stmtCheck->execute([
+					':column_name' => $columnName
+				]);
+				$exists = (int)$stmtCheck->fetchColumn() > 0;
+
+				if (!$exists) {
+					$conn->exec($sqlAdd);
+				}
+			}
+		} catch (Exception $e) {
+		}
+	}
+
+	function syncDashboardCategoriasStatsColumns()
+	{
+		global $conn;
+		$this->ensureDashboardCategoriasStatsColumns();
+
+		try {
+			$sql = "UPDATE categorias c
+			LEFT JOIN (
+				SELECT v.id_categoria AS categoria_id, COUNT(DISTINCT v.id_produto) AS total_produtos
+				FROM vendas v
+				GROUP BY v.id_categoria
+			) p ON p.categoria_id = c.id
+			LEFT JOIN (
+				SELECT v.id_categoria AS categoria_id, COUNT(v.id) AS total_vendas
+				FROM vendas v
+				GROUP BY v.id_categoria
+			) s ON s.categoria_id = c.id
+			LEFT JOIN (
+				SELECT v.id_categoria AS categoria_id, COALESCE(SUM(v.Receita), 0) AS total_receita
+				FROM vendas v
+				GROUP BY v.id_categoria
+			) r ON r.categoria_id = c.id
+			SET
+				c.total_produtos = COALESCE(p.total_produtos, 0),
+				c.total_vendas = COALESCE(s.total_vendas, 0),
+				c.total_receita = COALESCE(r.total_receita, 0)";
+
+			$conn->prepare($sql)->execute();
+		} catch (Exception $e) {
+		}
+	}
+
 	function addDashboardCidade($info)
 	{
 		$info = json_decode($info, true);
@@ -961,8 +1127,17 @@ class Dashboarddb
 			return json_encode(array('val' => 2, 'msg' => 'Preencha os campos obrigatórios para adicionar a cidade.'));
 		}
 
+		if (mb_strlen($descricao, 'UTF-8') > 100) {
+			return json_encode(array('val' => 2, 'msg' => 'A descrição da cidade não pode ter mais de 100 caracteres.'));
+		}
+
+		$this->allowDashboardDescricaoDuplicates('cidade');
+		$geo = $this->getDashboardCidadeGeoByDescricao($descricao);
+
 		$dados = array(
-			'descricao' => $descricao
+			'descricao' => $descricao,
+			'id_distrito' => $geo['id_distrito'],
+			'id_concelho' => $geo['id_concelho']
 		);
 
 		$insert = saveData("cidade", $dados);
@@ -984,8 +1159,17 @@ class Dashboarddb
 			return json_encode(array('val' => 2, 'msg' => 'Preencha os campos obrigatórios para editar a cidade.'));
 		}
 
+		if (mb_strlen($descricao, 'UTF-8') > 100) {
+			return json_encode(array('val' => 2, 'msg' => 'A descrição da cidade não pode ter mais de 100 caracteres.'));
+		}
+
+		$this->allowDashboardDescricaoDuplicates('cidade');
+		$geo = $this->getDashboardCidadeGeoByDescricao($descricao);
+
 		$dados = array(
-			'descricao' => $descricao
+			'descricao' => $descricao,
+			'id_distrito' => $geo['id_distrito'],
+			'id_concelho' => $geo['id_concelho']
 		);
 
 		$update = saveData("cidade", $dados, $id);
@@ -1007,6 +1191,85 @@ class Dashboarddb
 
 		$delete = $this->deleteDashboardDataBulk("cidade", $ids);
 		return json_encode(array('val' => $delete['val'], 'msg' => $delete['msg']));
+	}
+
+	function getDashboardCidadeGeoByDescricao($descricao)
+	{
+		global $conn;
+
+		$descricao = trim((string)$descricao);
+		$result = [
+			'id_distrito' => 0,
+			'id_concelho' => 0
+		];
+
+		if ($descricao == '') {
+			return $result;
+		}
+
+		try {
+			$params = [':descricao' => mb_strtolower($descricao, 'UTF-8')];
+
+			$sqlConcelho = "SELECT cc.id, cc.id_distrito
+				FROM core_concelhos cc
+				WHERE LOWER(TRIM(cc.descricao)) = :descricao
+				LIMIT 1";
+			$stmtConcelho = $conn->prepare($sqlConcelho);
+			$stmtConcelho->execute($params);
+			$rowConcelho = $stmtConcelho->fetch(PDO::FETCH_ASSOC);
+			if ($rowConcelho) {
+				$result['id_concelho'] = (int)$rowConcelho['id'];
+				$result['id_distrito'] = (int)$rowConcelho['id_distrito'];
+				return $result;
+			}
+
+			$sqlDistrito = "SELECT cd.id
+				FROM core_distritos cd
+				WHERE LOWER(TRIM(cd.descricao)) = :descricao
+				LIMIT 1";
+			$stmtDistrito = $conn->prepare($sqlDistrito);
+			$stmtDistrito->execute($params);
+			$rowDistrito = $stmtDistrito->fetch(PDO::FETCH_ASSOC);
+			if ($rowDistrito) {
+				$result['id_distrito'] = (int)$rowDistrito['id'];
+			}
+		} catch (Exception $e) {
+		}
+
+		return $result;
+	}
+
+	function backfillDashboardCidadeGeoRelations()
+	{
+		global $conn;
+
+		try {
+			$sqlConcelho = "UPDATE cidade c
+				INNER JOIN core_concelhos cc ON LOWER(TRIM(cc.descricao)) = LOWER(TRIM(c.descricao))
+				SET
+					c.id_concelho = cc.id,
+					c.id_distrito = CASE
+						WHEN c.id_distrito IS NULL OR c.id_distrito = 0 THEN cc.id_distrito
+						ELSE c.id_distrito
+					END
+				WHERE c.id_concelho IS NULL OR c.id_concelho = 0";
+			$conn->prepare($sqlConcelho)->execute();
+
+			$sqlDistritoFromConcelho = "UPDATE cidade c
+				INNER JOIN core_concelhos cc ON cc.id = c.id_concelho
+				SET c.id_distrito = cc.id_distrito
+				WHERE (c.id_distrito IS NULL OR c.id_distrito = 0)
+					AND c.id_concelho IS NOT NULL
+					AND c.id_concelho > 0";
+			$conn->prepare($sqlDistritoFromConcelho)->execute();
+
+			$sqlDistrito = "UPDATE cidade c
+				INNER JOIN core_distritos cd ON LOWER(TRIM(cd.descricao)) = LOWER(TRIM(c.descricao))
+				SET c.id_distrito = cd.id
+				WHERE c.id_distrito IS NULL OR c.id_distrito = 0";
+			$conn->prepare($sqlDistrito)->execute();
+		} catch (Exception $e) {
+		}
 	}
 
 	function updateDashboardVenda($info)
@@ -1145,6 +1408,122 @@ class Dashboarddb
 		];
 	}
 
+	function buildDashboardProdutosFilterOptions($array)
+	{
+		$produtos = [];
+		$tipos = [];
+
+		foreach ($array as $row) {
+			if (isset($row['descricao']) && trim((string)$row['descricao']) != '') {
+				$produtos[trim((string)$row['descricao'])] = trim((string)$row['descricao']);
+			}
+			if (isset($row['tipo_produto']) && trim((string)$row['tipo_produto']) != '') {
+				$tipos[trim((string)$row['tipo_produto'])] = trim((string)$row['tipo_produto']);
+			}
+		}
+
+		sort($produtos);
+		sort($tipos);
+
+		$optionsProdutos = "";
+		foreach ($produtos as $produto) {
+			$optionsProdutos .= "<option value='".htmlspecialchars($produto)."'>".htmlspecialchars($produto)."</option>";
+		}
+
+		$optionsTipos = "";
+		foreach ($tipos as $tipo) {
+			$optionsTipos .= "<option value='".htmlspecialchars($tipo)."'>".htmlspecialchars($tipo)."</option>";
+		}
+
+		return [
+			'produto' => $optionsProdutos,
+			'tipo' => $optionsTipos
+		];
+	}
+
+	function buildDashboardCategoriasFilterOptions($array)
+	{
+		$categorias = [];
+
+		foreach ($array as $row) {
+			if (isset($row['descricao']) && trim((string)$row['descricao']) != '') {
+				$categorias[trim((string)$row['descricao'])] = trim((string)$row['descricao']);
+			}
+		}
+
+		sort($categorias);
+
+		$optionsCategorias = "";
+		foreach ($categorias as $categoria) {
+			$optionsCategorias .= "<option value='".htmlspecialchars($categoria)."'>".htmlspecialchars($categoria)."</option>";
+		}
+
+		return [
+			'categoria' => $optionsCategorias
+		];
+	}
+
+	function buildDashboardCidadesFilterOptions($array)
+	{
+		$cidades = [];
+		$distritos = [];
+		$concelhos = [];
+		$produtos = [];
+
+		foreach ($array as $row) {
+			if (isset($row['descricao']) && trim((string)$row['descricao']) != '') {
+				$cidades[trim((string)$row['descricao'])] = trim((string)$row['descricao']);
+			}
+			if (isset($row['distrito']) && trim((string)$row['distrito']) != '') {
+				$distritos[trim((string)$row['distrito'])] = trim((string)$row['distrito']);
+			}
+			if (isset($row['concelho']) && trim((string)$row['concelho']) != '') {
+				$concelhos[trim((string)$row['concelho'])] = trim((string)$row['concelho']);
+			}
+			if (isset($row['produtos_tokens']) && trim((string)$row['produtos_tokens']) != '') {
+				$tokens = explode('||', (string)$row['produtos_tokens']);
+				foreach ($tokens as $token) {
+					$token = trim((string)$token);
+					if ($token != '') {
+						$produtos[$token] = $token;
+					}
+				}
+			}
+		}
+
+		sort($cidades);
+		sort($distritos);
+		sort($concelhos);
+		sort($produtos);
+
+		$optionsCidades = "";
+		foreach ($cidades as $cidade) {
+			$optionsCidades .= "<option value='".htmlspecialchars($cidade)."'>".htmlspecialchars($cidade)."</option>";
+		}
+
+		$optionsDistritos = "";
+		foreach ($distritos as $distrito) {
+			$optionsDistritos .= "<option value='".htmlspecialchars($distrito)."'>".htmlspecialchars($distrito)."</option>";
+		}
+
+		$optionsConcelhos = "";
+		foreach ($concelhos as $concelho) {
+			$optionsConcelhos .= "<option value='".htmlspecialchars($concelho)."'>".htmlspecialchars($concelho)."</option>";
+		}
+
+		$optionsProdutos = "";
+		foreach ($produtos as $produto) {
+			$optionsProdutos .= "<option value='".htmlspecialchars($produto)."'>".htmlspecialchars($produto)."</option>";
+		}
+
+		return [
+			'cidade' => $optionsCidades,
+			'distrito' => $optionsDistritos,
+			'concelho' => $optionsConcelhos,
+			'produto' => $optionsProdutos
+		];
+	}
+
 	function normalizeDashboardStatsDate($date)
 	{
 		$date = trim((string)$date);
@@ -1180,6 +1559,26 @@ class Dashboarddb
 
 		$normalized = array_values(array_unique($normalized));
 		return $normalized;
+	}
+
+	function normalizeDashboardFilterNumber($value)
+	{
+		$raw = trim((string)$value);
+		if ($raw == '') {
+			return null;
+		}
+
+		$normalized = str_replace([' ', '€'], '', $raw);
+		if (strpos($normalized, ',') !== false) {
+			$normalized = str_replace('.', '', $normalized);
+			$normalized = str_replace(',', '.', $normalized);
+		}
+
+		if (!is_numeric($normalized)) {
+			return null;
+		}
+
+		return (float)$normalized;
 	}
 
 	function getDashboardStatsFilters($filters = [])
@@ -1713,6 +2112,592 @@ class Dashboarddb
 		}
 	}
 
+	function exportDashboardProdutosPdf($info)
+	{
+		global $conn;
+		$info = json_decode($info, true);
+
+		$produtos = $this->normalizeDashboardMultiFilterValues($info['produtos'] ?? []);
+		if (count($produtos) < 1 && isset($info['descricao']) && trim((string)$info['descricao']) != '') {
+			$produtos = [trim((string)$info['descricao'])];
+		}
+		$tipos = $this->normalizeDashboardMultiFilterValues($info['tipos'] ?? []);
+		$precoMin = $this->normalizeDashboardFilterNumber($info['precoMin'] ?? '');
+		$precoMax = $this->normalizeDashboardFilterNumber($info['precoMax'] ?? '');
+		$estadoVendas = isset($info['estadoVendas']) ? trim((string)$info['estadoVendas']) : '';
+
+		if ($precoMin !== null && $precoMax !== null && $precoMin > $precoMax) {
+			return json_encode(array("val" => 2, "msg" => "Preço mínimo não pode ser maior que o preço máximo."));
+		}
+
+		try {
+			$sql = "SELECT
+				p.id,
+				p.descricao,
+				tp.descricao AS tipo_produto,
+				p.preco_uni,
+				p.created_at,
+				p.updated_at,
+				COUNT(v.id) AS total_vendas,
+				COALESCE(SUM(v.Receita), 0) AS total_receita
+			FROM produtos p
+			LEFT JOIN tipo_produto tp ON tp.id = p.id_tipo_produto
+			LEFT JOIN vendas v ON v.id_produto = p.id
+			WHERE 1=1";
+
+			$params = [];
+
+			if (count($produtos) > 0) {
+				$produtoPlaceholders = [];
+				foreach ($produtos as $idx => $produtoValue) {
+					$placeholder = ':produto_'.$idx;
+					$produtoPlaceholders[] = $placeholder;
+					$params[$placeholder] = mb_strtolower($produtoValue, 'UTF-8');
+				}
+				$sql .= " AND LOWER(TRIM(p.descricao)) IN (".implode(',', $produtoPlaceholders).")";
+			}
+
+			if ($precoMin !== null) {
+				$sql .= " AND p.preco_uni >= :preco_min";
+				$params[':preco_min'] = $precoMin;
+			}
+
+			if ($precoMax !== null) {
+				$sql .= " AND p.preco_uni <= :preco_max";
+				$params[':preco_max'] = $precoMax;
+			}
+
+			if (count($tipos) > 0) {
+				$tipoPlaceholders = [];
+				foreach ($tipos as $idx => $tipoValue) {
+					$placeholder = ':tipo_'.$idx;
+					$tipoPlaceholders[] = $placeholder;
+					$params[$placeholder] = mb_strtolower($tipoValue, 'UTF-8');
+				}
+				$sql .= " AND LOWER(TRIM(tp.descricao)) IN (".implode(',', $tipoPlaceholders).")";
+			}
+
+			$sql .= " GROUP BY p.id, p.descricao, tp.descricao, p.preco_uni, p.created_at, p.updated_at";
+
+			if ($estadoVendas === 'com') {
+				$sql .= " HAVING COUNT(v.id) > 0";
+			} else if ($estadoVendas === 'sem') {
+				$sql .= " HAVING COUNT(v.id) = 0";
+			}
+
+			$sql .= " ORDER BY p.descricao ASC";
+
+			$stmt = $conn->prepare($sql);
+			$stmt->execute($params);
+			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if (!$rows) {
+				return json_encode(array("val" => 2, "msg" => "Não existem registos para os filtros selecionados."));
+			}
+
+			require_once dirname(__DIR__, 3)."/vendor/autoload.php";
+			$workspacePath = dirname(__DIR__, 3);
+
+			$mpdf = new \Mpdf\Mpdf([
+				"mode"            => "utf-8",
+				"format"          => "A4-L",
+				"margin_top"      => 38,
+				"margin_bottom"   => 22,
+				"margin_left"     => 14,
+				"margin_right"    => 14,
+				"margin_header"   => 8,
+				"margin_footer"   => 6,
+			]);
+
+			$mpdf->AliasNbPages();
+			$logoTag = "<span style='font-size:22px;font-weight:900;color:#FF8800;letter-spacing:1px;font-family:Arial;'>FPB</span>";
+
+			$mpdf->SetHTMLHeader("<table width='100%' cellpadding='0' cellspacing='0' style='border-bottom:2.5px solid #FF8800;padding-bottom:5px;'><tr><td width='50%'>".$logoTag."</td><td width='50%' style='text-align:right;font-size:14px;font-weight:bold;color:#111111;font-family:Arial;'>Relatório de Produtos</td></tr></table>");
+			$mpdf->SetHTMLFooter("<table width='100%' cellpadding='0' cellspacing='0' style='border-top:1px solid #cbd5e0;padding-top:4px;font-size:8px;color:#888888;font-family:Arial;'><tr><td width='33%'>FPB &copy; ".date('Y')."</td><td width='34%' style='text-align:center;'>Gerado em: ".date('d/m/Y H:i')."</td><td width='33%' style='text-align:right;'>P&aacute;gina {PAGENO} de {nb}</td></tr></table>");
+
+			$tipoLabel = (count($tipos) > 0) ? implode(', ', $tipos) : 'Todos';
+			$produtoLabel = (count($produtos) > 0) ? implode(', ', $produtos) : 'Todos';
+			$precoMinLabel = ($precoMin !== null) ? number_format($precoMin, 2, ',', '.') : '-';
+			$precoMaxLabel = ($precoMax !== null) ? number_format($precoMax, 2, ',', '.') : '-';
+			$estadoLabel = ($estadoVendas === 'com') ? 'Com vendas' : (($estadoVendas === 'sem') ? 'Sem vendas' : 'Todos');
+			$totalVendas = 0;
+			$totalReceita = 0;
+			foreach ($rows as $row) {
+				$totalVendas += (int)$row['total_vendas'];
+				$totalReceita += (float)$row['total_receita'];
+			}
+
+			$html  = "<style>body{font-family:Arial,sans-serif;color:#333333;font-size:10px}.fbox{background:#fff8f3;border-left:4px solid #FF8800;padding:7px 11px;margin-bottom:12px;font-size:9.5px;line-height:1.6}.flabel{color:#FF8800;font-weight:bold}table.m{width:100%;border-collapse:collapse;font-size:9.5px}table.m thead tr{background-color:#111111;color:#ffffff}table.m thead th{padding:7px 6px;text-align:left;border:1px solid #333333;white-space:nowrap;color:#ffffff}table.m tbody tr.o{background-color:#ffffff}table.m tbody tr.e{background-color:#fff3ec}table.m tbody td{padding:5px 6px;border:1px solid #ffe0cc;vertical-align:top}table.m tfoot tr{background-color:#ffe8d6}table.m tfoot td{padding:6px 6px;border:1px solid #ffbf99;font-weight:bold;font-size:9.5px}.tr{text-align:right}.tc{text-align:center}</style>";
+			$html .= "<div class='fbox'><span class='flabel'>Produto:</span> ".htmlspecialchars($produtoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Tipo:</span> ".htmlspecialchars($tipoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Preço mín.:</span> ".htmlspecialchars($precoMinLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Preço máx.:</span> ".htmlspecialchars($precoMaxLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Vendas:</span> ".htmlspecialchars($estadoLabel)."</div>";
+
+			$html .= "<table class='m'><thead><tr><th>ID</th><th>Produto</th><th>Tipo</th><th class='tr'>Preço (&euro;)</th><th class='tc'>N.&ordm; vendas</th><th>Criado em</th><th>Atualizado em</th><th class='tr'>Receita total (&euro;)</th></tr></thead><tbody>";
+			$i = 0;
+			foreach ($rows as $row) {
+				$cls = ($i % 2 === 0) ? 'o' : 'e';
+				$html .= "<tr class='".$cls."'><td>".htmlspecialchars((string)$row['id'])."</td><td>".htmlspecialchars((string)$row['descricao'])."</td><td>".htmlspecialchars((string)$row['tipo_produto'])."</td><td class='tr'>".number_format((float)$row['preco_uni'], 2, ',', '.')." &euro;</td><td class='tc'>".(int)$row['total_vendas']."</td><td>".htmlspecialchars((string)$row['created_at'])."</td><td>".htmlspecialchars((string)$row['updated_at'])."</td><td class='tr'>".number_format((float)$row['total_receita'], 2, ',', '.')." &euro;</td></tr>";
+				$i++;
+			}
+			$html .= "</tbody><tfoot><tr><td colspan='4'>Total &mdash; ".count($rows)." registo(s)</td><td class='tc'>".number_format($totalVendas, 0, ',', '.')."</td><td colspan='2'></td><td class='tr'>".number_format($totalReceita, 2, ',', '.')." &euro;</td></tr></tfoot></table>";
+
+			$relativePath = "uploads/dashboard/pdf/user".$_SESSION['user'];
+			$targetPath = $workspacePath."/".$relativePath;
+			if (!is_dir($targetPath)) {
+				mkdir($targetPath, 0777, true);
+			}
+
+			$fileName = "relatorio_produtos_".date("Ymd_His").".pdf";
+			$destination = $targetPath."/".$fileName;
+
+			$mpdf->WriteHTML($html);
+			$mpdf->Output($destination, 'F');
+
+			return json_encode(array("val" => 1, "msg" => "Relatório PDF gerado com sucesso.", "link" => $relativePath."/".$fileName));
+		} catch (Exception $e) {
+			return json_encode(array("val" => 2, "msg" => "Erro ao gerar PDF: ".$e->getMessage()));
+		}
+	}
+
+	function exportDashboardCategoriasPdf($info)
+	{
+		global $conn;
+		$info = json_decode($info, true);
+
+		$categorias = $this->normalizeDashboardMultiFilterValues($info['categorias'] ?? []);
+		if (count($categorias) < 1 && isset($info['descricao']) && trim((string)$info['descricao']) != '') {
+			$categorias = [trim((string)$info['descricao'])];
+		}
+		$estadoProdutos = isset($info['estadoProdutos']) ? trim((string)$info['estadoProdutos']) : '';
+		$estadoVendas = isset($info['estadoVendas']) ? trim((string)$info['estadoVendas']) : '';
+
+		try {
+			$sql = "SELECT
+				c.id,
+				c.descricao,
+				COUNT(v.id) AS total_vendas,
+				COUNT(DISTINCT v.id_produto) AS total_produtos,
+				COALESCE(SUM(v.Receita), 0) AS total_receita
+			FROM categorias c
+			LEFT JOIN vendas v ON v.id_categoria = c.id
+			WHERE 1=1";
+
+			$params = [];
+			if (count($categorias) > 0) {
+				$categoriaPlaceholders = [];
+				foreach ($categorias as $idx => $value) {
+					$placeholder = ':categoria_'.$idx;
+					$categoriaPlaceholders[] = $placeholder;
+					$params[$placeholder] = mb_strtolower($value, 'UTF-8');
+				}
+				$sql .= " AND LOWER(TRIM(c.descricao)) IN (".implode(',', $categoriaPlaceholders).")";
+			}
+
+			$sql .= " GROUP BY c.id, c.descricao";
+
+			$having = [];
+			if ($estadoProdutos === 'com') {
+				$having[] = "COUNT(DISTINCT v.id_produto) > 0";
+			} else if ($estadoProdutos === 'sem') {
+				$having[] = "COUNT(DISTINCT v.id_produto) = 0";
+			}
+			if ($estadoVendas === 'com') {
+				$having[] = "COUNT(v.id) > 0";
+			} else if ($estadoVendas === 'sem') {
+				$having[] = "COUNT(v.id) = 0";
+			}
+
+			if (count($having) > 0) {
+				$sql .= " HAVING ".implode(' AND ', $having);
+			}
+
+			$sql .= " ORDER BY c.descricao ASC";
+
+			$stmt = $conn->prepare($sql);
+			$stmt->execute($params);
+			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if (!$rows) {
+				return json_encode(array("val" => 2, "msg" => "Não existem registos para os filtros selecionados."));
+			}
+
+			require_once dirname(__DIR__, 3)."/vendor/autoload.php";
+			$workspacePath = dirname(__DIR__, 3);
+
+			$mpdf = new \Mpdf\Mpdf([
+				"mode"            => "utf-8",
+				"format"          => "A4-L",
+				"margin_top"      => 38,
+				"margin_bottom"   => 22,
+				"margin_left"     => 14,
+				"margin_right"    => 14,
+				"margin_header"   => 8,
+				"margin_footer"   => 6,
+			]);
+
+			$mpdf->AliasNbPages();
+			$logoTag = "<span style='font-size:22px;font-weight:900;color:#FF8800;letter-spacing:1px;font-family:Arial;'>FPB</span>";
+
+			$mpdf->SetHTMLHeader("<table width='100%' cellpadding='0' cellspacing='0' style='border-bottom:2.5px solid #FF8800;padding-bottom:5px;'><tr><td width='50%'>".$logoTag."</td><td width='50%' style='text-align:right;font-size:14px;font-weight:bold;color:#111111;font-family:Arial;'>Relatório de Categorias</td></tr></table>");
+			$mpdf->SetHTMLFooter("<table width='100%' cellpadding='0' cellspacing='0' style='border-top:1px solid #cbd5e0;padding-top:4px;font-size:8px;color:#888888;font-family:Arial;'><tr><td width='33%'>FPB &copy; ".date('Y')."</td><td width='34%' style='text-align:center;'>Gerado em: ".date('d/m/Y H:i')."</td><td width='33%' style='text-align:right;'>P&aacute;gina {PAGENO} de {nb}</td></tr></table>");
+
+			$categoriaIds = [];
+			foreach ($rows as $row) {
+				$categoriaId = (int)$row['id'];
+				$categoriaIds[] = $categoriaId;
+			}
+
+			$produtosPorCategoria = [];
+			if (count($categoriaIds) > 0) {
+				$produtoPlaceholders = [];
+				$produtoParams = [];
+				foreach ($categoriaIds as $idx => $categoriaId) {
+					$placeholder = ':cat_id_'.$idx;
+					$produtoPlaceholders[] = $placeholder;
+					$produtoParams[$placeholder] = $categoriaId;
+				}
+
+				$sqlProdutos = "SELECT
+					v.id_categoria AS categoria_id,
+					p.descricao AS produto,
+					COUNT(v.id) AS total_vendas,
+					COALESCE(SUM(v.Receita), 0) AS total_receita
+				FROM vendas v
+				INNER JOIN produtos p ON p.id = v.id_produto
+				WHERE v.id_categoria IN (".implode(',', $produtoPlaceholders).")
+				GROUP BY v.id_categoria, p.id, p.descricao
+				ORDER BY p.descricao ASC";
+
+				$stmtProdutos = $conn->prepare($sqlProdutos);
+				$stmtProdutos->execute($produtoParams);
+				$rowsProdutos = $stmtProdutos->fetchAll(PDO::FETCH_ASSOC);
+
+				foreach ($rowsProdutos as $rowProduto) {
+					$categoriaId = (int)$rowProduto['categoria_id'];
+					if (!isset($produtosPorCategoria[$categoriaId])) {
+						$produtosPorCategoria[$categoriaId] = [];
+					}
+
+					$produtosPorCategoria[$categoriaId][] = [
+						'produto' => trim((string)$rowProduto['produto']),
+						'total_vendas' => (int)$rowProduto['total_vendas'],
+						'total_receita' => (float)$rowProduto['total_receita'],
+					];
+				}
+			}
+
+			$estadoProdutosLabel = ($estadoProdutos === 'com') ? 'Com produtos' : (($estadoProdutos === 'sem') ? 'Sem produtos' : 'Todos');
+			$estadoVendasLabel = ($estadoVendas === 'com') ? 'Com vendas' : (($estadoVendas === 'sem') ? 'Sem vendas' : 'Todos');
+			$totalProdutos = 0;
+			$totalVendas = 0;
+			$totalReceita = 0;
+			foreach ($rows as $row) {
+				$totalProdutos += (int)$row['total_produtos'];
+				$totalVendas += (int)$row['total_vendas'];
+				$totalReceita += (float)$row['total_receita'];
+			}
+
+			$html  = "<style>
+				body      { font-family:Arial,sans-serif; color:#333333; font-size:10px; }
+				.fbox     { background:#fff8f3; border-left:4px solid #FF8800;
+				            padding:7px 11px; margin-bottom:12px; font-size:9.5px; line-height:1.6; }
+				.flabel   { color:#FF8800; font-weight:bold; }
+				table.m   { width:100%; border-collapse:collapse; font-size:9.5px; }
+				table.m thead tr   { background-color:#111111; color:#ffffff; }
+				table.m thead th   { padding:7px 6px; text-align:left;
+				                     border:1px solid #333333; white-space:nowrap; color:#ffffff; }
+				table.m tbody tr.o { background-color:#ffffff; }
+				table.m tbody tr.e { background-color:#fff3ec; }
+				table.m tbody td   { padding:5px 6px; border:1px solid #ffe0cc;
+				                     vertical-align:top; }
+				table.m tfoot tr   { background-color:#ffe8d6; }
+				table.m tfoot td   { padding:6px 6px; border:1px solid #ffbf99;
+				                     font-weight:bold; font-size:9.5px; }
+				.tr { text-align:right; }
+				.tc { text-align:center; }
+			</style>";
+			$categoriaLabel = (count($categorias) > 0) ? implode(', ', $categorias) : 'Todas';
+			$html .= "<div class='fbox'><span class='flabel'>Categorias:</span> ".htmlspecialchars($categoriaLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Produtos:</span> ".htmlspecialchars($estadoProdutosLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Vendas:</span> ".htmlspecialchars($estadoVendasLabel)."</div>";
+
+			$html .= "<table class='m'><thead><tr><th>ID</th><th>Categoria</th><th class='tc'>N.&ordm; produtos</th><th class='tc'>N.&ordm; vendas</th><th>Produtos</th><th class='tc'>Vendas por produto</th><th class='tr'>Receita por produto (&euro;)</th><th class='tr'>Receita total (&euro;)</th></tr></thead><tbody>";
+			$i = 0;
+			foreach ($rows as $row) {
+				$cls = ($i % 2 === 0) ? 'o' : 'e';
+				$categoriaId = (int)$row['id'];
+				$produtosDetalhe = '-';
+				$vendasDetalhe = '-';
+				$receitaDetalhe = '-';
+				if (isset($produtosPorCategoria[$categoriaId]) && count($produtosPorCategoria[$categoriaId]) > 0) {
+					$produtosLinhas = [];
+					$vendasLinhas = [];
+					$receitasLinhas = [];
+					foreach ($produtosPorCategoria[$categoriaId] as $detalheProduto) {
+						$produtosLinhas[] = htmlspecialchars((string)$detalheProduto['produto']);
+						$vendasLinhas[] = number_format((int)$detalheProduto['total_vendas'], 0, ',', '.');
+						$receitasLinhas[] = number_format((float)$detalheProduto['total_receita'], 2, ',', '.')." &euro;";
+					}
+					$produtosDetalhe = implode('<br>', $produtosLinhas);
+					$vendasDetalhe = implode('<br>', $vendasLinhas);
+					$receitaDetalhe = implode('<br>', $receitasLinhas);
+				}
+				$html .= "<tr class='".$cls."'><td>".htmlspecialchars((string)$row['id'])."</td><td>".htmlspecialchars((string)$row['descricao'])."</td><td class='tc'>".(int)$row['total_produtos']."</td><td class='tc'>".(int)$row['total_vendas']."</td><td>".$produtosDetalhe."</td><td class='tc'>".$vendasDetalhe."</td><td class='tr'>".$receitaDetalhe."</td><td class='tr'>".number_format((float)$row['total_receita'], 2, ',', '.')." &euro;</td></tr>";
+				$i++;
+			}
+			$html .= "</tbody><tfoot><tr><td colspan='2'>Total &mdash; ".count($rows)." registo(s)</td><td class='tc'>".number_format($totalProdutos, 0, ',', '.')."</td><td class='tc'>".number_format($totalVendas, 0, ',', '.')."</td><td></td><td></td><td></td><td class='tr'>".number_format($totalReceita, 2, ',', '.')." &euro;</td></tr></tfoot></table>";
+
+			$relativePath = "uploads/dashboard/pdf/user".$_SESSION['user'];
+			$targetPath = $workspacePath."/".$relativePath;
+			if (!is_dir($targetPath)) {
+				mkdir($targetPath, 0777, true);
+			}
+
+			$fileName = "relatorio_categorias_".date("Ymd_His").".pdf";
+			$destination = $targetPath."/".$fileName;
+
+			$mpdf->WriteHTML($html);
+			$mpdf->Output($destination, 'F');
+
+			return json_encode(array("val" => 1, "msg" => "Relatório PDF gerado com sucesso.", "link" => $relativePath."/".$fileName));
+		} catch (Exception $e) {
+			return json_encode(array("val" => 2, "msg" => "Erro ao gerar PDF: ".$e->getMessage()));
+		}
+	}
+
+	function exportDashboardCidadesPdf($info)
+	{
+		global $conn;
+		$info = json_decode($info, true);
+
+		$cidades = $this->normalizeDashboardMultiFilterValues($info['cidades'] ?? []);
+		if (count($cidades) < 1 && isset($info['descricao']) && trim((string)$info['descricao']) != '') {
+			$cidades = [trim((string)$info['descricao'])];
+		}
+		$distritos = $this->normalizeDashboardMultiFilterValues($info['distritos'] ?? []);
+		$concelhos = $this->normalizeDashboardMultiFilterValues($info['concelhos'] ?? []);
+		$produtos = $this->normalizeDashboardMultiFilterValues($info['produtos'] ?? []);
+		$estadoVendas = isset($info['estadoVendas']) ? trim((string)$info['estadoVendas']) : '';
+		$this->backfillDashboardCidadeGeoRelations();
+
+		try {
+			$sql = "SELECT
+				c.id,
+				c.descricao,
+				COALESCE(cd.descricao, '') AS distrito,
+				COALESCE(cc.descricao, '') AS concelho,
+				COUNT(v.id) AS total_vendas,
+				COUNT(DISTINCT v.id_produto) AS total_produtos,
+				COALESCE(SUM(v.Receita), 0) AS total_receita
+			FROM cidade c
+			LEFT JOIN core_distritos cd ON cd.id = c.id_distrito
+			LEFT JOIN core_concelhos cc ON cc.id = c.id_concelho
+			LEFT JOIN vendas v ON v.id_cidade = c.id
+			LEFT JOIN produtos p ON p.id = v.id_produto
+			WHERE 1=1";
+
+			$params = [];
+			if (count($cidades) > 0) {
+				$cidadePlaceholders = [];
+				foreach ($cidades as $idx => $value) {
+					$placeholder = ':cidade_'.$idx;
+					$cidadePlaceholders[] = $placeholder;
+					$params[$placeholder] = mb_strtolower($value, 'UTF-8');
+				}
+				$sql .= " AND LOWER(TRIM(c.descricao)) IN (".implode(',', $cidadePlaceholders).")";
+			}
+
+			if (count($distritos) > 0) {
+				$distritoPlaceholders = [];
+				foreach ($distritos as $idx => $value) {
+					$placeholder = ':distrito_'.$idx;
+					$distritoPlaceholders[] = $placeholder;
+					$params[$placeholder] = mb_strtolower($value, 'UTF-8');
+				}
+				$sql .= " AND LOWER(TRIM(cd.descricao)) IN (".implode(',', $distritoPlaceholders).")";
+			}
+
+			if (count($concelhos) > 0) {
+				$concelhoPlaceholders = [];
+				foreach ($concelhos as $idx => $value) {
+					$placeholder = ':concelho_'.$idx;
+					$concelhoPlaceholders[] = $placeholder;
+					$params[$placeholder] = mb_strtolower($value, 'UTF-8');
+				}
+				$sql .= " AND LOWER(TRIM(cc.descricao)) IN (".implode(',', $concelhoPlaceholders).")";
+			}
+
+			if (count($produtos) > 0) {
+				$produtoPlaceholders = [];
+				foreach ($produtos as $idx => $value) {
+					$placeholder = ':produto_'.$idx;
+					$produtoPlaceholders[] = $placeholder;
+					$params[$placeholder] = mb_strtolower($value, 'UTF-8');
+				}
+				$sql .= " AND LOWER(TRIM(p.descricao)) IN (".implode(',', $produtoPlaceholders).")";
+			}
+
+			$sql .= " GROUP BY c.id, c.descricao, cd.descricao, cc.descricao";
+
+			if ($estadoVendas === 'com') {
+				$sql .= " HAVING COUNT(v.id) > 0";
+			} else if ($estadoVendas === 'sem') {
+				$sql .= " HAVING COUNT(v.id) = 0";
+			}
+
+			$sql .= " ORDER BY c.descricao ASC";
+
+			$stmt = $conn->prepare($sql);
+			$stmt->execute($params);
+			$rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+			if (!$rows) {
+				return json_encode(array("val" => 2, "msg" => "Não existem registos para os filtros selecionados."));
+			}
+
+			require_once dirname(__DIR__, 3)."/vendor/autoload.php";
+			$workspacePath = dirname(__DIR__, 3);
+
+			$mpdf = new \Mpdf\Mpdf([
+				"mode"            => "utf-8",
+				"format"          => "A4-L",
+				"margin_top"      => 38,
+				"margin_bottom"   => 22,
+				"margin_left"     => 14,
+				"margin_right"    => 14,
+				"margin_header"   => 8,
+				"margin_footer"   => 6,
+			]);
+
+			$mpdf->AliasNbPages();
+			$logoTag = "<span style='font-size:22px;font-weight:900;color:#FF8800;letter-spacing:1px;font-family:Arial;'>FPB</span>";
+
+			$mpdf->SetHTMLHeader("<table width='100%' cellpadding='0' cellspacing='0' style='border-bottom:2.5px solid #FF8800;padding-bottom:5px;'><tr><td width='50%'>".$logoTag."</td><td width='50%' style='text-align:right;font-size:14px;font-weight:bold;color:#111111;font-family:Arial;'>Relatório de Cidades</td></tr></table>");
+			$mpdf->SetHTMLFooter("<table width='100%' cellpadding='0' cellspacing='0' style='border-top:1px solid #cbd5e0;padding-top:4px;font-size:8px;color:#888888;font-family:Arial;'><tr><td width='33%'>FPB &copy; ".date('Y')."</td><td width='34%' style='text-align:center;'>Gerado em: ".date('d/m/Y H:i')."</td><td width='33%' style='text-align:right;'>P&aacute;gina {PAGENO} de {nb}</td></tr></table>");
+
+			$cidadeIds = [];
+			foreach ($rows as $row) {
+				$cidadeIds[] = (int)$row['id'];
+			}
+
+			$receitaPorProdutoCidade = [];
+			if (count($cidadeIds) > 0) {
+				$cidadePlaceholders = [];
+				$produtoCidadeParams = [];
+				foreach ($cidadeIds as $idx => $cidadeId) {
+					$placeholder = ':cidade_id_'.$idx;
+					$cidadePlaceholders[] = $placeholder;
+					$produtoCidadeParams[$placeholder] = $cidadeId;
+				}
+
+				$sqlReceitaProduto = "SELECT
+					v.id_cidade AS cidade_id,
+					p.descricao AS produto,
+					COALESCE(SUM(v.Receita), 0) AS total_receita
+				FROM vendas v
+				INNER JOIN produtos p ON p.id = v.id_produto
+				WHERE v.id_cidade IN (".implode(',', $cidadePlaceholders).")";
+
+				if (count($produtos) > 0) {
+					$produtoPlaceholders = [];
+					foreach ($produtos as $idx => $value) {
+						$placeholder = ':produto_pdf_'.$idx;
+						$produtoPlaceholders[] = $placeholder;
+						$produtoCidadeParams[$placeholder] = mb_strtolower($value, 'UTF-8');
+					}
+					$sqlReceitaProduto .= " AND LOWER(TRIM(p.descricao)) IN (".implode(',', $produtoPlaceholders).")";
+				}
+
+				$sqlReceitaProduto .= " GROUP BY v.id_cidade, p.id, p.descricao ORDER BY p.descricao ASC";
+
+				$stmtReceitaProduto = $conn->prepare($sqlReceitaProduto);
+				$stmtReceitaProduto->execute($produtoCidadeParams);
+				$rowsReceitaProduto = $stmtReceitaProduto->fetchAll(PDO::FETCH_ASSOC);
+
+				foreach ($rowsReceitaProduto as $rowProduto) {
+					$cidadeId = (int)$rowProduto['cidade_id'];
+					if (!isset($receitaPorProdutoCidade[$cidadeId])) {
+						$receitaPorProdutoCidade[$cidadeId] = [];
+					}
+
+					$receitaPorProdutoCidade[$cidadeId][] = [
+						'produto' => trim((string)$rowProduto['produto']),
+						'total_receita' => (float)$rowProduto['total_receita'],
+					];
+				}
+			}
+
+			$distritoLabel = (count($distritos) > 0) ? implode(', ', $distritos) : 'Todos';
+			$concelhoLabel = (count($concelhos) > 0) ? implode(', ', $concelhos) : 'Todos';
+			$produtoLabel = (count($produtos) > 0) ? implode(', ', $produtos) : 'Todos';
+			$estadoLabel = ($estadoVendas === 'com') ? 'Com vendas' : (($estadoVendas === 'sem') ? 'Sem vendas' : 'Todos');
+			$totalVendas = 0;
+			$totalProdutos = 0;
+			$totalReceita = 0;
+			foreach ($rows as $row) {
+				$totalVendas += (int)$row['total_vendas'];
+				$totalProdutos += (int)$row['total_produtos'];
+				$totalReceita += (float)$row['total_receita'];
+			}
+
+			$html  = "<style>
+				body      { font-family:Arial,sans-serif; color:#333333; font-size:10px; }
+				.fbox     { background:#fff8f3; border-left:4px solid #FF8800;
+				            padding:7px 11px; margin-bottom:12px; font-size:9.5px; line-height:1.6; }
+				.flabel   { color:#FF8800; font-weight:bold; }
+				table.m   { width:100%; border-collapse:collapse; font-size:9.5px; }
+				table.m thead tr   { background-color:#111111; color:#ffffff; }
+				table.m thead th   { padding:7px 6px; text-align:left;
+				                     border:1px solid #333333; white-space:nowrap; color:#ffffff; }
+				table.m tbody tr.o { background-color:#ffffff; }
+				table.m tbody tr.e { background-color:#fff3ec; }
+				table.m tbody td   { padding:5px 6px; border:1px solid #ffe0cc;
+				                     vertical-align:top; }
+				table.m tfoot tr   { background-color:#ffe8d6; }
+				table.m tfoot td   { padding:6px 6px; border:1px solid #ffbf99;
+				                     font-weight:bold; font-size:9.5px; }
+				.tr { text-align:right; }
+				.tc { text-align:center; }
+			</style>";
+			$cidadeLabel = (count($cidades) > 0) ? implode(', ', $cidades) : 'Todas';
+			$html .= "<div class='fbox'><span class='flabel'>Cidade:</span> ".htmlspecialchars($cidadeLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Distrito:</span> ".htmlspecialchars($distritoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Concelho:</span> ".htmlspecialchars($concelhoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Produtos:</span> ".htmlspecialchars($produtoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Vendas:</span> ".htmlspecialchars($estadoLabel)."</div>";
+
+			$html .= "<table class='m'><thead><tr><th>ID</th><th>Cidade</th><th>Distrito</th><th>Concelho</th><th class='tc'>N.&ordm; produtos</th><th>Produtos</th><th class='tr'>Receita por produto (&euro;)</th><th class='tc'>N.&ordm; vendas</th><th class='tr'>Receita total (&euro;)</th></tr></thead><tbody>";
+			$i = 0;
+			foreach ($rows as $row) {
+				$cls = ($i % 2 === 0) ? 'o' : 'e';
+				$cidadeId = (int)$row['id'];
+				$produtosDetalhe = '-';
+				$receitaProdutoDetalhe = '-';
+				if (isset($receitaPorProdutoCidade[$cidadeId]) && count($receitaPorProdutoCidade[$cidadeId]) > 0) {
+					$produtosLinhas = [];
+					$receitasLinhas = [];
+					foreach ($receitaPorProdutoCidade[$cidadeId] as $detalheProduto) {
+						$produtosLinhas[] = htmlspecialchars((string)$detalheProduto['produto']);
+						$receitasLinhas[] = number_format((float)$detalheProduto['total_receita'], 2, ',', '.')." &euro;";
+					}
+					$produtosDetalhe = implode('<br>', $produtosLinhas);
+					$receitaProdutoDetalhe = implode('<br>', $receitasLinhas);
+				}
+				$html .= "<tr class='".$cls."'><td>".htmlspecialchars((string)$row['id'])."</td><td>".htmlspecialchars((string)$row['descricao'])."</td><td>".htmlspecialchars((string)$row['distrito'])."</td><td>".htmlspecialchars((string)$row['concelho'])."</td><td class='tc'>".(int)$row['total_produtos']."</td><td>".$produtosDetalhe."</td><td class='tr'>".$receitaProdutoDetalhe."</td><td class='tc'>".(int)$row['total_vendas']."</td><td class='tr'>".number_format((float)$row['total_receita'], 2, ',', '.')." &euro;</td></tr>";
+				$i++;
+			}
+			$html .= "</tbody><tfoot><tr><td colspan='4'>Total &mdash; ".count($rows)." registo(s)</td><td class='tc'>".number_format($totalProdutos, 0, ',', '.')."</td><td></td><td></td><td class='tc'>".number_format($totalVendas, 0, ',', '.')."</td><td class='tr'>".number_format($totalReceita, 2, ',', '.')." &euro;</td></tr></tfoot></table>";
+
+			$relativePath = "uploads/dashboard/pdf/user".$_SESSION['user'];
+			$targetPath = $workspacePath."/".$relativePath;
+			if (!is_dir($targetPath)) {
+				mkdir($targetPath, 0777, true);
+			}
+
+			$fileName = "relatorio_cidades_".date("Ymd_His").".pdf";
+			$destination = $targetPath."/".$fileName;
+
+			$mpdf->WriteHTML($html);
+			$mpdf->Output($destination, 'F');
+
+			return json_encode(array("val" => 1, "msg" => "Relatório PDF gerado com sucesso.", "link" => $relativePath."/".$fileName));
+		} catch (Exception $e) {
+			return json_encode(array("val" => 2, "msg" => "Erro ao gerar PDF: ".$e->getMessage()));
+		}
+	}
+
 	function topbar(){
     	global $conn;
     	$arr = [];
@@ -2028,29 +3013,25 @@ class Dashboarddb
 						</div>
 						<div class='dashboard-filters-body'>
 							<div class='row dashboard-filters-row'>
-								<div class='col-md-2 col-sm-6 mb-3'>
+								<div class='col-md col-sm-6 mb-3'>
 									<label class='dashboard-filter-label'><i class='fas fa-calendar-day'></i>Data inicial</label>
 									<input type='date' id='dashboardVendasStartDate' class='dashboard-filter-control'>
 								</div>
-								<div class='col-md-2 col-sm-6 mb-3'>
+								<div class='col-md col-sm-6 mb-3'>
 									<label class='dashboard-filter-label'><i class='fas fa-calendar-check'></i>Data final</label>
 									<input type='date' id='dashboardVendasEndDate' class='dashboard-filter-control'>
 								</div>
-								<div class='col-md-2 col-sm-6 mb-3'>
+								<div class='col-md col-sm-6 mb-3'>
 									<label class='dashboard-filter-label'><i class='fas fa-tags'></i>Categoria</label>
 									<select id='dashboardVendasCategoria' class='dashboard-filter-control' multiple data-placeholder='Selecione uma categoria'>".$filterOptions['categoria']."</select>
 								</div>
-								<div class='col-md-2 col-sm-6 mb-3'>
+								<div class='col-md col-sm-6 mb-3'>
 									<label class='dashboard-filter-label'><i class='fas fa-city'></i>Cidade</label>
 									<select id='dashboardVendasCidade' class='dashboard-filter-control' multiple data-placeholder='Selecione uma cidade'>".$filterOptions['cidade']."</select>
 								</div>
-								<div class='col-md-2 col-sm-6 mb-3'>
+								<div class='col-md col-sm-6 mb-3'>
 									<label class='dashboard-filter-label'><i class='fas fa-store'></i>Canal</label>
 									<select id='dashboardVendasCanal' class='dashboard-filter-control' multiple data-placeholder='Selecione um canal'>".$filterOptions['canal']."</select>
-								</div>
-								<div class='col-md-2 col-sm-6 mb-3'>
-									<label class='dashboard-filter-label'><i class='fas fa-box-open'></i>Produto</label>
-									<select id='dashboardVendasProduto' class='dashboard-filter-control' multiple data-placeholder='Selecione um produto'>".$filterOptions['produto']."</select>
 								</div>
 							</div>
 							<div class='dashboard-filters-actions'>
@@ -2075,6 +3056,7 @@ class Dashboarddb
 							<thead>
 								<tr>
 									".($canDeleteVenda ? "<th class='text-center dashboard-bulk-select-col' style='width:88px;'><label class='dashboard-bulk-select-label mb-0'><input type='checkbox' class='dashboard-bulk-select-all' id='dashboardVendasSelectAll' title='Selecionar todos'><span class='dashboard-bulk-select-text'>Sel. Todos</span></label></th>" : "")."
+									<th><i class='fas fa-hashtag mr-1'></i>ID Venda</th>
 									<th><i class='fas fa-calendar-alt mr-1'></i>Data</th>
 									<th><i class='fas fa-box mr-1'></i>Produto</th>
 									<th><i class='fas fa-tags mr-1'></i>Categoria</th>
@@ -2184,18 +3166,66 @@ class Dashboarddb
 					p.preco_uni,
 					p.created_at,
 					p.updated_at,
-					tp.descricao AS tipo_produto
+					tp.descricao AS tipo_produto,
+					COUNT(v.id) AS total_vendas
 				FROM produtos p
 				LEFT JOIN tipo_produto tp ON tp.id = p.id_tipo_produto
+				LEFT JOIN vendas v ON v.id_produto = p.id
+				GROUP BY p.id, p.descricao, p.id_tipo_produto, p.preco_uni, p.created_at, p.updated_at, tp.descricao
 				ORDER BY p.descricao ASC";
 				$stmt = $conn->prepare($sql);
 				$stmt->execute();
 				$array = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				$filterOptions = $this->buildDashboardProdutosFilterOptions($array);
 
 				$msg = "
-					<div class='mb-3 d-flex justify-content-end align-items-center'>
-						".($canCreateProduto ? "<button type='button' class='btn btn-success dashboard-table-add-btn' onclick='openDashboardProdutoModal()'><i class='fas fa-plus mr-1'></i>Adicionar produto</button>" : "")."
-						".($canDeleteProduto ? "<button type='button' class='btn btn-secondary dashboard-table-delete-btn dashboard-bulk-delete-btn ml-2' id='dashboardProdutosDeleteSelectedBtn' onclick='confirmDeleteSelectedDashboardProdutos()' disabled><i class='fas fa-trash mr-1'></i>Eliminar</button>" : "")."
+					<div class='dashboard-filters-panel'>
+						<div class='dashboard-filters-header'>
+							<i class='fas fa-sliders-h mr-2'></i>Filtros
+						</div>
+						<div class='dashboard-filters-body'>
+							<div class='row dashboard-filters-row'>
+								<div class='col-md-3 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-search'></i>Produto</label>
+									<select id='dashboardProdutosDescricaoFilter' class='dashboard-filter-control' multiple data-placeholder='Selecione o produto'>".$filterOptions['produto']."</select>
+								</div>
+								<div class='col-md-3 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-layer-group'></i>Tipo de produto</label>
+									<select id='dashboardProdutosTipoFilter' class='dashboard-filter-control' multiple data-placeholder='Selecione o tipo'>".$filterOptions['tipo']."</select>
+								</div>
+								<div class='col-md-2 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-arrow-down'></i>Preço mín. (€)</label>
+									<input type='number' id='dashboardProdutosPrecoMin' class='dashboard-filter-control' min='0' step='0.01' placeholder='0,00'>
+								</div>
+								<div class='col-md-2 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-arrow-up'></i>Preço máx. (€)</label>
+									<input type='number' id='dashboardProdutosPrecoMax' class='dashboard-filter-control' min='0' step='0.01' placeholder='0,00'>
+								</div>
+								<div class='col-md-2 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-shopping-cart'></i>Vendas</label>
+									<select id='dashboardProdutosVendasEstado' class='dashboard-filter-control'>
+										<option value=''>Todos</option>
+										<option value='com'>Com vendas</option>
+										<option value='sem'>Sem vendas</option>
+									</select>
+								</div>
+							</div>
+							<div class='dashboard-filters-actions'>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-apply' onclick='applyDashboardProdutosFilters()'>
+									<i class='fas fa-filter mr-1'></i> Aplicar filtros
+								</button>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-clear' onclick='clearDashboardProdutosFilters()'>
+									<i class='fas fa-eraser mr-1'></i> Limpar
+								</button>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-pdf' onclick='downloadDashboardProdutosPdf()'>
+									<i class='fas fa-file-pdf mr-1'></i> Gerar PDF
+								</button>
+								<div class='ml-auto d-flex align-items-center'>
+									".($canCreateProduto ? "<button type='button' class='btn btn-success dashboard-table-add-btn' onclick='openDashboardProdutoModal()'><i class='fas fa-plus mr-1'></i>Adicionar produto</button>" : "")."
+									".($canDeleteProduto ? "<button type='button' class='btn btn-secondary dashboard-table-delete-btn dashboard-bulk-delete-btn ml-2' id='dashboardProdutosDeleteSelectedBtn' onclick='confirmDeleteSelectedDashboardProdutos()' disabled><i class='fas fa-trash mr-1'></i>Eliminar</button>" : "")."
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class='table-responsive'>
 						<table class='table table-hover table-sm' id='dashboardProdutosTable'>
@@ -2226,7 +3256,7 @@ class Dashboarddb
 								<div class='modal-body'>
 									<div class='row'>
 										<div class='col-md-6 mb-2'>
-											<label class='form-label'>Descrição *</label>
+											<label class='form-label'>Nome Produto *</label>
 											<input type='hidden' id='dashboardProdutoRowId' value=''>
 											<input type='text' class='form-control' id='dashboardProdutoDescricao' placeholder='Nome do produto'>
 										</div>
@@ -2265,6 +3295,7 @@ class Dashboarddb
 		$msg = "";
 		$array = [];
 			try {
+				$this->syncDashboardCategoriasStatsColumns();
 				$canCreateCategoria = isset($_SESSION['perm']['core']['dashboard']['Adicionar']) && $_SESSION['perm']['core']['dashboard']['Adicionar'];
 				$canEditCategoria = isset($_SESSION['perm']['core']['dashboard']['Editar']) && $_SESSION['perm']['core']['dashboard']['Editar'];
 				$canDeleteCategoria = isset($_SESSION['perm']['core']['dashboard']['Apagar']) && $_SESSION['perm']['core']['dashboard']['Apagar'];
@@ -2272,25 +3303,70 @@ class Dashboarddb
 
 				$sql = "SELECT
 					c.id,
-					c.descricao
+					c.descricao,
+					c.total_vendas,
+					c.total_produtos,
+					c.total_receita
 				FROM categorias c
 				ORDER BY c.descricao ASC";
 				$stmt = $conn->prepare($sql);
 				$stmt->execute();
 				$array = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				$filterOptions = $this->buildDashboardCategoriasFilterOptions($array);
 
 				$msg = "
-					<div class='mb-3 d-flex justify-content-end align-items-center'>
-						".($canCreateCategoria ? "<button type='button' class='btn btn-success dashboard-table-add-btn' onclick='openDashboardCategoriaModal()'><i class='fas fa-plus mr-1'></i>Adicionar categoria</button>" : "")."
-						".($canDeleteCategoria ? "<button type='button' class='btn btn-secondary dashboard-table-delete-btn dashboard-bulk-delete-btn ml-2' id='dashboardCategoriasDeleteSelectedBtn' onclick='confirmDeleteSelectedDashboardCategorias()' disabled><i class='fas fa-trash mr-1'></i>Eliminar</button>" : "")."
+					<div class='dashboard-filters-panel'>
+						<div class='dashboard-filters-header'>
+							<i class='fas fa-sliders-h mr-2'></i>Filtros
+						</div>
+						<div class='dashboard-filters-body'>
+							<div class='row dashboard-filters-row'>
+								<div class='col-md-4 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-tags'></i>Categoria</label>
+									<select id='dashboardCategoriasFilter' class='dashboard-filter-control' multiple data-placeholder='Selecione a categoria'>".$filterOptions['categoria']."</select>
+								</div>
+								<div class='col-md-4 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-boxes'></i>Produtos</label>
+									<select id='dashboardCategoriasProdutosEstado' class='dashboard-filter-control'>
+										<option value=''>Todos</option>
+										<option value='com'>Com produtos</option>
+										<option value='sem'>Sem produtos</option>
+									</select>
+								</div>
+								<div class='col-md-4 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-shopping-cart'></i>Vendas</label>
+									<select id='dashboardCategoriasVendasEstado' class='dashboard-filter-control'>
+										<option value=''>Todos</option>
+										<option value='com'>Com vendas</option>
+										<option value='sem'>Sem vendas</option>
+									</select>
+								</div>
+							</div>
+							<div class='dashboard-filters-actions'>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-apply' onclick='applyDashboardCategoriasFilters()'>
+									<i class='fas fa-filter mr-1'></i> Aplicar filtros
+								</button>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-clear' onclick='clearDashboardCategoriasFilters()'>
+									<i class='fas fa-eraser mr-1'></i> Limpar
+								</button>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-pdf' onclick='downloadDashboardCategoriasPdf()'>
+									<i class='fas fa-file-pdf mr-1'></i> Gerar PDF
+								</button>
+								<div class='ml-auto d-flex align-items-center'>
+									".($canCreateCategoria ? "<button type='button' class='btn btn-success dashboard-table-add-btn' onclick='openDashboardCategoriaModal()'><i class='fas fa-plus mr-1'></i>Adicionar categoria</button>" : "")."
+									".($canDeleteCategoria ? "<button type='button' class='btn btn-secondary dashboard-table-delete-btn dashboard-bulk-delete-btn ml-2' id='dashboardCategoriasDeleteSelectedBtn' onclick='confirmDeleteSelectedDashboardCategorias()' disabled><i class='fas fa-trash mr-1'></i>Eliminar</button>" : "")."
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class='table-responsive'>
 						<table class='table table-hover table-sm' id='dashboardCategoriasTable'>
 							<thead>
 								<tr>
 									".($canDeleteCategoria ? "<th class='text-center dashboard-bulk-select-col' style='width:88px;'><label class='dashboard-bulk-select-label mb-0'><input type='checkbox' class='dashboard-bulk-select-all' id='dashboardCategoriasSelectAll' title='Selecionar todos'><span class='dashboard-bulk-select-text'>Sel. Todos</span></label></th>" : "")."
-									<th><i class='fas fa-hashtag mr-1'></i>ID</th>
 									<th><i class='fas fa-tags mr-1'></i>Categoria</th>
+									<th><i class='fas fa-boxes mr-1'></i>Produtos</th>
+									<th><i class='fas fa-shopping-cart mr-1'></i>Vendas</th>
 									".($showCategoriasActions ? "<th><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
 								</tr>
 							</thead>
@@ -2311,7 +3387,7 @@ class Dashboarddb
 										<div class='col-md-12 mb-2'>
 											<label class='form-label'>Categoria *</label>
 											<input type='hidden' id='dashboardCategoriaRowId' value=''>
-											<input type='text' class='form-control' id='dashboardCategoriaDescricao' placeholder='Nome da categoria'>
+											<input type='text' class='form-control' id='dashboardCategoriaDescricao' maxlength='100' placeholder='Nome da categoria'>
 										</div>
 									</div>
 								</div>
@@ -2337,6 +3413,7 @@ class Dashboarddb
 		$msg = "";
 		$array = [];
 			try {
+				$this->backfillDashboardCidadeGeoRelations();
 				$canCreateCidade = isset($_SESSION['perm']['core']['dashboard']['Adicionar']) && $_SESSION['perm']['core']['dashboard']['Adicionar'];
 				$canEditCidade = isset($_SESSION['perm']['core']['dashboard']['Editar']) && $_SESSION['perm']['core']['dashboard']['Editar'];
 				$canDeleteCidade = isset($_SESSION['perm']['core']['dashboard']['Apagar']) && $_SESSION['perm']['core']['dashboard']['Apagar'];
@@ -2344,25 +3421,82 @@ class Dashboarddb
 
 				$sql = "SELECT
 					c.id,
-					c.descricao
+					c.descricao,
+					c.id_distrito,
+					c.id_concelho,
+					COALESCE(cd.descricao, '') AS distrito,
+					COALESCE(cc.descricao, '') AS concelho,
+					COUNT(v.id) AS total_vendas,
+					COUNT(DISTINCT v.id_produto) AS total_produtos,
+					COALESCE(GROUP_CONCAT(DISTINCT p.descricao ORDER BY p.descricao SEPARATOR '||'), '') AS produtos_tokens
 				FROM cidade c
+				LEFT JOIN core_distritos cd ON cd.id = c.id_distrito
+				LEFT JOIN core_concelhos cc ON cc.id = c.id_concelho
+				LEFT JOIN vendas v ON v.id_cidade = c.id
+				LEFT JOIN produtos p ON p.id = v.id_produto
+				GROUP BY c.id, c.descricao, c.id_distrito, c.id_concelho, cd.descricao, cc.descricao
 				ORDER BY c.descricao ASC";
 				$stmt = $conn->prepare($sql);
 				$stmt->execute();
 				$array = $stmt->fetchAll(PDO::FETCH_ASSOC);
+				$filterOptions = $this->buildDashboardCidadesFilterOptions($array);
 
 				$msg = "
-					<div class='mb-3 d-flex justify-content-end align-items-center'>
-						".($canCreateCidade ? "<button type='button' class='btn btn-success dashboard-table-add-btn' onclick='openDashboardCidadeModal()'><i class='fas fa-plus mr-1'></i>Adicionar cidade</button>" : "")."
-						".($canDeleteCidade ? "<button type='button' class='btn btn-secondary dashboard-table-delete-btn dashboard-bulk-delete-btn ml-2' id='dashboardCidadesDeleteSelectedBtn' onclick='confirmDeleteSelectedDashboardCidades()' disabled><i class='fas fa-trash mr-1'></i>Eliminar</button>" : "")."
+					<div class='dashboard-filters-panel'>
+						<div class='dashboard-filters-header'>
+							<i class='fas fa-sliders-h mr-2'></i>Filtros
+						</div>
+						<div class='dashboard-filters-body'>
+							<div class='row dashboard-filters-row'>
+								<div class='col-lg col-md-6 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-city'></i>Cidade</label>
+									<select id='dashboardCidadesCidadeFilter' class='dashboard-filter-control' multiple data-placeholder='Selecione a cidade'>".$filterOptions['cidade']."</select>
+								</div>
+								<div class='col-lg col-md-6 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-map-marked-alt'></i>Distrito</label>
+									<select id='dashboardCidadesDistritoFilter' class='dashboard-filter-control' multiple data-placeholder='Selecione o distrito'>".$filterOptions['distrito']."</select>
+								</div>
+								<div class='col-lg col-md-6 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-map'></i>Concelho</label>
+									<select id='dashboardCidadesConcelhoFilter' class='dashboard-filter-control' multiple data-placeholder='Selecione o concelho'>".$filterOptions['concelho']."</select>
+								</div>
+								<div class='col-lg col-md-6 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-box-open'></i>Produtos</label>
+									<select id='dashboardCidadesProdutoFilter' class='dashboard-filter-control' multiple data-placeholder='Selecione o produto'>".$filterOptions['produto']."</select>
+								</div>
+								<div class='col-lg col-md-6 col-sm-6 mb-3'>
+									<label class='dashboard-filter-label'><i class='fas fa-shopping-cart'></i>Vendas</label>
+									<select id='dashboardCidadesVendasEstado' class='dashboard-filter-control'>
+										<option value=''>Todos</option>
+										<option value='com'>Com vendas</option>
+										<option value='sem'>Sem vendas</option>
+									</select>
+								</div>
+							</div>
+							<div class='dashboard-filters-actions'>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-apply' onclick='applyDashboardCidadesFilters()'>
+									<i class='fas fa-filter mr-1'></i> Aplicar filtros
+								</button>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-clear' onclick='clearDashboardCidadesFilters()'>
+									<i class='fas fa-eraser mr-1'></i> Limpar
+								</button>
+								<button type='button' class='dashboard-filter-btn dashboard-filter-btn-pdf' onclick='downloadDashboardCidadesPdf()'>
+									<i class='fas fa-file-pdf mr-1'></i> Gerar PDF
+								</button>
+								<div class='ml-auto d-flex align-items-center'>
+									".($canCreateCidade ? "<button type='button' class='btn btn-success dashboard-table-add-btn' onclick='openDashboardCidadeModal()'><i class='fas fa-plus mr-1'></i>Adicionar cidade</button>" : "")."
+									".($canDeleteCidade ? "<button type='button' class='btn btn-secondary dashboard-table-delete-btn dashboard-bulk-delete-btn ml-2' id='dashboardCidadesDeleteSelectedBtn' onclick='confirmDeleteSelectedDashboardCidades()' disabled><i class='fas fa-trash mr-1'></i>Eliminar</button>" : "")."
+								</div>
+							</div>
+						</div>
 					</div>
 					<div class='table-responsive'>
 						<table class='table table-hover table-sm' id='dashboardCidadesTable'>
 							<thead>
 								<tr>
 									".($canDeleteCidade ? "<th class='text-center dashboard-bulk-select-col' style='width:88px;'><label class='dashboard-bulk-select-label mb-0'><input type='checkbox' class='dashboard-bulk-select-all' id='dashboardCidadesSelectAll' title='Selecionar todos'><span class='dashboard-bulk-select-text'>Sel. Todos</span></label></th>" : "")."
-									<th><i class='fas fa-hashtag mr-1'></i>ID</th>
 									<th><i class='fas fa-city mr-1'></i>Cidade</th>
+									<th><i class='fas fa-boxes mr-1'></i>Produtos vendidos</th>
 									".($showCidadesActions ? "<th><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
 								</tr>
 							</thead>
@@ -2383,7 +3517,7 @@ class Dashboarddb
 										<div class='col-md-12 mb-2'>
 											<label class='form-label'>Cidade *</label>
 											<input type='hidden' id='dashboardCidadeRowId' value=''>
-											<input type='text' class='form-control' id='dashboardCidadeDescricao' placeholder='Nome da cidade'>
+											<input type='text' class='form-control' id='dashboardCidadeDescricao' maxlength='100' placeholder='Nome da cidade'>
 										</div>
 									</div>
 								</div>
@@ -2407,9 +3541,9 @@ class Dashboarddb
 	function getDashboardCsvFiles(){
 		$array = [];
 		$canDelete = isset($_SESSION['perm']['core']['dashboard']['Apagar']) && $_SESSION['perm']['core']['dashboard']['Apagar'];
-		$workspacePath = dirname(__DIR__, 3);
-		$relativePath = "uploads/dashboard/csv/user".$_SESSION['user'];
-		$targetPath = $workspacePath."/".$relativePath;
+		$paths = $this->getDashboardCsvStoragePaths($_SESSION['user']);
+		$relativePath = $paths['finalRelativePath'];
+		$targetPath = $paths['finalAbsolutePath'];
 
 		if(!is_dir($targetPath)){
 			return $array;
@@ -2460,6 +3594,7 @@ class Dashboarddb
 		$val = 1;
 		$msg = "";
 		$previewRows = [];
+		$uploadTempPath = "";
 
 		if(!isset($_SESSION['perm']['core']['dashboard']['Importar']) || !$_SESSION['perm']['core']['dashboard']['Importar']){
 			return json_encode(array("val" => 2, "msg" => "Sem permissão para upload de ficheiros CSV.", "array" => $this->getDashboardCsvFiles()));
@@ -2469,9 +3604,9 @@ class Dashboarddb
 			return json_encode(array("val" => 2, "msg" => "Não foi selecionado nenhum ficheiro.", "array" => $this->getDashboardCsvFiles()));
 		}
 
-		$workspacePath = dirname(__DIR__, 3);
-		$relativePath = "uploads/dashboard/csv/user".$_SESSION['user'];
-		$targetPath = $workspacePath."/".$relativePath;
+		$paths = $this->getDashboardCsvStoragePaths($_SESSION['user']);
+		$workspacePath = $paths['workspacePath'];
+		$targetPath = $paths['tempAbsolutePath'];
 
 		if (!is_dir($targetPath)) {
 			mkdir($targetPath, 0777, true);
@@ -2495,7 +3630,7 @@ class Dashboarddb
 		}
 
 		if($val == 1){
-			$folder = "dashboard/csv/user".$_SESSION['user'];
+			$folder = "dashboard/csv_tmp/user".$_SESSION['user'];
 			$uploadPayload = array("files" => $files);
 			$uploadResultRaw = uploadFiles($uploadPayload, $folder);
 			$uploadResult = json_decode($uploadResultRaw, true);
@@ -2526,9 +3661,13 @@ class Dashboarddb
 					if ($parseResult['val'] != 1) {
 						$val = 2;
 						$msg = $parseResult['msg'];
+						if (is_file($destination)) {
+							@unlink($destination);
+						}
 					} else {
 						$previewRows = $parseResult['rows'];
-						$msg = "Ficheiro CSV carregado para tratamento. A inserção na base de dados só acontece após confirmação.";
+						$uploadTempPath = $relativeSavedPath;
+						$msg = "Ficheiro CSV carregado para tratamento temporário. Só será registado após confirmação com inserção válida.";
 					}
 				}
 			}
@@ -2539,7 +3678,7 @@ class Dashboarddb
 			$val = 2;
 		}
 
-		return json_encode(array("val" => $val, "msg" => $msg, "rows" => $previewRows, "array" => $this->getDashboardCsvFiles()));
+		return json_encode(array("val" => $val, "msg" => $msg, "rows" => $previewRows, "uploadTempPath" => $uploadTempPath, "array" => $this->getDashboardCsvFiles()));
 	}
 
 	function commitDashboardCsvPreview($info){
@@ -2553,12 +3692,43 @@ class Dashboarddb
 		if (isset($info['rows']) && is_array($info['rows'])) {
 			$rows = $info['rows'];
 		}
+		$uploadTempPath = isset($info['uploadTempPath']) ? str_replace('\\', '/', trim((string)$info['uploadTempPath'])) : '';
 
 		if(count($rows) < 1){
 			return json_encode(array("val" => 2, "msg" => "Não existem linhas válidas para importar."));
 		}
 
 		$importResult = $this->importDashboardCsvRows($rows);
+		$paths = $this->getDashboardCsvStoragePaths($_SESSION['user']);
+		$tempRelativePrefix = $paths['tempRelativePath'].'/';
+
+		if ($uploadTempPath != '' && strpos($uploadTempPath, '..') === false && strpos($uploadTempPath, $tempRelativePrefix) === 0) {
+			$tempAbsolutePath = $paths['workspacePath'].'/'.$uploadTempPath;
+			if (is_file($tempAbsolutePath)) {
+				if ((int)$importResult['val'] === 1 && (int)$importResult['importedRows'] > 0) {
+					if (!is_dir($paths['finalAbsolutePath'])) {
+						mkdir($paths['finalAbsolutePath'], 0777, true);
+					}
+
+					$fileName = basename($tempAbsolutePath);
+					$finalAbsolutePath = $paths['finalAbsolutePath'].'/'.$fileName;
+					if (file_exists($finalAbsolutePath)) {
+						$nameWithoutExt = pathinfo($fileName, PATHINFO_FILENAME);
+						$ext = pathinfo($fileName, PATHINFO_EXTENSION);
+						$fileName = $nameWithoutExt.'_'.date('YmdHis').($ext != '' ? '.'.$ext : '');
+						$finalAbsolutePath = $paths['finalAbsolutePath'].'/'.$fileName;
+					}
+
+					if (!@rename($tempAbsolutePath, $finalAbsolutePath)) {
+						$importResult['msg'] .= ' As linhas foram importadas, mas não foi possível registar o ficheiro no histórico.';
+						@unlink($tempAbsolutePath);
+					}
+				} else {
+					@unlink($tempAbsolutePath);
+				}
+			}
+		}
+
 		return json_encode(array(
 			"val" => $importResult['val'],
 			"msg" => $importResult['msg'],
@@ -2567,6 +3737,36 @@ class Dashboarddb
 			"duplicateRows" => (int)$importResult['duplicateRows'],
 			"invalidRows" => (int)$importResult['invalidRows']
 		));
+	}
+
+	function discardDashboardCsvUpload($info){
+		$info = json_decode($info, true);
+
+		if(!isset($_SESSION['perm']['core']['dashboard']['Importar']) || !$_SESSION['perm']['core']['dashboard']['Importar']){
+			return json_encode(array("val" => 2, "msg" => "Sem permissão para remover upload temporário."));
+		}
+
+		$uploadTempPath = isset($info['uploadTempPath']) ? str_replace('\\', '/', trim((string)$info['uploadTempPath'])) : '';
+		if ($uploadTempPath == '' || strpos($uploadTempPath, '..') !== false) {
+			return json_encode(array("val" => 1, "msg" => "Sem ficheiro temporário para remover."));
+		}
+
+		$paths = $this->getDashboardCsvStoragePaths($_SESSION['user']);
+		$tempRelativePrefix = $paths['tempRelativePath'].'/';
+		if (strpos($uploadTempPath, $tempRelativePrefix) !== 0) {
+			return json_encode(array("val" => 2, "msg" => "Caminho temporário inválido."));
+		}
+
+		$tempAbsolutePath = $paths['workspacePath'].'/'.$uploadTempPath;
+		if (!is_file($tempAbsolutePath)) {
+			return json_encode(array("val" => 1, "msg" => "Sem ficheiro temporário para remover."));
+		}
+
+		if (@unlink($tempAbsolutePath)) {
+			return json_encode(array("val" => 1, "msg" => "Ficheiro temporário removido."));
+		}
+
+		return json_encode(array("val" => 2, "msg" => "Não foi possível remover o ficheiro temporário."));
 	}
 
 	function validateDashboardCsvPreview($info){
