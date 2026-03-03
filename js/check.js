@@ -1940,7 +1940,12 @@ async function createDataTable(
         label === "" ||
         normalized === "sel." ||
         normalized === "sel" ||
-        normalized.indexOf("sel. todos") > -1
+        normalized.indexOf("sel. todos") > -1 ||
+        normalized === "acoes" ||
+        normalized === "acao" ||
+        normalized.indexOf("acoes") > -1 ||
+        normalized.indexOf("acao") > -1 ||
+        normalized.indexOf("action") > -1
       ) {
         continue;
       }
@@ -1984,16 +1989,28 @@ async function createDataTable(
       var html =
         "<div class='" +
         toolbarClass +
-        " d-flex flex-wrap align-items-center mb-2' style='gap:8px;'>" +
-        "<span style='font-size:12px;font-weight:600;'>Ordenar:</span>" +
-        "<select class='form-control form-control-sm dt-card-sort-column' style='max-width:230px;'></select>" +
-        "<select class='form-control form-control-sm dt-card-sort-direction' style='max-width:130px;'>" +
-        "<option value='asc'>Ascendente</option>" +
-        "<option value='desc'>Descendente</option>" +
+        "'>" +
+        "<span class='dt-card-sort-label'><i class='fa fa-sort'></i><span>Filtros</span></span>" +
+        "<select class='form-control form-control-sm dt-card-sort-column'></select>" +
+        "<select class='form-control form-control-sm dt-card-sort-direction'>" +
+        "<option value='asc'>Asc &#9650;</option>" +
+        "<option value='desc'>Desc &#9660;</option>" +
         "</select>" +
         "</div>";
       $wrapper.prepend(html);
       $existingToolbar = $wrapper.children("." + toolbarClass).first();
+    }
+
+    /* Place toolbar right after the DT controls row (Sel. Todos + Procurar).
+       Avoid :first-child — if the toolbar was prepended first it breaks the pseudo. */
+    var $topControlsRow = $wrapper
+      .children(".dt-layout-row:not(.dt-layout-table)")
+      .first();
+    if (
+      $topControlsRow.length &&
+      $existingToolbar.prev()[0] !== $topControlsRow[0]
+    ) {
+      $existingToolbar.insertAfter($topControlsRow);
     }
 
     var $columnSelect = $existingToolbar.find(".dt-card-sort-column");
@@ -2054,11 +2071,43 @@ async function createDataTable(
     $directionSelect.on("change" + eventNamespace, applySort);
   }
 
+  function syncDataTableCardLayout(
+    dataTable,
+    tableSelector,
+    maxWidth,
+    desktopLimit,
+  ) {
+    var isCard = isCardTableViewport(maxWidth);
+    var $table = $(tableSelector);
+
+    if (!$table.length || !dataTable) {
+      return;
+    }
+
+    if (isCard) {
+      $table.addClass("dt-card-table");
+      applyDataTableCardLabels(tableSelector);
+      if (dataTable.page && dataTable.page.len && dataTable.page.len() !== 4) {
+        dataTable.page.len(4).draw(false);
+      }
+    } else {
+      $table.removeClass("dt-card-table");
+      if (dataTable.page && dataTable.page.len && dataTable.page.len() === 4) {
+        var nextDesktopLimit =
+          typeof desktopLimit === "number" && desktopLimit > 0
+            ? desktopLimit
+            : 10;
+        dataTable.page.len(nextDesktopLimit).draw(false);
+      }
+    }
+  }
+
   function bindDataTableCardSortResize(
     dataTable,
     tableSelector,
     maxWidth,
     tableKey,
+    desktopLimit,
   ) {
     var resizeNamespace = "resize.dtCardSort_" + tableKey;
     var timerVarName = "_dtCardSortResizeTimer_" + tableKey;
@@ -2068,6 +2117,12 @@ async function createDataTable(
       .on(resizeNamespace, function () {
         clearTimeout(window[timerVarName]);
         window[timerVarName] = setTimeout(function () {
+          syncDataTableCardLayout(
+            dataTable,
+            tableSelector,
+            maxWidth,
+            desktopLimit,
+          );
           renderDataTableCardSortToolbar(
             dataTable,
             tableSelector,
@@ -2274,19 +2329,9 @@ async function createDataTable(
 
       let dataTable = $(table).DataTable(dataTableOptions);
 
-      if (isCardViewport && dataTable.page && dataTable.page.len) {
-        dataTable.page.len(4).draw(false);
-      }
+      var desktopLimit = typeof limit === "number" && limit > 0 ? limit : 10;
 
-      if (
-        !isCardViewport &&
-        dataTable.page &&
-        dataTable.page.len &&
-        dataTable.page.len() === 4
-      ) {
-        var desktopLimit = typeof limit === "number" && limit > 0 ? limit : 10;
-        dataTable.page.len(desktopLimit).draw(false);
-      }
+      syncDataTableCardLayout(dataTable, table, cardViewportMax, desktopLimit);
 
       var tableSortKey = getDataTableSortKey(dataTable, table);
       renderDataTableCardSortToolbar(
@@ -2300,6 +2345,7 @@ async function createDataTable(
         table,
         cardViewportMax,
         tableSortKey,
+        desktopLimit,
       );
 
       $("button").removeClass(
