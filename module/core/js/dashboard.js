@@ -1691,7 +1691,8 @@ function syncDashboardVendasDependentFilters(changedFilterId) {
   var rows = getDashboardVendasRowsArray();
 
   function rowMatchesDate(row) {
-    var rowDate = row && row.DataHora ? row.DataHora.toString().substring(0, 10) : "";
+    var rowDate =
+      row && row.DataHora ? row.DataHora.toString().substring(0, 10) : "";
     if (startDate !== "" && rowDate < startDate) {
       return false;
     }
@@ -1711,11 +1712,13 @@ function syncDashboardVendasDependentFilters(changedFilterId) {
       continue;
     }
 
-    var categoriaRaw = row.categoria != null ? row.categoria.toString().trim() : "";
+    var categoriaRaw =
+      row.categoria != null ? row.categoria.toString().trim() : "";
     var categoria = categoriaRaw.toLowerCase();
     var cidadeRaw = row.cidade != null ? row.cidade.toString().trim() : "";
     var cidade = cidadeRaw.toLowerCase();
-    var canalRaw = row.canal_venda != null ? row.canal_venda.toString().trim() : "";
+    var canalRaw =
+      row.canal_venda != null ? row.canal_venda.toString().trim() : "";
     var canal = canalRaw.toLowerCase();
 
     if (
@@ -1743,9 +1746,11 @@ function syncDashboardVendasDependentFilters(changedFilterId) {
     }
   }
 
-  var allowedCategorias = Object.keys(allowedCategoriasMap).sort(function (a, b) {
-    return a.localeCompare(b, "pt", { sensitivity: "base" });
-  });
+  var allowedCategorias = Object.keys(allowedCategoriasMap).sort(
+    function (a, b) {
+      return a.localeCompare(b, "pt", { sensitivity: "base" });
+    },
+  );
   var allowedCidades = Object.keys(allowedCidadesMap).sort(function (a, b) {
     return a.localeCompare(b, "pt", { sensitivity: "base" });
   });
@@ -2399,13 +2404,17 @@ function clampDashboardProdutosPriceInputs() {
   var maxVal = parseDashboardLocaleNumber($precoMax.val() || "");
 
   if (!isNaN(minVal)) {
-    var minUpperBound = !isNaN(maxVal) ? Math.min(globalMax, maxVal) : globalMax;
+    var minUpperBound = !isNaN(maxVal)
+      ? Math.min(globalMax, maxVal)
+      : globalMax;
     minVal = Math.max(globalMin, Math.min(minVal, minUpperBound));
     $precoMin.val(minVal.toFixed(2));
   }
 
   if (!isNaN(maxVal)) {
-    var maxLowerBound = !isNaN(minVal) ? Math.max(globalMin, minVal) : globalMin;
+    var maxLowerBound = !isNaN(minVal)
+      ? Math.max(globalMin, minVal)
+      : globalMin;
     maxVal = Math.max(maxLowerBound, Math.min(maxVal, globalMax));
     $precoMax.val(maxVal.toFixed(2));
   }
@@ -2432,9 +2441,12 @@ function configureDashboardProdutosPriceInputs() {
         event.preventDefault();
       }
     })
-    .on("blur.dashboardProdutosPrice change.dashboardProdutosPrice", function () {
-      clampDashboardProdutosPriceInputs();
-    });
+    .on(
+      "blur.dashboardProdutosPrice change.dashboardProdutosPrice",
+      function () {
+        clampDashboardProdutosPriceInputs();
+      },
+    );
 
   $precoMax
     .off(
@@ -2449,9 +2461,12 @@ function configureDashboardProdutosPriceInputs() {
         event.preventDefault();
       }
     })
-    .on("blur.dashboardProdutosPrice change.dashboardProdutosPrice", function () {
-      clampDashboardProdutosPriceInputs();
-    });
+    .on(
+      "blur.dashboardProdutosPrice change.dashboardProdutosPrice",
+      function () {
+        clampDashboardProdutosPriceInputs();
+      },
+    );
 }
 
 function validateDashboardProdutosPriceRange(showToast) {
@@ -2502,7 +2517,10 @@ function validateDashboardProdutosPriceRange(showToast) {
 
   if (!isNaN(precoMin) && !isNaN(precoMax) && precoMin > precoMax) {
     if (showToast) {
-      toaster("O preço mínimo não pode ser maior que o preço máximo.", "warning");
+      toaster(
+        "O preço mínimo não pode ser maior que o preço máximo.",
+        "warning",
+      );
     }
     return false;
   }
@@ -2564,9 +2582,11 @@ function syncDashboardProdutosDependentFilters(changedFilterId) {
   var allowedTiposMap = {};
   for (var i = 0; i < rows.length; i++) {
     var row = rows[i] || {};
-    var produtoRaw = row.descricao != null ? row.descricao.toString().trim() : "";
+    var produtoRaw =
+      row.descricao != null ? row.descricao.toString().trim() : "";
     var produto = produtoRaw.toLowerCase();
-    var tipoRaw = row.tipo_produto != null ? row.tipo_produto.toString().trim() : "";
+    var tipoRaw =
+      row.tipo_produto != null ? row.tipo_produto.toString().trim() : "";
     var tipo = tipoRaw.toLowerCase();
 
     if (!rowMatchesPreco(row)) {
@@ -2689,12 +2709,15 @@ function initializeDashboardProdutosSelectFilters() {
     "#dashboardProdutosDescricaoFilter, #dashboardProdutosTipoFilter, #dashboardProdutosVendasEstado, #dashboardProdutosPrecoMin, #dashboardProdutosPrecoMax",
   )
     .off("change.dashboardProdutosCascade input.dashboardProdutosCascade")
-    .on("change.dashboardProdutosCascade input.dashboardProdutosCascade", function () {
-      if (dashboardProdutosCascadeSyncing) {
-        return;
-      }
-      syncDashboardProdutosDependentFilters(this.id);
-    });
+    .on(
+      "change.dashboardProdutosCascade input.dashboardProdutosCascade",
+      function () {
+        if (dashboardProdutosCascadeSyncing) {
+          return;
+        }
+        syncDashboardProdutosDependentFilters(this.id);
+      },
+    );
 
   syncDashboardProdutosDependentFilters("");
 }
@@ -2777,7 +2800,10 @@ function applyDashboardProdutosFilters() {
       : parseDashboardLocaleNumber(data[colOffset + 3] || "");
     var totalVendas = row ? parseInt(row.total_vendas, 10) || 0 : 0;
 
-    if (produtosFiltro.length > 0 && produtosFiltro.indexOf(rowDescricao) === -1) {
+    if (
+      produtosFiltro.length > 0 &&
+      produtosFiltro.indexOf(rowDescricao) === -1
+    ) {
       return false;
     }
     if (tiposFiltro.length > 0 && tiposFiltro.indexOf(rowTipo) === -1) {
