@@ -582,7 +582,7 @@ class Dashboarddb
 			FROM produtos
 			WHERE descricao IS NOT NULL AND TRIM(descricao) <> ''
 			GROUP BY LOWER(TRIM(descricao)), ROUND(COALESCE(preco_uni, 0), 2)
-			ORDER BY TRIM(descricao) ASC, ROUND(COALESCE(preco_uni, 0), 2) ASC";
+			ORDER BY CONVERT(TRIM(descricao) USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC, ROUND(COALESCE(preco_uni, 0), 2) ASC";
 			$stmtProdutos = $conn->prepare($sqlProdutos);
 			$stmtProdutos->execute();
 			$rowsProdutos = $stmtProdutos->fetchAll(PDO::FETCH_ASSOC);
@@ -594,7 +594,7 @@ class Dashboarddb
 				$produtoOptions .= "<option value='".(int)$rowProduto['id']."' data-preco='".htmlspecialchars((string)$produtoPreco, ENT_QUOTES, 'UTF-8')."'>".htmlspecialchars($produtoLabel)."</option>";
 			}
 
-			$sqlCidade = "SELECT id, descricao FROM cidade ORDER BY descricao ASC";
+			$sqlCidade = "SELECT id, descricao FROM cidade ORDER BY CONVERT(descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 			$stmtCidade = $conn->prepare($sqlCidade);
 			$stmtCidade->execute();
 			$rowsCidade = $stmtCidade->fetchAll(PDO::FETCH_ASSOC);
@@ -602,7 +602,7 @@ class Dashboarddb
 				$cidadeOptions .= "<option value='".(int)$rowCidade['id']."'>".htmlspecialchars((string)$rowCidade['descricao'])."</option>";
 			}
 
-			$sqlCategorias = "SELECT id, descricao FROM categorias ORDER BY descricao ASC";
+			$sqlCategorias = "SELECT id, descricao FROM categorias ORDER BY CONVERT(descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 			$stmtCategorias = $conn->prepare($sqlCategorias);
 			$stmtCategorias->execute();
 			$rowsCategorias = $stmtCategorias->fetchAll(PDO::FETCH_ASSOC);
@@ -615,7 +615,7 @@ class Dashboarddb
 				'Loja Física' => 'Loja Física'
 			];
 
-			$sqlCanais = "SELECT DISTINCT TRIM(canal_venda) AS canal_venda FROM vendas WHERE canal_venda IS NOT NULL AND TRIM(canal_venda) <> '' ORDER BY TRIM(canal_venda) ASC";
+			$sqlCanais = "SELECT DISTINCT TRIM(canal_venda) AS canal_venda FROM vendas WHERE canal_venda IS NOT NULL AND TRIM(canal_venda) <> '' ORDER BY CONVERT(TRIM(canal_venda) USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 			$stmtCanais = $conn->prepare($sqlCanais);
 			$stmtCanais->execute();
 			$rowsCanais = $stmtCanais->fetchAll(PDO::FETCH_ASSOC);
@@ -1089,14 +1089,29 @@ class Dashboarddb
 		try {
 			$sql = "UPDATE categorias c
 			LEFT JOIN (
-				SELECT v.id_categoria AS categoria_id, COUNT(DISTINCT v.id_produto) AS total_produtos
+				SELECT
+					v.id_categoria AS categoria_id,
+					COUNT(DISTINCT LOWER(TRIM(p.descricao))) AS total_produtos
 				FROM vendas v
+				LEFT JOIN produtos p ON p.id = v.id_produto
+				WHERE p.descricao IS NOT NULL AND TRIM(p.descricao) <> ''
 				GROUP BY v.id_categoria
 			) p ON p.categoria_id = c.id
 			LEFT JOIN (
-				SELECT v.id_categoria AS categoria_id, COUNT(v.id) AS total_vendas
-				FROM vendas v
-				GROUP BY v.id_categoria
+				SELECT
+					base.categoria_id,
+					SUM(base.total_vendas_produto) AS total_vendas
+				FROM (
+					SELECT
+						v.id_categoria AS categoria_id,
+						LOWER(TRIM(p.descricao)) AS produto_key,
+						COALESCE(SUM(v.Quantidade), 0) AS total_vendas_produto
+					FROM vendas v
+					LEFT JOIN produtos p ON p.id = v.id_produto
+					WHERE p.descricao IS NOT NULL AND TRIM(p.descricao) <> ''
+					GROUP BY v.id_categoria, LOWER(TRIM(p.descricao))
+				) base
+				GROUP BY base.categoria_id
 			) s ON s.categoria_id = c.id
 			LEFT JOIN (
 				SELECT v.id_categoria AS categoria_id, COALESCE(SUM(v.Receita), 0) AS total_receita
@@ -2185,7 +2200,7 @@ class Dashboarddb
 				$sql .= " HAVING COUNT(v.id) = 0";
 			}
 
-			$sql .= " ORDER BY p.descricao ASC";
+			$sql .= " ORDER BY CONVERT(p.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 
 			$stmt = $conn->prepare($sql);
 			$stmt->execute($params);
@@ -2273,11 +2288,16 @@ class Dashboarddb
 			$sql = "SELECT
 				c.id,
 				c.descricao,
-				COUNT(v.id) AS total_vendas,
-				COUNT(DISTINCT v.id_produto) AS total_produtos,
+				COALESCE(SUM(v.Quantidade), 0) AS total_vendas,
+				COUNT(DISTINCT CASE
+					WHEN p.descricao IS NOT NULL AND TRIM(p.descricao) <> ''
+					THEN LOWER(TRIM(p.descricao))
+					ELSE NULL
+				END) AS total_produtos,
 				COALESCE(SUM(v.Receita), 0) AS total_receita
 			FROM categorias c
 			LEFT JOIN vendas v ON v.id_categoria = c.id
+			LEFT JOIN produtos p ON p.id = v.id_produto
 			WHERE 1=1";
 
 			$params = [];
@@ -2295,21 +2315,21 @@ class Dashboarddb
 
 			$having = [];
 			if ($estadoProdutos === 'com') {
-				$having[] = "COUNT(DISTINCT v.id_produto) > 0";
+				$having[] = "COUNT(DISTINCT CASE WHEN p.descricao IS NOT NULL AND TRIM(p.descricao) <> '' THEN LOWER(TRIM(p.descricao)) ELSE NULL END) > 0";
 			} else if ($estadoProdutos === 'sem') {
-				$having[] = "COUNT(DISTINCT v.id_produto) = 0";
+				$having[] = "COUNT(DISTINCT CASE WHEN p.descricao IS NOT NULL AND TRIM(p.descricao) <> '' THEN LOWER(TRIM(p.descricao)) ELSE NULL END) = 0";
 			}
 			if ($estadoVendas === 'com') {
-				$having[] = "COUNT(v.id) > 0";
+				$having[] = "COALESCE(SUM(v.Quantidade), 0) > 0";
 			} else if ($estadoVendas === 'sem') {
-				$having[] = "COUNT(v.id) = 0";
+				$having[] = "COALESCE(SUM(v.Quantidade), 0) = 0";
 			}
 
 			if (count($having) > 0) {
 				$sql .= " HAVING ".implode(' AND ', $having);
 			}
 
-			$sql .= " ORDER BY c.descricao ASC";
+			$sql .= " ORDER BY CONVERT(c.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 
 			$stmt = $conn->prepare($sql);
 			$stmt->execute($params);
@@ -2358,13 +2378,13 @@ class Dashboarddb
 				$sqlProdutos = "SELECT
 					v.id_categoria AS categoria_id,
 					p.descricao AS produto,
-					COUNT(v.id) AS total_vendas,
+					COALESCE(SUM(v.Quantidade), 0) AS total_vendas,
 					COALESCE(SUM(v.Receita), 0) AS total_receita
 				FROM vendas v
 				INNER JOIN produtos p ON p.id = v.id_produto
 				WHERE v.id_categoria IN (".implode(',', $produtoPlaceholders).")
-				GROUP BY v.id_categoria, p.id, p.descricao
-				ORDER BY p.descricao ASC";
+				GROUP BY v.id_categoria, LOWER(TRIM(p.descricao)), p.descricao
+				ORDER BY CONVERT(p.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 
 				$stmtProdutos = $conn->prepare($sqlProdutos);
 				$stmtProdutos->execute($produtoParams);
@@ -2482,8 +2502,8 @@ class Dashboarddb
 				c.descricao,
 				COALESCE(cd.descricao, '') AS distrito,
 				COALESCE(cc.descricao, '') AS concelho,
-				COUNT(v.id) AS total_vendas,
-				COUNT(DISTINCT v.id_produto) AS total_produtos,
+				COALESCE(SUM(v.Quantidade), 0) AS total_vendas,
+				COALESCE(SUM(v.Quantidade), 0) AS total_produtos,
 				COALESCE(SUM(v.Receita), 0) AS total_receita
 			FROM cidade c
 			LEFT JOIN core_distritos cd ON cd.id = c.id_distrito
@@ -2536,12 +2556,12 @@ class Dashboarddb
 			$sql .= " GROUP BY c.id, c.descricao, cd.descricao, cc.descricao";
 
 			if ($estadoVendas === 'com') {
-				$sql .= " HAVING COUNT(v.id) > 0";
+				$sql .= " HAVING COALESCE(SUM(v.Quantidade), 0) > 0";
 			} else if ($estadoVendas === 'sem') {
-				$sql .= " HAVING COUNT(v.id) = 0";
+				$sql .= " HAVING COALESCE(SUM(v.Quantidade), 0) = 0";
 			}
 
-			$sql .= " ORDER BY c.descricao ASC";
+			$sql .= " ORDER BY CONVERT(c.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 
 			$stmt = $conn->prepare($sql);
 			$stmt->execute($params);
@@ -2604,7 +2624,7 @@ class Dashboarddb
 					$sqlReceitaProduto .= " AND LOWER(TRIM(p.descricao)) IN (".implode(',', $produtoPlaceholders).")";
 				}
 
-				$sqlReceitaProduto .= " GROUP BY v.id_cidade, p.id, p.descricao ORDER BY p.descricao ASC";
+				$sqlReceitaProduto .= " GROUP BY v.id_cidade, p.id, p.descricao ORDER BY CONVERT(p.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 
 				$stmtReceitaProduto = $conn->prepare($sqlReceitaProduto);
 				$stmtReceitaProduto->execute($produtoCidadeParams);
@@ -2658,7 +2678,7 @@ class Dashboarddb
 			$cidadeLabel = (count($cidades) > 0) ? implode(', ', $cidades) : 'Todas';
 			$html .= "<div class='fbox'><span class='flabel'>Cidade:</span> ".htmlspecialchars($cidadeLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Distrito:</span> ".htmlspecialchars($distritoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Concelho:</span> ".htmlspecialchars($concelhoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Produtos:</span> ".htmlspecialchars($produtoLabel)." &nbsp;&bull;&nbsp; <span class='flabel'>Vendas:</span> ".htmlspecialchars($estadoLabel)."</div>";
 
-			$html .= "<table class='m'><thead><tr><th>ID</th><th>Cidade</th><th>Distrito</th><th>Concelho</th><th class='tc'>N.&ordm; produtos</th><th>Produtos</th><th class='tr'>Receita por produto (&euro;)</th><th class='tc'>N.&ordm; vendas</th><th class='tr'>Receita total (&euro;)</th></tr></thead><tbody>";
+			$html .= "<table class='m'><thead><tr><th>ID</th><th>Cidade</th><th>Distrito</th><th>Concelho</th><th class='tc'>Qtd. produtos vendidos</th><th>Produtos</th><th class='tr'>Receita por produto (&euro;)</th><th class='tc'>N.&ordm; vendas</th><th class='tr'>Receita total (&euro;)</th></tr></thead><tbody>";
 			$i = 0;
 			foreach ($rows as $row) {
 				$cls = ($i % 2 === 0) ? 'o' : 'e';
@@ -3150,7 +3170,7 @@ class Dashboarddb
 					'tipoProdutoOptions' => ''
 				];
 				if($canCreateProduto || $canEditProduto){
-					$sqlTipoProduto = "SELECT id, descricao FROM tipo_produto ORDER BY descricao ASC";
+					$sqlTipoProduto = "SELECT id, descricao FROM tipo_produto ORDER BY CONVERT(descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 					$stmtTipoProduto = $conn->prepare($sqlTipoProduto);
 					$stmtTipoProduto->execute();
 					$rowsTipoProduto = $stmtTipoProduto->fetchAll(PDO::FETCH_ASSOC);
@@ -3172,7 +3192,7 @@ class Dashboarddb
 				LEFT JOIN tipo_produto tp ON tp.id = p.id_tipo_produto
 				LEFT JOIN vendas v ON v.id_produto = p.id
 				GROUP BY p.id, p.descricao, p.id_tipo_produto, p.preco_uni, p.created_at, p.updated_at, tp.descricao
-				ORDER BY p.descricao ASC";
+				ORDER BY CONVERT(p.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 				$stmt = $conn->prepare($sql);
 				$stmt->execute();
 				$array = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -3308,7 +3328,7 @@ class Dashboarddb
 					c.total_produtos,
 					c.total_receita
 				FROM categorias c
-				ORDER BY c.descricao ASC";
+				ORDER BY CONVERT(c.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 				$stmt = $conn->prepare($sql);
 				$stmt->execute();
 				$array = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -3426,16 +3446,16 @@ class Dashboarddb
 					c.id_concelho,
 					COALESCE(cd.descricao, '') AS distrito,
 					COALESCE(cc.descricao, '') AS concelho,
-					COUNT(v.id) AS total_vendas,
-					COUNT(DISTINCT v.id_produto) AS total_produtos,
-					COALESCE(GROUP_CONCAT(DISTINCT p.descricao ORDER BY p.descricao SEPARATOR '||'), '') AS produtos_tokens
+					COALESCE(SUM(v.Quantidade), 0) AS total_vendas,
+					COALESCE(SUM(v.Quantidade), 0) AS total_produtos,
+					COALESCE(GROUP_CONCAT(DISTINCT p.descricao ORDER BY CONVERT(p.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci SEPARATOR '||'), '') AS produtos_tokens
 				FROM cidade c
 				LEFT JOIN core_distritos cd ON cd.id = c.id_distrito
 				LEFT JOIN core_concelhos cc ON cc.id = c.id_concelho
 				LEFT JOIN vendas v ON v.id_cidade = c.id
 				LEFT JOIN produtos p ON p.id = v.id_produto
 				GROUP BY c.id, c.descricao, c.id_distrito, c.id_concelho, cd.descricao, cc.descricao
-				ORDER BY c.descricao ASC";
+				ORDER BY CONVERT(c.descricao USING utf8mb4) COLLATE utf8mb4_unicode_ci ASC";
 				$stmt = $conn->prepare($sql);
 				$stmt->execute();
 				$array = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -3496,7 +3516,7 @@ class Dashboarddb
 								<tr>
 									".($canDeleteCidade ? "<th class='text-center dashboard-bulk-select-col' style='width:88px;'><label class='dashboard-bulk-select-label mb-0'><input type='checkbox' class='dashboard-bulk-select-all' id='dashboardCidadesSelectAll' title='Selecionar todos'><span class='dashboard-bulk-select-text'>Sel. Todos</span></label></th>" : "")."
 									<th><i class='fas fa-city mr-1'></i>Cidade</th>
-									<th><i class='fas fa-boxes mr-1'></i>Produtos vendidos</th>
+									<th><i class='fas fa-boxes mr-1'></i>Qtd. produtos vendidos</th>
 									".($showCidadesActions ? "<th><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
 								</tr>
 							</thead>

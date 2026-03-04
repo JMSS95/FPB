@@ -1746,6 +1746,97 @@ function drawer(
   });
 }
 
+/* ──────────────────────────────────────────────────────────────
+ *  Portuguese locale-aware sorting for DataTables 2
+ *  Runs once when check.js is evaluated, BEFORE any table init.
+ * ────────────────────────────────────────────────────────────── */
+(function initPortugueseDataTableSort() {
+  if (typeof $ === "undefined" || !$.fn || !$.fn.dataTable) {
+    return;
+  }
+
+  window.__dtPtLocaleSortApplied = true;   /* prevent re-apply in createDataTable fallback */
+  var DT = $.fn.dataTable;
+
+  /* ── helpers ──────────────────────────────────────────────── */
+  var _htmlDecoder = document.createElement("textarea");
+
+  function _stripHtmlTags(text) {
+    return text.replace(/<[^>]*>/g, " ");
+  }
+
+  function _decodeHtmlEntities(text) {
+    _htmlDecoder.innerHTML = text;
+    return _htmlDecoder.value;
+  }
+
+  function _stripDiacritics(text) {
+    return text.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+
+  function _normalizePre(value, isHtml) {
+    if (value == null || value === "") {
+      return "";
+    }
+    var s = String(value);
+    if (isHtml) {
+      s = _decodeHtmlEntities(_stripHtmlTags(s));
+    }
+    s = s.replace(/\s+/g, " ").trim().toLocaleLowerCase("pt");
+    return _stripDiacritics(s);
+  }
+
+  function _ptAsc(a, b) {
+    a = a == null ? "" : String(a);
+    b = b == null ? "" : String(b);
+    return a.localeCompare(b, "pt", { sensitivity: "base", numeric: true });
+  }
+
+  function _ptDesc(a, b) {
+    return _ptAsc(b, a);
+  }
+
+  /* ── 1.  Direct ext.type.order (belt)  ──────────────────── */
+  var ord = DT.ext && DT.ext.type && DT.ext.type.order;
+  if (ord) {
+    ord["string-pre"] = function (d) {
+      return _normalizePre(d, false);
+    };
+    ord["string-asc"] = _ptAsc;
+    ord["string-desc"] = _ptDesc;
+    ord["html-pre"] = function (d) {
+      return _normalizePre(d, true);
+    };
+    ord["html-asc"] = _ptAsc;
+    ord["html-desc"] = _ptDesc;
+  }
+
+  /* ── 2.  DT2 DataTable.type() API (suspenders)  ─────────── */
+  if (typeof DT.type === "function") {
+    DT.type("string", "order", {
+      pre: function (d) {
+        return _normalizePre(d, false);
+      },
+      asc: _ptAsc,
+      desc: _ptDesc,
+    });
+
+    DT.type("html", "order", {
+      pre: function (d) {
+        return _normalizePre(d, true);
+      },
+      asc: _ptAsc,
+      desc: _ptDesc,
+    });
+
+    /* string-utf8 (DT2 auto-detects when data has non-ASCII chars) */
+    DT.type("string-utf8", "order", {
+      asc: _ptAsc,
+      desc: _ptDesc,
+    });
+  }
+})();
+
 async function createDataTable(
   id = null,
   buttons = false,
@@ -1757,6 +1848,54 @@ async function createDataTable(
   cache = false,
   customOptions = null,
 ) {
+
+  /* ── Fallback: ensure PT locale sort is registered ────────────── */
+  /* The IIFE above may have run before DataTables 2 was loaded     */
+  /* (footer.html loads DT2 asynchronously). Re-apply here where    */
+  /* DT2 is guaranteed to exist.                                    */
+  (function _ensurePtSort() {
+    if (!$.fn || !$.fn.dataTable) return;
+    if (window.__dtPtLocaleSortApplied) return;
+    window.__dtPtLocaleSortApplied = true;
+
+    var DT = $.fn.dataTable;
+    var _dec = document.createElement("textarea");
+
+    function _strip(t) { return t.replace(/<[^>]*>/g, " "); }
+    function _ent(t)   { _dec.innerHTML = t; return _dec.value; }
+    function _dia(t)   { return t.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+
+    function _pre(v, html) {
+      if (v == null || v === "") return "";
+      var s = String(v);
+      if (html) s = _ent(_strip(s));
+      return _dia(s.replace(/\s+/g, " ").trim().toLocaleLowerCase("pt"));
+    }
+
+    function _asc(a, b) {
+      a = (a == null ? "" : String(a));
+      b = (b == null ? "" : String(b));
+      return a.localeCompare(b, "pt", { sensitivity: "base", numeric: true });
+    }
+    function _desc(a, b) { return _asc(b, a); }
+
+    var ord = DT.ext && DT.ext.type && DT.ext.type.order;
+    if (ord) {
+      ord["string-pre"]  = function (d) { return _pre(d, false); };
+      ord["string-asc"]  = _asc;
+      ord["string-desc"] = _desc;
+      ord["html-pre"]    = function (d) { return _pre(d, true); };
+      ord["html-asc"]    = _asc;
+      ord["html-desc"]   = _desc;
+    }
+
+    if (typeof DT.type === "function") {
+      DT.type("string",      "order", { pre: function (d) { return _pre(d, false); }, asc: _asc, desc: _desc });
+      DT.type("html",        "order", { pre: function (d) { return _pre(d, true);  }, asc: _asc, desc: _desc });
+      DT.type("string-utf8", "order", { asc: _asc, desc: _desc });
+    }
+  })();
+
   function isCardTableViewport(maxWidth) {
     /* Use clientWidth (excludes scrollbar) to match CSS @media queries.
        On Windows the scrollbar is ~17px, causing window.innerWidth to
