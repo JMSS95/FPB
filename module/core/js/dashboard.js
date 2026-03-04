@@ -1360,6 +1360,14 @@ function renderDashboardTopProducts(topProducts) {
     return;
   }
 
+  /* Destroy existing DT before replacing tbody HTML */
+  if (
+    $.fn.DataTable &&
+    $.fn.DataTable.isDataTable("#dashboardTopProductsTable")
+  ) {
+    $("#dashboardTopProductsTable").DataTable().clear().destroy();
+  }
+
   var html = "";
   for (var i = 0; i < topProducts.length; i++) {
     var product = topProducts[i];
@@ -1378,7 +1386,7 @@ function renderDashboardTopProducts(topProducts) {
   }
 
   $("#dashboardTopProductsTableBody").html(html);
-  initDashboardStatsDataTables();
+  initDashboardStatsDataTable("dashboardTopProductsTable");
 }
 
 function renderDashboardCities(cities) {
@@ -1401,6 +1409,11 @@ function renderDashboardCities(cities) {
     return;
   }
 
+  /* Destroy existing DT before replacing tbody HTML */
+  if ($.fn.DataTable && $.fn.DataTable.isDataTable("#dashboardCitiesTable")) {
+    $("#dashboardCitiesTable").DataTable().clear().destroy();
+  }
+
   var html = "";
   for (var i = 0; i < cities.length; i++) {
     var city = cities[i];
@@ -1416,7 +1429,7 @@ function renderDashboardCities(cities) {
   }
 
   $("#dashboardCitiesTableBody").html(html);
-  initDashboardStatsDataTables();
+  initDashboardStatsDataTable("dashboardCitiesTable");
 }
 
 function getDashboardResponsiveOptions(tableId, nonOrderableTargets) {
@@ -1473,43 +1486,41 @@ function applyDashboardCardLabels(tableId) {
 }
 
 function initDashboardStatsDataTables() {
+  initDashboardStatsDataTable("dashboardTopProductsTable");
+  initDashboardStatsDataTable("dashboardCitiesTable");
+}
+
+/**
+ * Initialise (or re-initialise) a single stats-panel DataTable.
+ * Safe to call even if the table does not exist on the page.
+ */
+function initDashboardStatsDataTable(tableId) {
   if (!$.fn.DataTable) {
     return;
   }
 
-  if (
-    $("#dashboardTopProductsTable").length &&
-    !$.fn.DataTable.isDataTable("#dashboardTopProductsTable")
-  ) {
-    createDataTable(
-      "dashboardTopProductsTable",
-      false,
-      "",
-      false,
-      10,
-      [],
-      true,
-      false,
-      getDashboardResponsiveOptions("dashboardTopProductsTable"),
-    );
+  var $tbl = $("#" + tableId);
+  if (!$tbl.length) {
+    return;
   }
 
-  if (
-    $("#dashboardCitiesTable").length &&
-    !$.fn.DataTable.isDataTable("#dashboardCitiesTable")
-  ) {
-    createDataTable(
-      "dashboardCitiesTable",
-      false,
-      "",
-      false,
-      10,
-      [],
-      true,
-      false,
-      getDashboardResponsiveOptions("dashboardCitiesTable"),
-    );
+  /* Skip if already a DT — the render function is responsible for
+     destroying before repopulating the tbody.                      */
+  if ($.fn.DataTable.isDataTable("#" + tableId)) {
+    return;
   }
+
+  createDataTable(
+    tableId,
+    false,
+    "",
+    false,
+    10,
+    [],
+    true,
+    false,
+    getDashboardResponsiveOptions(tableId),
+  );
 }
 
 function renderDashboardVendasTable(arrayVendas) {
