@@ -1755,7 +1755,7 @@ function drawer(
     return;
   }
 
-  window.__dtPtLocaleSortApplied = true;   /* prevent re-apply in createDataTable fallback */
+  window.__dtPtLocaleSortApplied = true; /* prevent re-apply in createDataTable fallback */
   var DT = $.fn.dataTable;
 
   /* ── helpers ──────────────────────────────────────────────── */
@@ -1848,7 +1848,6 @@ async function createDataTable(
   cache = false,
   customOptions = null,
 ) {
-
   /* ── Fallback: ensure PT locale sort is registered ────────────── */
   /* The IIFE above may have run before DataTables 2 was loaded     */
   /* (footer.html loads DT2 asynchronously). Re-apply here where    */
@@ -1861,9 +1860,16 @@ async function createDataTable(
     var DT = $.fn.dataTable;
     var _dec = document.createElement("textarea");
 
-    function _strip(t) { return t.replace(/<[^>]*>/g, " "); }
-    function _ent(t)   { _dec.innerHTML = t; return _dec.value; }
-    function _dia(t)   { return t.normalize("NFD").replace(/[\u0300-\u036f]/g, ""); }
+    function _strip(t) {
+      return t.replace(/<[^>]*>/g, " ");
+    }
+    function _ent(t) {
+      _dec.innerHTML = t;
+      return _dec.value;
+    }
+    function _dia(t) {
+      return t.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
 
     function _pre(v, html) {
       if (v == null || v === "") return "";
@@ -1873,25 +1879,43 @@ async function createDataTable(
     }
 
     function _asc(a, b) {
-      a = (a == null ? "" : String(a));
-      b = (b == null ? "" : String(b));
+      a = a == null ? "" : String(a);
+      b = b == null ? "" : String(b);
       return a.localeCompare(b, "pt", { sensitivity: "base", numeric: true });
     }
-    function _desc(a, b) { return _asc(b, a); }
+    function _desc(a, b) {
+      return _asc(b, a);
+    }
 
     var ord = DT.ext && DT.ext.type && DT.ext.type.order;
     if (ord) {
-      ord["string-pre"]  = function (d) { return _pre(d, false); };
-      ord["string-asc"]  = _asc;
+      ord["string-pre"] = function (d) {
+        return _pre(d, false);
+      };
+      ord["string-asc"] = _asc;
       ord["string-desc"] = _desc;
-      ord["html-pre"]    = function (d) { return _pre(d, true); };
-      ord["html-asc"]    = _asc;
-      ord["html-desc"]   = _desc;
+      ord["html-pre"] = function (d) {
+        return _pre(d, true);
+      };
+      ord["html-asc"] = _asc;
+      ord["html-desc"] = _desc;
     }
 
     if (typeof DT.type === "function") {
-      DT.type("string",      "order", { pre: function (d) { return _pre(d, false); }, asc: _asc, desc: _desc });
-      DT.type("html",        "order", { pre: function (d) { return _pre(d, true);  }, asc: _asc, desc: _desc });
+      DT.type("string", "order", {
+        pre: function (d) {
+          return _pre(d, false);
+        },
+        asc: _asc,
+        desc: _desc,
+      });
+      DT.type("html", "order", {
+        pre: function (d) {
+          return _pre(d, true);
+        },
+        asc: _asc,
+        desc: _desc,
+      });
       DT.type("string-utf8", "order", { asc: _asc, desc: _desc });
     }
   })();
@@ -2415,6 +2439,61 @@ async function createDataTable(
 
       if (customOptions && typeof customOptions === "object") {
         dataTableOptions = $.extend(true, {}, dataTableOptions, customOptions);
+      }
+
+      if (dataTableOptions.bStateSave) {
+        var currentColumnCount = $(table + " thead th").length;
+        var stateTableId = id != null ? String(id) : "table";
+        var stateStorageKey =
+          "DataTables_" + stateTableId + "_cols_" + currentColumnCount;
+
+        var existingStateSaveCallback = dataTableOptions.stateSaveCallback;
+        var existingStateLoadCallback = dataTableOptions.stateLoadCallback;
+        var existingStateLoadParams = dataTableOptions.stateLoadParams;
+
+        dataTableOptions.stateSaveCallback = function (settings, data) {
+          if (typeof existingStateSaveCallback === "function") {
+            existingStateSaveCallback.call(this, settings, data);
+            return;
+          }
+
+          try {
+            localStorage.setItem(stateStorageKey, JSON.stringify(data));
+          } catch (e) {}
+        };
+
+        dataTableOptions.stateLoadCallback = function (settings) {
+          if (typeof existingStateLoadCallback === "function") {
+            var loadedState = existingStateLoadCallback.call(this, settings);
+            if (loadedState) {
+              return loadedState;
+            }
+          }
+
+          try {
+            var rawState = localStorage.getItem(stateStorageKey);
+            return rawState ? JSON.parse(rawState) : null;
+          } catch (e) {
+            return null;
+          }
+        };
+
+        dataTableOptions.stateLoadParams = function (settings, data) {
+          var savedColumnCount =
+            data && Array.isArray(data.columns) ? data.columns.length : null;
+
+          if (
+            typeof savedColumnCount === "number" &&
+            currentColumnCount > 0 &&
+            savedColumnCount !== currentColumnCount
+          ) {
+            return false;
+          }
+
+          if (typeof existingStateLoadParams === "function") {
+            return existingStateLoadParams.call(this, settings, data);
+          }
+        };
       }
 
       var cardViewportMax =

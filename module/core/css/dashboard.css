@@ -3931,7 +3931,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > thead
     > tr
-    > th:last-child,
+    > th.dashboard-actions-col,
   :is(
       #dashboardTopProductsTable,
       #dashboardCitiesTable,
@@ -3943,7 +3943,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > tbody
     > tr
-    > td:last-child {
+    > td.dashboard-actions-col {
     width: 104px !important;
     min-width: 104px !important;
     max-width: 104px !important;
@@ -4051,7 +4051,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > thead
     > tr
-    > th:last-child,
+    > th.dashboard-actions-col,
   :is(
       #dashboardTopProductsTable,
       #dashboardCitiesTable,
@@ -4063,7 +4063,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > tbody
     > tr
-    > td:last-child {
+    > td.dashboard-actions-col {
     width: 116px !important;
     min-width: 116px !important;
     max-width: 116px !important;
@@ -4262,7 +4262,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > thead
     > tr
-    > th:last-child,
+    > th.dashboard-actions-col,
   :is(
       #dashboardTopProductsTable,
       #dashboardCitiesTable,
@@ -4274,7 +4274,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > tbody
     > tr
-    > td:last-child {
+    > td.dashboard-actions-col {
     width: 122px !important;
     min-width: 122px !important;
     max-width: 122px !important;
@@ -4296,7 +4296,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > tbody
     > tr
-    > td:last-child
+    > td.dashboard-actions-col
     .dashboard-row-edit-btn,
   :is(
       #dashboardTopProductsTable,
@@ -4309,7 +4309,7 @@ table.dataTable.dt-card-table > tbody > tr > td {
     )
     > tbody
     > tr
-    > td:last-child
+    > td.dashboard-actions-col
     .dashboard-row-download-btn {
     width: calc(100% - 12px) !important;
     max-width: 106px !important;
@@ -4565,5 +4565,219 @@ table.dataTable.dt-card-table > tbody > tr > td {
     min-height: 36px !important;
     font-size: 0.8rem !important;
     padding: 0 8px !important;
+  }
+}
+
+/* =====================================================
+  PRODUTOS DESKTOP FIT — 1139px to 1920px
+  Stable columns for analyst/admin without relying on last-child
+  ===================================================== */
+@media (min-width: 1139px) and (max-width: 1920px) {
+  #dashboardProdutosTable_wrapper:has(#dashboardProdutosTable.dashboard-no-actions) {
+    overflow-x: hidden !important;
+  }
+
+  #dashboardProdutosTable.dashboard-no-actions {
+    width: 100% !important;
+    table-layout: fixed !important;
+  }
+
+  #dashboardProdutosTable.dashboard-no-actions > thead > tr > th,
+  #dashboardProdutosTable.dashboard-no-actions > tbody > tr > td {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-produtos-col-id,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-produtos-col-id {
+    width: 74px !important;
+    min-width: 74px !important;
+    max-width: 74px !important;
+  }
+
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-produtos-col-preco,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-produtos-col-preco {
+    width: 150px !important;
+    min-width: 150px !important;
+    max-width: 150px !important;
+    text-align: right !important;
+  }
+
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-produtos-col-criado,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-produtos-col-criado,
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-produtos-col-atualizado,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-produtos-col-atualizado {
+    width: 176px !important;
+    min-width: 176px !important;
+    max-width: 176px !important;
+    text-align: left !important;
+    padding-left: 8px !important;
+    padding-right: 4px !important;
+  }
+
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-actions-col,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-actions-col {
+    width: 112px !important;
+    min-width: 112px !important;
+    max-width: 112px !important;
+  }
+}
+
+/* =====================================================
+  UNIFIED TABLE ALIGNMENT — 1139px to 1920px
+  Left-align all columns and size by content need
+  ===================================================== */
+@media (min-width: 1139px) and (max-width: 1920px) {
+  :is(
+    #dashboardVendasTable_wrapper:has(#dashboardVendasTable.dashboard-no-actions),
+    #dashboardProdutosTable_wrapper:has(#dashboardProdutosTable.dashboard-no-actions),
+    #dashboardCategoriasTable_wrapper:has(#dashboardCategoriasTable.dashboard-no-actions),
+    #dashboardCidadesTable_wrapper:has(#dashboardCidadesTable.dashboard-no-actions)
+  ) {
+    overflow-x: auto !important;
+  }
+
+  :is(
+    #dashboardVendasTable.dashboard-no-actions,
+    #dashboardProdutosTable.dashboard-no-actions,
+    #dashboardCategoriasTable.dashboard-no-actions,
+    #dashboardCidadesTable.dashboard-no-actions
+  ) {
+    width: 100% !important;
+    table-layout: auto !important;
+  }
+
+  :is(
+      #dashboardVendasTable.dashboard-no-actions,
+      #dashboardProdutosTable.dashboard-no-actions,
+      #dashboardCategoriasTable.dashboard-no-actions,
+      #dashboardCidadesTable.dashboard-no-actions
+    )
+    > thead
+    > tr
+    > th,
+  :is(
+      #dashboardVendasTable.dashboard-no-actions,
+      #dashboardProdutosTable.dashboard-no-actions,
+      #dashboardCategoriasTable.dashboard-no-actions,
+      #dashboardCidadesTable.dashboard-no-actions
+    )
+    > tbody
+    > tr
+    > td {
+    text-align: left !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+
+  :is(
+      #dashboardVendasTable.dashboard-no-actions,
+      #dashboardProdutosTable.dashboard-no-actions,
+      #dashboardCategoriasTable.dashboard-no-actions,
+      #dashboardCidadesTable.dashboard-no-actions
+    )
+    > thead
+    > tr
+    > th.dashboard-bulk-select-col,
+  :is(
+      #dashboardVendasTable.dashboard-no-actions,
+      #dashboardProdutosTable.dashboard-no-actions,
+      #dashboardCategoriasTable.dashboard-no-actions,
+      #dashboardCidadesTable.dashboard-no-actions
+    )
+    > tbody
+    > tr
+    > td.dashboard-bulk-select-col {
+    width: 1% !important;
+    min-width: 56px !important;
+    max-width: 72px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+  }
+
+  :is(
+      #dashboardVendasTable.dashboard-no-actions,
+      #dashboardProdutosTable.dashboard-no-actions,
+      #dashboardCategoriasTable.dashboard-no-actions,
+      #dashboardCidadesTable.dashboard-no-actions
+    )
+    > thead
+    > tr
+    > th.dashboard-actions-col,
+  :is(
+      #dashboardVendasTable.dashboard-no-actions,
+      #dashboardProdutosTable.dashboard-no-actions,
+      #dashboardCategoriasTable.dashboard-no-actions,
+      #dashboardCidadesTable.dashboard-no-actions
+    )
+    > tbody
+    > tr
+    > td.dashboard-actions-col {
+    width: 1% !important;
+    min-width: 90px !important;
+    max-width: 122px !important;
+    white-space: nowrap !important;
+    text-align: center !important;
+  }
+
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-produtos-col-preco,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-produtos-col-preco,
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-produtos-col-criado,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-produtos-col-criado,
+  #dashboardProdutosTable.dashboard-no-actions
+    > thead
+    > tr
+    > th.dashboard-produtos-col-atualizado,
+  #dashboardProdutosTable.dashboard-no-actions
+    > tbody
+    > tr
+    > td.dashboard-produtos-col-atualizado {
+    text-align: left !important;
   }
 }
