@@ -1589,7 +1589,11 @@ function renderDashboardVendasTable(arrayVendas) {
       "<td>" +
       cidade +
       "</td>" +
-      (showActions ? "<td class='text-nowrap'>" + actionsHtml + "</td>" : "") +
+      (showActions
+        ? "<td class='text-nowrap dashboard-actions-col'>" +
+          actionsHtml +
+          "</td>"
+        : "") +
       "</tr>";
   }
 
@@ -1598,6 +1602,7 @@ function renderDashboardVendasTable(arrayVendas) {
   }
 
   $("#dashboardVendasTableBody").html(tableBody);
+  $("#dashboardVendasTable").toggleClass("dashboard-no-actions", !showActions);
   if ($.fn.DataTable && !$.fn.DataTable.isDataTable("#dashboardVendasTable")) {
     var vendasTableOptions = getDashboardResponsiveOptions(
       "dashboardVendasTable",
@@ -2260,25 +2265,29 @@ function renderDashboardProdutosTable(arrayProdutos) {
           idProduto +
           "'></td>"
         : "") +
-      "<td>" +
+      "<td class='dashboard-produtos-col-id'>" +
       idProduto +
       "</td>" +
-      "<td>" +
+      "<td class='dashboard-produtos-col-produto'>" +
       descricao +
       "</td>" +
-      "<td>" +
+      "<td class='dashboard-produtos-col-tipo'>" +
       tipoProduto +
       "</td>" +
-      "<td>" +
+      "<td class='dashboard-produtos-col-preco'>" +
       precoUnitario +
       "</td>" +
-      "<td>" +
+      "<td class='dashboard-produtos-col-criado'>" +
       createdAt +
       "</td>" +
-      "<td>" +
+      "<td class='dashboard-produtos-col-atualizado'>" +
       updatedAt +
       "</td>" +
-      (showActions ? "<td class='text-nowrap'>" + actionsHtml + "</td>" : "") +
+      (showActions
+        ? "<td class='text-nowrap dashboard-actions-col'>" +
+          actionsHtml +
+          "</td>"
+        : "") +
       "</tr>";
   }
 
@@ -2287,6 +2296,10 @@ function renderDashboardProdutosTable(arrayProdutos) {
   }
 
   $("#dashboardProdutosTableBody").html(tableBody);
+  $("#dashboardProdutosTable").toggleClass(
+    "dashboard-no-actions",
+    !showActions,
+  );
   if (
     $.fn.DataTable &&
     !$.fn.DataTable.isDataTable("#dashboardProdutosTable")
@@ -3634,11 +3647,16 @@ function renderDashboardCategoriasTable(arrayCategorias) {
       "<td>" +
       vendasLabel +
       "</td>" +
-      (canEdit ? "<td class='text-nowrap'>" + actionsHtml + "</td>" : "") +
+      (canEdit
+        ? "<td class='text-nowrap dashboard-actions-col'>" +
+          actionsHtml +
+          "</td>"
+        : "") +
       "</tr>";
   }
 
   $("#dashboardCategoriasTableBody").html(tableBody);
+  $("#dashboardCategoriasTable").toggleClass("dashboard-no-actions", !canEdit);
   if (
     $.fn.DataTable &&
     !$.fn.DataTable.isDataTable("#dashboardCategoriasTable")
@@ -4275,11 +4293,16 @@ function renderDashboardCidadesTable(arrayCidades) {
       "<td class='text-center'>" +
       produtosVendidosLabel +
       "</td>" +
-      (canEdit ? "<td class='text-nowrap'>" + actionsHtml + "</td>" : "") +
+      (canEdit
+        ? "<td class='text-nowrap dashboard-actions-col'>" +
+          actionsHtml +
+          "</td>"
+        : "") +
       "</tr>";
   }
 
   $("#dashboardCidadesTableBody").html(tableBody);
+  $("#dashboardCidadesTable").toggleClass("dashboard-no-actions", !canEdit);
   if ($.fn.DataTable && !$.fn.DataTable.isDataTable("#dashboardCidadesTable")) {
     createDataTable(
       "dashboardCidadesTable",

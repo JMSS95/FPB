@@ -3084,7 +3084,7 @@ class Dashboarddb
 									<th><i class='fas fa-euro-sign mr-1'></i>Receita (€)</th>
 									<th><i class='fas fa-store mr-1'></i>Canal</th>
 									<th><i class='fas fa-city mr-1'></i>Cidade</th>
-									".($showVendasActions ? "<th><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
+									".($showVendasActions ? "<th class='dashboard-actions-col'><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
 								</tr>
 							</thead>
 							<tbody id='dashboardVendasTableBody'></tbody>
@@ -3252,13 +3252,13 @@ class Dashboarddb
 							<thead>
 								<tr>
 									".($canDeleteProduto ? "<th class='text-center dashboard-bulk-select-col' style='width:88px;'><label class='dashboard-bulk-select-label mb-0'><input type='checkbox' class='dashboard-bulk-select-all' id='dashboardProdutosSelectAll' title='Selecionar todos'><span class='dashboard-bulk-select-text'>Sel. Todos</span></label></th>" : "")."
-									<th><i class='fas fa-hashtag mr-1'></i>ID</th>
-									<th><i class='fas fa-box-open mr-1'></i>Produto</th>
-									<th><i class='fas fa-layer-group mr-1'></i>Tipo Produto</th>
-									<th><i class='fas fa-euro-sign mr-1'></i>Preço Unitário (€)</th>
-									<th><i class='fas fa-calendar-plus mr-1'></i>Criado em</th>
-									<th><i class='fas fa-calendar-check mr-1'></i>Atualizado em</th>
-									".($showProdutosActions ? "<th><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
+									<th class='dashboard-produtos-col-id'><i class='fas fa-hashtag mr-1'></i>ID</th>
+									<th class='dashboard-produtos-col-produto'><i class='fas fa-box-open mr-1'></i>Produto</th>
+									<th class='dashboard-produtos-col-tipo'><i class='fas fa-layer-group mr-1'></i>Tipo Produto</th>
+									<th class='dashboard-produtos-col-preco'><i class='fas fa-euro-sign mr-1'></i>Preço Unitário (€)</th>
+									<th class='dashboard-produtos-col-criado'><i class='fas fa-calendar-plus mr-1'></i>Criado em</th>
+									<th class='dashboard-produtos-col-atualizado'><i class='fas fa-calendar-check mr-1'></i>Atualizado em</th>
+									".($showProdutosActions ? "<th class='dashboard-actions-col'><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
 								</tr>
 							</thead>
 							<tbody id='dashboardProdutosTableBody'></tbody>
@@ -3387,7 +3387,7 @@ class Dashboarddb
 									<th><i class='fas fa-tags mr-1'></i>Categoria</th>
 									<th><i class='fas fa-boxes mr-1'></i>Produtos</th>
 									<th><i class='fas fa-shopping-cart mr-1'></i>Vendas</th>
-									".($showCategoriasActions ? "<th><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
+									".($showCategoriasActions ? "<th class='dashboard-actions-col'><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
 								</tr>
 							</thead>
 							<tbody id='dashboardCategoriasTableBody'></tbody>
@@ -3517,7 +3517,7 @@ class Dashboarddb
 									".($canDeleteCidade ? "<th class='text-center dashboard-bulk-select-col' style='width:88px;'><label class='dashboard-bulk-select-label mb-0'><input type='checkbox' class='dashboard-bulk-select-all' id='dashboardCidadesSelectAll' title='Selecionar todos'><span class='dashboard-bulk-select-text'>Sel. Todos</span></label></th>" : "")."
 									<th><i class='fas fa-city mr-1'></i>Cidade</th>
 									<th><i class='fas fa-boxes mr-1'></i>Qtd. produtos vendidos</th>
-									".($showCidadesActions ? "<th><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
+									".($showCidadesActions ? "<th class='dashboard-actions-col'><i class='fas fa-cogs mr-1'></i>Ações</th>" : "")."
 								</tr>
 							</thead>
 							<tbody id='dashboardCidadesTableBody'></tbody>
